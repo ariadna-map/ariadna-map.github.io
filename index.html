@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ariadna — Карта КНП «ПСИХІАТРІЯ»</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: map on top (sticky on a phone), one question below it — "what are you looking for" — then one answer card. */
+:root{
+  --bg:#eef1ec; --surface:#ffffff; --ink:#15262a; --muted:#5a6a6c; --line:#d9dfdb;
+  --accent:#0d6a66; --accent-ink:#ffffff; --route:#dd4f24;
+  --green:#d6e5cd; --terr:#fbfaf2; --road:#ffffff; --road-edge:#c5ccc6; --major:#f7e7a6; --bldg:#c3cbc9; --bldg-key:#8fc6c0;
+  --display:"Unbounded","Golos Text",system-ui,sans-serif; --body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1719; --surface:#18242a; --ink:#e9f0ee; --muted:#93a4a4; --line:#2b3a40;
+    --accent:#4dbdb2; --accent-ink:#06211f; --route:#ff8658;
+    --green:#17271f; --terr:#1c282c; --road:#3a4a51; --road-edge:#0f1719; --major:#5b5330; --bldg:#3b494e; --bldg-key:#2c6f6a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1719; --surface:#18242a; --ink:#e9f0ee; --muted:#93a4a4; --line:#2b3a40;
+  --accent:#4dbdb2; --accent-ink:#06211f; --route:#ff8658;
+  --green:#17271f; --terr:#1c282c; --road:#3a4a51; --road-edge:#0f1719; --major:#5b5330; --bldg:#3b494e; --bldg-key:#2c6f6a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+.app{display:flex;flex-direction:column;min-height:100%}
+.mapwrap{position:sticky;top:0;z-index:5;height:54vh;min-height:300px;max-height:560px;background:var(--bg);border-bottom:1px solid var(--line)}
+#map{display:block;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#map.drag{cursor:grabbing}
+.brand{position:absolute;left:12px;top:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 11px;pointer-events:none;max-width:calc(100% - 80px)}
+.brand b{font-family:var(--display);font-size:12px;letter-spacing:.02em;display:block}
+.brand span{font-size:12.5px;color:var(--muted)}
+.zoom{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1;cursor:pointer}
+.zoom button:focus-visible,.chip:focus-visible,.seg button:focus-visible,.toggle input:focus-visible+span,a:focus-visible{outline:3px solid var(--route);outline-offset:2px}
+.legend{position:absolute;left:12px;bottom:10px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 9px;pointer-events:none}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--route);vertical-align:middle;margin-right:5px}
+.legend i.st{border-top:3px dotted var(--muted)}
+.panel{padding:16px 16px 28px;display:flex;flex-direction:column;gap:18px;max-width:720px;width:100%;margin:0 auto}
+h1{font-family:var(--display);font-size:17px;line-height:1.25;margin:0;text-wrap:balance}
+h2{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.06em}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px;font-weight:500;cursor:pointer;min-height:44px}
+.chip.num{min-width:48px;padding:9px 0;text-align:center;border-radius:12px;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card{scroll-margin-top:calc(min(54vh,560px) + 12px);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.card .k{font-family:var(--display);font-size:22px;line-height:1.15;color:var(--accent)}
+.card .what{font-weight:600;font-size:18px;line-height:1.3}
+.card .sub{color:var(--muted);font-size:14.5px}
+.tels{display:flex;flex-wrap:wrap;gap:6px 16px;font-variant-numeric:tabular-nums}
+.tels a{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+.seg{display:grid;gap:8px}
+.seg button{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}
+.seg button b{font-weight:600}
+.seg button small{color:var(--muted);font-size:13.5px}
+.seg button[aria-pressed="true"]{border-color:var(--route);box-shadow:inset 0 0 0 1px var(--route);background:var(--surface)}
+.toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500}
+.toggle input{width:20px;height:20px;accent-color:var(--route)}
+.result{border-left:4px solid var(--route);padding:2px 0 2px 12px}
+.result .big{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.result p{margin:6px 0 0;font-size:15px}
+.warn{font-size:14px;color:var(--muted)}
+.go{display:inline-block;background:var(--ink);color:var(--surface);text-decoration:none;font-weight:600;padding:12px 16px;border-radius:12px;text-align:center}
+footer{font-size:13px;color:var(--muted);max-width:65ch}
+footer a{color:inherit}
+/* map */
+.land{fill:var(--bg)} .green{fill:var(--green)}
+.terr{fill:var(--terr);stroke:var(--accent);stroke-width:1.5;stroke-dasharray:6 5;vector-effect:non-scaling-stroke}
+.major{fill:none;stroke:var(--major);stroke-linecap:round;stroke-linejoin:round}
+.rd-e{fill:none;stroke:var(--road-edge);stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.rd{fill:none;stroke:var(--road);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.fw{fill:none;stroke:var(--muted);stroke-width:1.4;vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:.65}
+.stp{fill:none;stroke:var(--muted);stroke-width:3;vector-effect:non-scaling-stroke;stroke-dasharray:1.5 3;opacity:.9}
+.b{fill:var(--bldg);stroke:var(--surface);stroke-width:1;vector-effect:non-scaling-stroke;cursor:pointer}
+.b.key{fill:var(--bldg-key)}
+.b.on{fill:var(--route)}
+.route{fill:none;stroke:var(--route);stroke-width:5;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.route.halo{stroke:var(--surface);stroke-width:9}
+.route.last{stroke-width:3;stroke-dasharray:2 7}
+.lb{pointer-events:none}
+.lb text{font-family:var(--body);fill:var(--ink)}
+.badge circle{fill:var(--surface);stroke:var(--accent);stroke-width:2}
+.badge text{font-family:var(--display);font-size:11px;font-weight:700;text-anchor:middle;dominant-baseline:central;fill:var(--accent)}
+.badge.sec circle{stroke:var(--muted);stroke-width:1}
+.badge.sec text{fill:var(--muted);font-size:9px}
+.badge.on circle{fill:var(--route);stroke:var(--route)} .badge.on text{fill:#fff}
+.stn text{font-size:11px;font-weight:500;fill:var(--muted);text-anchor:middle;paint-order:stroke;stroke:var(--bg);stroke-width:3px}
+.stop rect{fill:var(--ink)} .stop text.t{fill:var(--surface);font-size:10px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+.stop text.n{font-size:11.5px;font-weight:600;paint-order:stroke;stroke:var(--bg);stroke-width:3px}
+.stop.on rect{fill:var(--route)}
+.poi text{font-size:11px;font-weight:500;fill:var(--muted);paint-order:stroke;stroke:var(--bg);stroke-width:3px}
+.poi circle{fill:var(--muted)}
+.pin circle{fill:var(--route);stroke:var(--surface);stroke-width:2}
+#map.far .sec,#map.far .poi{display:none}
+@media (min-width:900px){
+  html,body{height:100%}
+  .app{flex-direction:row-reverse;height:100%}
+  .mapwrap{position:relative;flex:1;height:auto;max-height:none;border-bottom:0;border-left:1px solid var(--line)}
+  .panel{width:420px;flex:none;margin:0;overflow:auto;padding:24px}
+  .card{scroll-margin-top:12px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="mapwrap">
+    <svg id="map" role="img" aria-label="Схема території лікарні з корпусами, дорогами та зупинками"></svg>
+    <div class="brand"><b>Ariadna</b><span>КНП «ПСИХІАТРІЯ», Кирилівська, 103</span></div>
+    <div class="zoom">
+      <button type="button" id="zin" aria-label="Наблизити">+</button>
+      <button type="button" id="zout" aria-label="Віддалити">−</button>
+      <button type="button" id="zfit" aria-label="Показати всю територію" title="Уся територія">⤢</button>
+    </div>
+    <div class="legend"><span><i></i>ваш маршрут</span><span><i class="st"></i>сходи</span></div>
+  </div>
+
+  <main class="panel">
+    <h1>Куди вам потрібно?</h1>
+    <section>
+      <div class="chips" id="quick"></div>
+    </section>
+    <section>
+      <h2>Відділення №</h2>
+      <div class="chips" id="nums"></div>
+    </section>
+    <section class="card" id="card" aria-live="polite"></section>
+    <footer>
+      <b>Ariadna</b> — сервіс навігації для пацієнтів і відвідувачів КНП «ПСИХІАТРІЯ».<br>
+      Перелік корпусів і відділень узято із сайту лікарні (psychiatry-kyiv.itmed.org, прочитано 14.11.2026). Контури будівель, доріжки, зупинки й номери маршрутів транспорту — © учасники OpenStreetMap; вони можуть відставати від дійсності. Час у дорозі приблизний. У невідкладному стані телефонуйте 103.
+    </footer>
+  </main>
+</div>
+
+<script>
+/* Coordinates: metres east (x) and south (y) of 50.4820 N, 30.4695 E. */
+var LAT0=50.4820, LON0=30.4695, KX=70840, KY=111320;
+
+var TERR="-345,245 -334,186 -322,147 -268,94 -236,84 -181,147 -154,143 -171,33 -97,15 -100,-11 -95,-118 16,-119 84,-153 99,-157 121,-156 165,-119 200,-126 221,-121 229,-124 236,-183 201,-188 158,-226 208,-320 219,-335 224,-337 237,-334 244,-327 250,-190 249,-102 268,-66 338,-27 348,-2 350,31 267,41 232,27 207,41 198,98 156,184 138,201 118,208 95,208 70,189 38,180 9,136 -38,149 -94,171 -130,214 -193,272 -226,288 -292,302 -317,286 -338,260";
+var GREEN="-560,-70 -394,-111 -338,-120 -164,-139 -120,-147 -65,-165 -9,-193 19,-211 62,-247 102,-292 110,-286 197,-347 255,-410 261,-417 301,-371 329,-328 379,-253 469,-120 484,-80 485,-52 478,-22 470,-4 459,10 418,48 401,70 395,100 402,127 501,294 560,400 -560,400";
+var MAJOR=[
+ [24,"-560,-70 -394,-111 -338,-120 -164,-139 -120,-147 -65,-165 -9,-193 19,-211 62,-247 102,-292 145,-366 167,-404 197,-445 255,-496"],
+ [16,"110,-286 197,-347 255,-410"],
+ [18,"220,-460 261,-417 301,-371 329,-328 379,-253 469,-120 491,-89 560,-10"],
+ [14,"469,-120 484,-80 485,-52 478,-22 470,-4 459,10 418,48 401,70 395,100 402,127 501,294 560,400"]
+];
+var STREETS=[["вул. Олени Теліги",-215,-150,-6],["вул. Кирилівська",436,-190,56],["Подільський узвіз",440,150,60],["Врубелівський узвіз",300,96,-35],["Кирилівський гай",-250,-55,0]];
+
+/* k: corpus label, key: listed on the hospital site, p: outline, lab: label point, door: entrance point, n: name */
+var B=[
+ {k:"1",key:1,lab:[0,95],door:[33,78],p:"5,56 2,44 21,38 42,107 -29,128 -43,80 -69,87 -84,92 -70,138 -135,157 -152,101 -139,97 -137,102 -98,91 -111,47 -45,27 -32,73 7,61"},
+ {k:"2",key:1,lab:[34,-42],door:[69,-38],p:"-2,-52 -4,-39 35,-35 33,-13 36,-12 39,-34 69,-31 70,-45"},
+ {k:"3",key:1,lab:[-70,-78],door:[-63,-75],p:"-86,-89 -86,-100 -50,-98 -51,-88 -63,-88 -64,-62 -58,-61 -58,-52 -89,-54 -89,-64 -82,-64 -82,-61 -77,-61 -75,-90"},
+ {k:"4",lab:[-10,-104],door:[-13,-97],p:"-37,-114 18,-110 17,-91 11,-91 11,-95 -13,-97 -32,-98 -32,-95 -39,-95"},
+ {k:"5",key:1,lab:[83,-119],door:[74,-114],p:"77,-143 61,-130 90,-94 104,-107 97,-115 91,-110 87,-115 92,-118 85,-128 80,-124 75,-131 82,-136"},
+ {k:"6",lab:[231,-88],door:[218,-108],p:"209,-103 235,-63 253,-74 227,-114"},
+ {k:"7",key:1,lab:[292,-22],door:[207,-36],p:"325,-9 328,-28 318,-33 313,-25 281,-43 284,-49 275,-54 261,-29 255,-30 256,-39 255,-43 251,-46 245,-44 243,-35 237,-36 237,-38 208,-42 207,-30 222,-28 220,-13 204,-15 203,-3 232,1 236,-27 241,-26 241,-19 253,-18 255,-25 270,-20 276,-31 307,-13 303,-6 320,2 264,11 266,21 314,13 323,18 334,-2"},
+ {k:"8",key:1,lab:[229,-225],door:[220,-225],p:"214,-250 224,-249 216,-198 237,-195 245,-252 215,-256"},
+ {k:"11",key:1,lab:[73,100],door:[65,81],p:"102,37 95,34 98,26 101,22 110,19 115,20 123,27 125,37 95,115 61,122 59,112 53,114 34,40 46,37 48,45 55,41 59,42 66,47 68,57 61,65 54,65 55,72 65,81 78,76 89,49 96,52"},
+ {k:"12",key:1,lab:[118,-22],door:[101,-34],p:"126,-33 132,-37 138,-27 133,-15 129,-16 128,-14 125,-7 129,-5 127,-2 124,1 115,2 109,-1 104,-10 105,-16 113,-13 117,-23 111,-33 86,-35 87,-47 102,-46 103,-53 106,-52 106,-46 118,-45"},
+ {k:"13",n:"Пральня",lab:[90,146],p:"54,139 66,136 66,133 73,131 73,135 117,123 118,129 104,133 109,151 80,159 81,162 74,164 68,139 55,142"},
+ {k:"14",n:"Котельня",lab:[55,154],p:"54,139 53,136 46,138 53,166 57,165 58,169 64,167 63,162 60,163"},
+ {k:"15",n:"Харчоблок",lab:[126,110],p:"117,123 118,129 142,123 134,91 110,98"},
+ {k:"16",n:"Овочесховище",lab:[138,164],p:"125,160 148,153 152,166 126,174 125,170 128,169"},
+ {k:"17",lab:[32,136],p:"47,126 48,130 28,136 30,142 20,145 16,135"},
+ {k:"22",n:"Майстерні",lab:[90,172],p:"81,171 88,163 98,173 91,181"},
+ {k:"23",n:"Судово-психіатрична експертиза",lab:[-262,238],p:"-286,281 -217,260 -235,194 -233,194 -234,189 -237,192 -314,212 -305,245 -298,243 -288,283"},
+ {k:"26",n:"Лікувально-виробничі майстерні",lab:[-185,196],p:"-209,209 -193,204 -203,165 -185,160 -175,201 -164,198 -158,201 -157,208 -160,213 -205,225"},
+ {k:"",n:"Патологічна анатомія",lab:[176,-226],p:"172,-213 169,-216 172,-220 168,-225 180,-236 185,-232 179,-227 183,-223"},
+ {k:"",lab:[155,27],p:"142,39 148,33 145,31 152,29 148,25 164,9 168,13 165,21 169,24 149,45"},
+ {k:"",lab:[170,82],p:"154,89 177,66 186,75 163,98"},
+ {k:"",lab:[225,-315],p:"221,-327 231,-325 230,-320 234,-319 232,-311 226,-312 223,-300 215,-302"}
+];
+
+/* v road, f footpath, p path, s steps, trailing x = closed to the public (drawn, never routed) */
+var WAYS=`f 118,-282 94,-299
+s 125,-291 118,-282
+f 110,-270 110,-273
+v 167,-32 171,-36 179,-56 184,-77 191,-107 208,-175 206,-195 199,-200 197,-215 202,-262
+f 328,-313 465,-116 477,-84 479,-53 476,-34 471,-21 444,3 444,9 444,17 405,50 397,62 387,92 388,109 392,124
+v -35,-165 -14,-168 16,-167 47,-158 64,-167 62,-193 73,-213 79,-235 85,-253
+f 110,-270 113,-267 125,-264 138,-260 158,-244
+sx 158,-244 172,-232
+v -331,-108 -322,-99 -317,-95 -293,-76 -233,-29 -219,-20 -196,-12 -44,-1
+v -396,176 -382,161 -314,92 -272,52 -265,49 -255,44 -239,42 -157,39
+v 185,219 193,177 205,155 249,114 281,91 305,74 373,53 393,47 430,20 444,9 459,10
+v -44,-1 -38,-1 26,4 60,7 72,8 93,10 101,11 136,16
+f -19,-167 -132,-123 -322,-99 -361,-95 -390,-90
+v 266,7 207,2 197,-5 201,-43 197,-43 179,-56
+f 192,-235 184,-242 172,-232
+v -142,157 -115,172
+v -328,218 -325,209 -294,193 -284,183 -253,145 -248,130 -237,118
+v -156,64 -127,57
+s -14,-47 -14,-56
+v 138,-9 150,-4
+f -8,-47 -14,-47
+s -3,-16 -38,-1
+v -159,56 -86,35 -47,24
+f 99,-102 106,-93
+v 191,-107 202,-104 214,-85 227,-63 227,-54 221,-48 201,-43
+v 191,-107 185,-107 141,-88 100,-64
+f -14,-77 -13,-97
+v 135,21 138,24 147,22 163,5
+v 61,-117 76,-92 80,-79 80,-57
+f 72,8 90,-19
+v 101,11 103,-13 101,-18 90,-19
+v 93,10 84,54 65,72
+v 124,75 137,90 148,119 147,147 141,152 99,161
+v 136,16 135,21 133,32 124,75 110,89 99,117 37,138
+v -138,197 -115,172 -107,165 -58,142 41,114 44,108 26,34 25,28 26,4
+f 60,7 28,-12 -3,-16 -8,-47 -6,-57 -1,-56
+v 100,-124 107,-107 106,-93 100,-64 99,-56
+v 205,155 198,143 225,65 226,54 167,-32
+v -138,197 -150,214 -161,226
+v -44,-1 -50,7 -60,11 -139,34 -157,39
+v -157,39 -159,56 -156,64 -156,97 -142,157 -138,197
+v 136,16 150,-4 158,-21 161,-28 167,-32
+v 99,-56 128,-53 148,-26 158,-21
+s 129,-224 135,-215 149,-218 142,-198 141,-192
+v 157,-164 173,-143 177,-120 185,-107
+p 142,-198 172,-232
+s -142,157 -171,158
+f -171,158 -178,175 -171,194
+s -171,194 -160,197 -155,204
+f -155,204 -150,214
+s 19,37 -2,42
+f 19,37 26,34
+f -47,24 -18,32 -7,43 -2,42
+f -7,43 -6,65
+f -86,35 -85,39
+f -85,39 -81,51
+f -81,51 -74,72 -71,83
+f -71,83 -69,87
+v -72,95 -59,139 -58,142
+f 8,116 9,119 -59,139 -114,165 -127,164
+f 5,104 8,116
+f -6,65 -5,70
+f -5,70 5,104
+f 25,28 60,7
+f 444,3 425,13 410,22 388,32 301,49 255,50 242,46
+f 229,36 171,-36
+s 242,46 229,36
+v 169,-326 172,-320 176,-314 157,-302 137,-273
+f 141,-192 154,-168 157,-164
+f 214,-85 184,-77
+v -63,-75 -14,-77 24,-77 80,-57 99,-56
+f -14,-77 -14,-56
+v 202,-104 222,-116
+v 281,91 254,60
+s 110,-273 118,-282
+s 138,-234 136,-236
+f 125,-264 122,-280
+f 113,-267 122,-280 130,-290
+f 139,-156 154,-168 182,-191 197,-180 200,-165 173,-143
+f 139,-156 141,-192
+f 136,-236 108,-267
+s 138,-260 138,-234
+s 138,-234 129,-224
+f -143,93 -101,81
+f -101,81 -88,77
+f -88,77 -74,72
+v 153,52 133,32
+s 9,119 29,113 41,114
+f -69,87 -68,91 -72,95
+v -143,93 -156,97
+f 110,-270 108,-267 84,-236 79,-235`;
+
+var STARTS={
+ e1:{at:[-322,-99],stop:[-344,-96],name:"Лікарня ім. Павлова",street:"вул. Олени Теліги",tr:"тролейбуси 27, 30, 31 · автобус 50",
+     hint:"Від зупинки йдіть асфальтовою дорогою, що відходить від вулиці вглиб лісу. Цією ж дорогою заїжджають автомобілі."},
+ e2:{at:[110,-270],stop:[101,-260],name:"Музей «Кирилівська церква»",street:"вул. Олени Теліги",tr:"тролейбуси 27, 30, 31 · автобус 50",
+     hint:"Від зупинки підніміться сходами до Кирилівської церкви й пройдіть повз неї через браму на територію лікарні. Тут тільки сходи."},
+ e3:{at:[444,9],stop:[455,24],name:"вул. Кирилівська",street:"ріг Подільського узвозу",tr:"тролейбуси 6, 18, 28, 33 · поруч трамваї 11, 12, 16, 19",
+     hint:"Від зупинки зверніть на Врубелівський узвіз. Пішки коротше стежкою зі сходами; автомобілем або без сходів — узвозом до в’їзду."}
+};
+var POI=[["Кирилівська церква",179,-171],["Стенд зі схемою лікарні",87,17]];
+
+var D=[
+ {id:"pr",q:1,t:"Приймальне відділення",k:"1",note:"Працює цілодобово",tel:["(044) 293-85-39"]},
+ {id:"pol",q:1,t:"Поліклініка",full:"Міська консультативно-діагностична поліклініка",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 293-64-64","(098) 454-18-39"]},
+ {id:"amb",q:1,t:"Амбулаторія № 1",full:"Правобережна психіатрична амбулаторія № 1",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 503-87-80","(095) 687-25-90"]},
+ {id:"kab",q:1,t:"Кабінет амбулаторного прийому",k:"5"},
+ {id:"adm",q:1,t:"Адміністрація",k:"12"},
+ {id:"1",k:"5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
+ {id:"2",k:"5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
+ {id:"3",k:"1",d:"активної терапії гострих психозів",tel:["(044) 503-87-03","(044) 293-85-43"]},
+ {id:"4",k:"1",d:"лікувально-діагностичне",tel:["(044) 503-87-04","(044) 503-87-05"]},
+ {id:"5",k:"11",d:"лікувально-діагностичне",tel:["(044) 293-64-65"]},
+ {id:"6",k:"7",d:"лікувально-діагностичне",tel:["(044) 293-64-52","(044) 293-64-53"]},
+ {id:"7",k:"1"},{id:"8",k:"8"},
+ {id:"9",k:null},
+ {id:"10",k:"8"},{id:"11",k:"2"},{id:"12",k:"2"},
+ {id:"13",k:"3",d:"комплексної терапії резистентних форм хімічної залежності"},
+ {id:"14",k:"3",d:"інфекційне",tel:["(044) 503-87-14"]},
+ {id:"15",k:"1",d:"психіатричної та паліативної допомоги",tel:["(044) 503-87-29","(044) 293-64-61"]},
+ {id:"16",k:"1",d:"для хворих із супутньою соматичною патологією",tel:["(044) 503-87-16"]},
+ {id:"18",k:"1",d:"геронтологічне",tel:["(044) 293-64-62"]},
+ {id:"19",k:"1",d:"для хворих на епілепсію",tel:["(044) 293-85-36","(044) 293-64-63"]},
+ {id:"20",k:"1"},{id:"22",k:"11"},{id:"23",k:"1"},{id:"24",k:"1"}
+];
+
+/* ---------- routing (pure) ---------- */
+function pts(s){return s.split(" ").map(function(a){var c=a.split(",");return [+c[0],+c[1]]})}
+function buildGraph(noSteps){
+  var idx={},nodes=[],adj=[];
+  function node(p){var key=p[0].toFixed(1)+","+p[1].toFixed(1);if(idx[key]===undefined){idx[key]=nodes.length;nodes.push(p);adj.push([])}return idx[key]}
+  WAYS.split("\n").forEach(function(line){
+    var sp=line.indexOf(" "),code=line.slice(0,sp),p=pts(line.slice(sp+1));
+    if(code.indexOf("x")>0)return; if(noSteps&&code==="s")return;
+    for(var i=1;i<p.length;i++){
+      var a=p[i-1],b=p[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(1,Math.ceil(L/10)),prev=node(a);
+      for(var j=1;j<=n;j++){var q=j===n?b:[a[0]+(b[0]-a[0])*j/n,a[1]+(b[1]-a[1])*j/n],cur=node(q);adj[prev].push([cur,L/n]);adj[cur].push([prev,L/n]);prev=cur}
+    }
+  });
+  return {idx:idx,nodes:nodes,adj:adj};
+}
+function findRoute(from,door,noSteps){
+  var g=buildGraph(noSteps),s=g.idx[from[0].toFixed(1)+","+from[1].toFixed(1)],n=g.nodes.length;
+  if(s===undefined)return null;
+  var dist=new Array(n).fill(Infinity),prev=new Array(n).fill(-1),done=new Array(n).fill(false);dist[s]=0;
+  for(var it=0;it<n;it++){
+    var u=-1,best=Infinity;for(var i=0;i<n;i++)if(!done[i]&&dist[i]<best){best=dist[i];u=i}
+    if(u<0)break;done[u]=true;
+    g.adj[u].forEach(function(e){if(dist[u]+e[1]<dist[e[0]]){dist[e[0]]=dist[u]+e[1];prev[e[0]]=u}});
+  }
+  var t=-1,bd=Infinity;
+  for(var k=0;k<n;k++){if(dist[k]===Infinity)continue;var d=Math.hypot(g.nodes[k][0]-door[0],g.nodes[k][1]-door[1]);var score=d*3+dist[k]*0.02;if(score<bd){bd=score;t=k}}
+  if(t<0)return null;
+  var tail=Math.hypot(g.nodes[t][0]-door[0],g.nodes[t][1]-door[1]);
+  if(tail>40)return null;
+  var path=[];for(var c=t;c>=0;c=prev[c])path.push(g.nodes[c]);path.reverse();
+  return {path:path,len:dist[t]+tail};
+}
+if(typeof document==="undefined"){
+  B.filter(function(b){return b.key}).forEach(function(b){
+    var out=["k"+b.k];Object.keys(STARTS).forEach(function(e){[false,true].forEach(function(ns){var r=findRoute(STARTS[e].at,b.door,ns);out.push(e+(ns?"-nosteps":"")+":"+(r?Math.round(r.len):"none"))})});
+    console.log(out.join("  "));
+  });
+} else {
+/* ---------- map ---------- */
+var svg=document.getElementById("map"),NS="http://www.w3.org/2000/svg";
+function lbl(cls,x,y,rot,inner,attrs){return '<g class="lb '+cls+'" data-x="'+x+'" data-y="'+y+'" data-r="'+(rot||0)+'" '+(attrs||"")+'>'+inner+'</g>'}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+var h='<rect class="land" x="-900" y="-800" width="1800" height="1500"/><polygon class="green" points="'+GREEN+'"/>';
+MAJOR.forEach(function(m){h+='<polyline class="major" stroke-width="'+m[0]+'" points="'+m[1]+'"/>'});
+h+='<polygon class="terr" points="'+TERR+'"/>';
+var rd="",rde="",fw="",stp="";
+WAYS.split("\n").forEach(function(line){var sp=line.indexOf(" "),c=line.charAt(0),p=line.slice(sp+1);
+  if(c==="v"){rde+='<polyline class="rd-e" points="'+p+'"/>';rd+='<polyline class="rd" points="'+p+'"/>'}
+  else if(c==="s")stp+='<polyline class="stp" points="'+p+'"/>'; else fw+='<polyline class="fw" points="'+p+'"/>'});
+h+=rde+rd+fw+stp;
+B.forEach(function(b,i){h+='<polygon class="b'+(b.key?" key":"")+'" data-b="'+i+'" points="'+b.p+'"/>'});
+h+='<g id="route"></g>';
+STREETS.forEach(function(s){h+=lbl("stn",s[1],s[2],s[3],'<text>'+esc(s[0])+'</text>')});
+POI.forEach(function(p){h+=lbl("poi",p[1],p[2],0,'<circle r="3"/><text x="7" y="4">'+esc(p[0])+'</text>')});
+B.forEach(function(b,i){if(!b.k)return;h+=lbl("badge"+(b.key?"":" sec"),b.lab[0],b.lab[1],0,'<circle r="'+(b.key?12:9)+'"/><text>'+b.k+'</text>','data-bb="'+i+'"')});
+Object.keys(STARTS).forEach(function(e){var s=STARTS[e];h+=lbl("stop",s.stop[0],s.stop[1],0,'<rect x="-9" y="-9" width="18" height="18" rx="4"/><text class="t">А</text><text class="n" x="13" y="4">'+esc(s.name)+'</text>','data-e="'+e+'"')});
+h+='<g id="pin"></g>';
+svg.innerHTML=h;
+
+var FULL={x:-430,y:-380,w:960,h:700},vb={x:FULL.x,y:FULL.y,w:FULL.w,h:FULL.h};
+function size(){var r=svg.getBoundingClientRect();return {w:r.width||360,h:r.height||300,l:r.left,t:r.top}}
+function apply(){
+  var s=size();vb.h=vb.w*s.h/s.w;
+  svg.setAttribute("viewBox",vb.x+" "+vb.y+" "+vb.w+" "+vb.h);
+  var k=vb.w/s.w;svg.classList.toggle("far",k>1.45);
+  svg.querySelectorAll(".lb").forEach(function(g){g.setAttribute("transform","translate("+g.dataset.x+" "+g.dataset.y+") rotate("+g.dataset.r+") scale("+k+")")});
+}
+function fit(x0,y0,x1,y1,pad){
+  var s=size(),a=s.w/s.h;pad=pad||0;x0-=pad;y0-=pad;x1+=pad;y1+=pad;
+  var w=x1-x0,hh=y1-y0;if(w/hh<a)w=hh*a;w=Math.max(w,160);
+  vb.w=w;vb.x=(x0+x1)/2-w/2;vb.y=(y0+y1)/2-(w/a)/2;apply();
+}
+function fitAll(){fit(-345,-345,470,302,20)}
+function zoomAt(f,cx,cy){
+  var s=size(),px=(cx-s.l)/s.w,py=(cy-s.t)/s.h,wx=vb.x+px*vb.w,wy=vb.y+py*vb.h;
+  var nw=Math.min(1500,Math.max(110,vb.w*f));vb.w=nw;vb.h=nw*s.h/s.w;vb.x=wx-px*vb.w;vb.y=wy-py*vb.h;apply();
+}
+var ptrs={},moved=0,pinch=0;
+svg.addEventListener("pointerdown",function(e){try{svg.setPointerCapture(e.pointerId)}catch(_){ }ptrs[e.pointerId]={x:e.clientX,y:e.clientY};moved=0;pinch=0;svg.classList.add("drag")});
+svg.addEventListener("pointermove",function(e){
+  var p=ptrs[e.pointerId];if(!p)return;var ids=Object.keys(ptrs),s=size(),k=vb.w/s.w;
+  if(ids.length===1){var dx=e.clientX-p.x,dy=e.clientY-p.y;moved+=Math.abs(dx)+Math.abs(dy);vb.x-=dx*k;vb.y-=dy*k;p.x=e.clientX;p.y=e.clientY;apply()}
+  else if(ids.length===2){p.x=e.clientX;p.y=e.clientY;var a=ptrs[ids[0]],b=ptrs[ids[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch&&d>0)zoomAt(pinch/d,(a.x+b.x)/2,(a.y+b.y)/2);pinch=d;moved+=10}
+});
+function up(e){
+  var had=ptrs[e.pointerId];delete ptrs[e.pointerId];pinch=0;if(!Object.keys(ptrs).length)svg.classList.remove("drag");
+  if(had&&moved<8&&e.type==="pointerup"){var el=document.elementFromPoint(e.clientX,e.clientY);if(el&&el.dataset&&el.dataset.b!==undefined)pickBuilding(+el.dataset.b)}
+}
+svg.addEventListener("pointerup",up);svg.addEventListener("pointercancel",up);
+svg.addEventListener("wheel",function(e){e.preventDefault();zoomAt(e.deltaY>0?1.2:1/1.2,e.clientX,e.clientY)},{passive:false});
+function zc(f){var s=size();zoomAt(f,s.l+s.w/2,s.t+s.h/2)}
+document.getElementById("zin").onclick=function(){zc(1/1.5)};
+document.getElementById("zout").onclick=function(){zc(1.5)};
+document.getElementById("zfit").onclick=fitAll;
+window.addEventListener("resize",apply);
+
+/* ---------- panel ---------- */
+var st={dept:"pr",b:0,start:"e1",noSteps:false};
+try{var sv=JSON.parse(localStorage.getItem("knp-map")||"{}");if(STARTS[sv.start])st.start=sv.start;st.noSteps=!!sv.noSteps}catch(_){}
+function bIndex(k){for(var i=0;i<B.length;i++)if(B[i].k===k)return i;return -1}
+function dTitle(d){return d.q?(d.full||d.t):"Відділення № "+d.id}
+var quick=document.getElementById("quick"),nums=document.getElementById("nums");
+D.forEach(function(d){var b=document.createElement("button");b.type="button";b.className="chip"+(d.q?"":" num");b.textContent=d.q?d.t:d.id;b.dataset.d=d.id;
+  if(!d.q)b.setAttribute("aria-label","Відділення номер "+d.id);
+  b.onclick=function(){st.dept=d.id;st.b=d.k===null?-1:bIndex(d.k);render(true);toCard()};(d.q?quick:nums).appendChild(b)});
+function toCard(){document.getElementById("card").scrollIntoView({block:"start",behavior:"smooth"})}
+function pickBuilding(i){st.b=i;st.dept=null;render(true);toCard()}
+function tels(list){return '<div class="tels">'+list.map(function(t){return '<a href="tel:+38'+t.replace(/\D/g,"")+'">'+t+'</a>'}).join("")+'</div>'}
+function render(zoom){
+  document.querySelectorAll(".chip").forEach(function(c){c.setAttribute("aria-pressed",c.dataset.d===st.dept?"true":"false")});
+  svg.querySelectorAll(".b").forEach(function(p){p.classList.toggle("on",+p.dataset.b===st.b)});
+  svg.querySelectorAll(".badge").forEach(function(p){p.classList.toggle("on",+p.dataset.bb===st.b)});
+  svg.querySelectorAll(".stop").forEach(function(p){p.classList.toggle("on",p.dataset.e===st.start&&st.b>=0)});
+  var card=document.getElementById("card"),rg=document.getElementById("route"),pin=document.getElementById("pin");rg.innerHTML="";pin.innerHTML="";
+  var d=null;D.forEach(function(x){if(x.id===st.dept)d=x});
+  if(st.b<0){
+    card.innerHTML='<div><div class="k">Корпус не вказано</div><div class="what">Відділення № 9</div><div class="sub">На сайті лікарні для нього зазначено лише «Врубелівський узвіз», без номера корпусу. Узвіз проходить уздовж південно-східного краю території — на карті він підписаний.</div></div><div class="sub">Уточніть місце в приймальному відділенні (цілодобово):</div>'+tels(["(044) 293-85-39"]);
+    if(zoom)fit(150,-20,470,230,10);return;
+  }
+  var b=B[st.b],door=b.door||b.lab,same=D.filter(function(x){return x.k===b.k&&b.k}),html="<div>";
+  html+='<div class="k">'+(b.k?"Корпус "+b.k:"Будівля без номера")+'</div>';
+  if(d){html+='<div class="what">'+esc(dTitle(d))+'</div>';if(d.d)html+='<div class="sub">'+esc(d.d)+'</div>';if(d.note)html+='<div class="sub">'+esc(d.note)+'</div>'}
+  else if(b.n)html+='<div class="what">'+esc(b.n)+'</div><div class="sub">Назва за OpenStreetMap, на сайті лікарні цього корпусу в переліку немає.</div>';
+  else if(!same.length)html+='<div class="sub">На сайті лікарні для цієї будівлі нічого не вказано.</div>';
+  html+="</div>";
+  if(d&&d.tel)html+=tels(d.tel);
+  var others=same.filter(function(x){return !d||x.id!==d.id});
+  if(others.length)html+='<div class="sub">'+(d?"У цьому ж корпусі: ":"У корпусі: ")+others.map(function(x){return x.q?x.t.toLowerCase():"№ "+x.id}).join(", ")+'.</div>';
+  html+='<div><h2>Звідки ви йдете?</h2><div class="seg">';
+  Object.keys(STARTS).forEach(function(e){var s=STARTS[e];html+='<button type="button" data-e="'+e+'" aria-pressed="'+(e===st.start)+'"><b>Зупинка «'+esc(s.name)+'»</b><small>'+esc(s.street)+' · '+esc(s.tr)+'</small></button>'});
+  html+='</div></div><label class="toggle"><input type="checkbox" id="ns"'+(st.noSteps?" checked":"")+'><span>Маршрут без сходів</span></label>';
+  var s=STARTS[st.start],r=findRoute(s.at,door,st.noSteps);
+  if(r){
+    var m=Math.max(1,Math.ceil(r.len/70)),lat=(LAT0-door[1]/KY).toFixed(6),lon=(LON0+door[0]/KX).toFixed(6);
+    html+='<div class="result"><div class="big">≈ '+Math.round(r.len/10)*10+' м · '+m+' хв пішки</div><p>'+esc(s.hint)+'</p></div>';
+    html+='<a class="go" href="https://www.google.com/maps/dir/?api=1&amp;destination='+lat+','+lon+'&amp;travelmode=walking" target="_blank" rel="noopener">Вести мене в Google Картах</a>';
+    html+='<div class="warn">Якщо брама зачинена, зверніться до охорони або зателефонуйте в приймальне: (044) 293-85-39.</div>';
+    var line=r.path.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join(" "),end=r.path[r.path.length-1];
+    rg.innerHTML='<polyline class="route halo" points="'+line+'"/><polyline class="route" points="'+line+'"/><polyline class="route last" points="'+end[0]+","+end[1]+" "+door[0]+","+door[1]+'"/>';
+    pin.innerHTML=lbl("pin",door[0],door[1],0,'<circle r="6"/>');
+    if(zoom){var xs=r.path.map(function(p){return p[0]}).concat([door[0],s.stop[0]]),ys=r.path.map(function(p){return p[1]}).concat([door[1],s.stop[1]]);fit(Math.min.apply(null,xs),Math.min.apply(null,ys),Math.max.apply(null,xs),Math.max.apply(null,ys),45)}
+    else apply();
+  } else {
+    html+='<div class="result"><div class="big">Без сходів звідси не пройти</div><p>Оберіть іншу зупинку: від «Лікарня ім. Павлова» та «вул. Кирилівська» є дорога без сходів.</p></div>';
+    if(zoom)fit(door[0]-120,door[1]-120,door[0]+120,door[1]+120,0);
+  }
+  card.innerHTML=html;
+  card.querySelectorAll(".seg button").forEach(function(x){x.onclick=function(){st.start=x.dataset.e;save();render(true)}});
+  document.getElementById("ns").onchange=function(e){st.noSteps=e.target.checked;save();render(true)};
+}
+function save(){try{localStorage.setItem("knp-map",JSON.stringify({start:st.start,noSteps:st.noSteps}))}catch(_){}}
+fitAll();render(true);
+}
+</script>
+</body>
+</html>
