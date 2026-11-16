@@ -308,6 +308,10 @@ rep('n:{k:"1",p:[-81.4,43.4],','n:{k:"1",dir:55,ta:"t",p:[-81.4,43.4],')
 rep('s:{k:"1",p:[4.3,109.6],','s:{k:"1",dir:-121,p:[4.3,109.6],')
 # вхід корпусу 11 стоїть на одній лінії з підписом «Приймальне · жін.»: кружечок — вище, підпис лягає поверх хвостика
 rep('  ENT["b"+b.k]={k:b.k,p:b.door,t:"",n:"Вхід до корпусу "+b.k,d:b.n||"головний вхід"}});','  ENT["b"+b.k]={k:b.k,p:b.door,t:"",n:"Вхід до корпусу "+b.k,d:b.n||"головний вхід"}});\nif(ENT.b11)ENT.b11.dir=60;')
+# ================= v8 (16.11.2026): світла палітра «Чіткий» =================
+CHITKYI='--bg:#e8eae4;--land:#e8eae4;--lawn:#b9d7a0;--lawn-edge:#9fc685;--park:#c4dcae;--park-edge:#a9cb8f;--road:#ffffff;--road-edge:#99a39b;--terr-edge:#76847a;--ctx:#d7dad3;--ctx-edge:#b9bdb5;--r-grey:#a8afb3;--r-graph:#7c848a;--r-blue:#a2b4c2;--r-terra:#c8876f;--r-green:#8cb999;--r-dgreen:#5c8d6f;--r-sage:#9fb19f;--b-edge:rgba(16,20,24,.6);--label:#0d1012;--major:#f3d97c;--major-edge:#cdb056;--steps:#5f6862;--wall:#6f5e48;--gate:#3d3026'
+rep('  color-scheme:light;','  /* «Чіткий» (обрано 16.11.2026): контрастніші газон, доріжки й корпуси — карту читають надворі, на сонці */\n  '+CHITKYI+';\n  color-scheme:light;')
+rep('<meta name="theme-color" content="#eef0ea" media="(prefers-color-scheme: light)">','<meta name="theme-color" content="#e8eae4" media="(prefers-color-scheme: light)">')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
