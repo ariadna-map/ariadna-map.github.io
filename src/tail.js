@@ -202,6 +202,7 @@ function render(zoom){
   var title=d?dTitle(d):(b.k?"Корпус "+b.k:(b.n||"Будівля")),sub="";
   if(d){sub=(d.d||d.note||"");if(d.d&&d.note)sub=d.d+" · "+d.note}
   else if(b.n)sub=b.n;
+  else if(b.nt)sub=b.nt;
   else if(same.length)sub="Тут: "+same.map(dName).join(", ");
   else sub="На сайті лікарні для цієї будівлі нічого не вказано";
   curTitle=d?(d.q||d.x?d.t:"Відділення № "+d.id):title;

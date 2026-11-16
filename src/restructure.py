@@ -248,6 +248,59 @@ rep('''stroke-width="1.2"/></svg>брама</li>''','''stroke-width="1.2"/></svg
     <li><svg viewBox="0 0 30 16"><path d="M2 6h26" stroke="var(--wall)" stroke-width="1.4"/><path d="M4 6v4.5M8 6v4.5M12 6v4.5M16 6v4.5M20 6v4.5M24 6v4.5" stroke="var(--wall)" stroke-width="1"/></svg>обрив, підпірна стіна</li>''')
 rep('<p class="foot" style="margin-top:10px">Перелік корпусів і відділень — сайт лікарні (psychiatry-kyiv.itmed.org, 14.11.2026).','<p class="foot" style="margin-top:10px">Перелік корпусів і відділень — сайт лікарні (psychiatry-kyiv.itmed.org, 14.11.2026). Двері відділень, поверхи, сходи й галерею уточнено на місці 16.11.2026.')
 
+# ================= v6 (16.11.2026): переїзд 6 і 9, ЕКОПФО, темна тема «Сланець», ворота, входи, доріжки =================
+rep('{id:"6",k:"2",ent:"k2",d:"Лікувально-діагностичне",','{id:"6",k:"2",ent:"k2",note:"переїхало з корпусу 7: старі корпуси закривають на капітальний ремонт",d:"Лікувально-діагностичне",')
+rep('{id:"9",k:"2",ent:"k2"}','{id:"9",k:"2",ent:"k2",note:"переїхало в корпус 2: старі корпуси закривають на капітальний ремонт"}')
+rep('{k:"7",lv:2,key:1,r:"r-terra",','{k:"7",lv:2,key:1,r:"r-terra",nt:"Відділення 6 переїхало в корпус 2",')
+rep(' {id:"lift",x:1,',' {id:"ekopfo",x:1,t:"ЕКОПФО",short:"ЕКОПФО",full:"ЕКОПФО — експертна команда з оцінювання повсякденного функціонування особи",k:"1",fl:1,ent:"n",kw:"експертна команда оцінювання повсякденного функціонування особи мсек інвалідність",note:"вхід той самий, що до відділень 7 і 15"},\n {id:"lift",x:1,')
+rep('n:{k:"1",p:[-81.4,43.4],t:"7 · 15",a:"r",n:"Вхід до відділень 7 і 15",','n:{k:"1",p:[-81.4,43.4],t:"7 · 15 · ЕКОПФО",a:"r",n:"Вхід до відділень 7, 15 і ЕКОПФО",')
+rep('<meta name="theme-color" content="#0e1316" media="(prefers-color-scheme: dark)">','<meta name="theme-color" content="#323c44" media="(prefers-color-scheme: dark)">')
+SLATE='--bg:#323c44;--land:#343e46;--terr:#3e4951;--terr-edge:#56636c;--park:#33493c;--park-edge:#3e5848;--road:#58656f;--road-edge:#343e46;--path:#88959d;--steps:#a8b3b9;--ctx:#404a52;--ctx-edge:#4b565e;--r-grey:#7a858d;--r-graph:#606a72;--r-blue:#7a8b98;--r-terra:#9e6f5f;--r-green:#5a8a6e;--r-dgreen:#477059;--r-sage:#738679;--r-white:#8c897e;--glass-tint:rgba(56,65,73,.6);--glass-glow:rgba(255,255,255,.11);--contour:#6c6652;--hach:#887b64;--label-halo:rgba(52,62,70,.9);--b-edge:rgba(0,0,0,.38);--relief:.45'
+i=s.index('@media (prefers-color-scheme:dark){:root{');j=s.index('}}',i)
+s=s[:j]+';\n  /* «Сланець» (обрано 16.11.2026) */\n  '+SLATE+'\n'+s[j:]
+s=s[:j]+';--lawn:#31473a;--lawn-edge:#3a5244;--gate:#d8cab2'+s[j:]
+# --- газони (з супутникового знімка), суцільні доріжки ---
+rep('--path:#b5bcb6; --steps:#8d958f;','--path:#b5bcb6; --steps:#8d958f; --lawn:#d4e5c6; --lawn-edge:#c4dab4; --gate:#5d4c3c;')
+rep('.fw{fill:none;stroke:var(--path);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3 2.4}',
+    '.lawn{fill:var(--lawn);stroke:var(--lawn-edge);stroke-width:.5;stroke-linejoin:round}\n.fw-e{fill:none;stroke:var(--road-edge);stroke-width:3.9;stroke-linecap:round;stroke-linejoin:round}\n.fw{fill:none;stroke:var(--road);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}\n.stp-b{fill:none;stroke:var(--road);stroke-width:3.6}')
+rep("h+='<polygon class=\"terr\" points=\"'+TERR+'\"/>';","h+='<polygon class=\"terr\" points=\"'+TERR+'\"/><path class=\"lawn\" fill-rule=\"evenodd\" d=\"'+LAWNS+'\"/>';")
+rep('var GATES=','var LAWNS="/*LAWNS*/";\nvar GATES=')
+rep('''var rd="",rde="",fw="",stp="";''','''var rd="",rde="",fw="",fwe="",stp="",stb="";''')
+rep('''  else if(c==="s")stp+='<polyline class="stp" points="'+p+'"/>'; else fw+='<polyline class="fw" points="'+p+'"/>'});
+h+=rde+rd+fw+stp;''','''  else if(c==="s"){stb+='<polyline class="stp-b" points="'+p+'"/>';stp+='<polyline class="stp" points="'+p+'"/>'}
+  else{fwe+='<polyline class="fw-e" points="'+p+'"/>';fw+='<polyline class="fw" points="'+p+'"/>'}});
+h+=rde+fwe+rd+fw+stb+stp;''')
+# --- брами: брус поперек дороги зі стовпчиками, у метрах карти ---
+rep('''GATES.forEach(function(g){h+=lbl("gate",g[0],g[1],0,'<rect x="-3.5" y="-3.5" width="7" height="7" rx="1.8"/>')});''',
+'''GATES.forEach(function(g){var best=null;WAYS.split("\\n").forEach(function(line){var sp=line.indexOf(" "),c=line.charAt(0),p=pts(line.slice(sp+1));
+    for(var i=1;i<p.length;i++){var a=p[i-1],b=p[i],dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((g[0]-a[0])*dx+(g[1]-a[1])*dy)/L2)),d=Math.hypot(a[0]+dx*t-g[0],a[1]+dy*t-g[1]);
+      if(!best||d<best.d)best={d:d,u:[dx/Math.sqrt(L2),dy/Math.sqrt(L2)],road:c==="v"}}});
+  var u=best&&best.d<12?best.u:[1,0],n=[-u[1],u[0]],L=best&&best.road?5.4:2.9,A=[g[0]-n[0]*L,g[1]-n[1]*L],Z=[g[0]+n[0]*L,g[1]+n[1]*L];
+  h+='<g class="gate"><line class="gate-b" x1="'+A[0].toFixed(1)+'" y1="'+A[1].toFixed(1)+'" x2="'+Z[0].toFixed(1)+'" y2="'+Z[1].toFixed(1)+'"/><circle class="gate-p" cx="'+A[0].toFixed(1)+'" cy="'+A[1].toFixed(1)+'" r="1.15"/><circle class="gate-p" cx="'+Z[0].toFixed(1)+'" cy="'+Z[1].toFixed(1)+'" r="1.15"/></g>'});''')
+rep('.gate rect{fill:var(--terr);stroke:var(--steps);stroke-width:1.2}','.gate-b{stroke:var(--gate);stroke-width:1.3}\n.gate-p{fill:var(--gate)}')
+rep('#map.far .lb.sec,#map.far .poi text,#map.far .stop text,#map.far .gate{display:none}','#map.far .lb.sec,#map.far .poi text,#map.far .stop text{display:none}')
+# --- входи: значок «вхід» (стрілка заходить у двері) замість крапки; головні входи інших корпусів з OpenStreetMap ---
+rep('var PRIV=','''B.forEach(function(b){if(!b.k||b.k==="1"||!b.door)return;
+  if(Object.keys(ENT).some(function(id){var p=ENT[id].p;return Math.hypot(p[0]-b.door[0],p[1]-b.door[1])<4}))return;
+  ENT["b"+b.k]={k:b.k,p:b.door,t:"",n:"Вхід до корпусу "+b.k,d:b.n||"головний вхід"}});
+var PRIV=''')
+ENTG='<circle class="dr" r="6.4"/><path class="dg" d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3"/>'
+rep('''h+=lbl("door sec",e.p[0],e.p[1],0,'<circle class="dr" r="3.6"/>'+(e.t?'<text x="'+tx+'" y="'+ty+'" text-anchor="'+an+'">\'''',
+    '''h+=lbl("door sec",e.p[0],e.p[1],0,\''''+ENTG+''''+(e.t?'<text x="'+tx+'" y="'+ty+'" text-anchor="'+an+'">\'''')
+rep('var e=ENT[id],a=e.a||"r",tx=a==="l"?-8:a==="r"?8:0,ty=a==="t"?-8:a==="b"?15:3.7,','var e=ENT[id],a=e.a||"r",tx=a==="l"?-10:a==="r"?10:0,ty=a==="t"?-10:a==="b"?17:3.7,')
+rep('.door .dr{fill:var(--key-b);stroke:var(--key-t);stroke-width:1.5}','.door .dr{fill:var(--key-b);stroke:var(--key-t);stroke-width:1.4}\n.door .dg{fill:none;stroke:var(--key-t);stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}')
+rep('.door.on .dr{fill:var(--thread);stroke:#fff}','.door.on .dr{fill:var(--thread);stroke:#fff}\n.door.on .dg{stroke:#fff}')
+# --- легенда ---
+rep('''<li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--path)" stroke-width="1.6" stroke-dasharray="3 2.4"/></svg>пішохідна доріжка</li>''',
+    '''<li><svg viewBox="0 0 30 16"><rect x="1" y="2" width="28" height="12" rx="3" fill="var(--lawn)"/><path d="M2 8h26" stroke="var(--road-edge)" stroke-width="4.4"/><path d="M2 8h26" stroke="var(--road)" stroke-width="2.8"/></svg>пішохідна доріжка, тротуар</li>
+    <li><svg viewBox="0 0 30 16"><rect x="2" y="2" width="26" height="12" rx="5" fill="var(--lawn)" stroke="var(--lawn-edge)"/></svg>газон, дерева, кущі</li>''')
+rep('''<li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--steps)" stroke-width="3.4" stroke-dasharray="1 1.3"/></svg>сходи</li>''',
+    '''<li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--road)" stroke-width="3.6"/><path d="M2 8h26" stroke="var(--steps)" stroke-width="3.4" stroke-dasharray="1 1.3"/></svg>сходи</li>''')
+rep('''<li><svg viewBox="0 0 30 16"><rect x="11" y="4" width="8" height="8" rx="2" fill="var(--terr)" stroke="var(--steps)" stroke-width="1.2"/></svg>брама</li>''',
+    '''<li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--road-edge)" stroke-width="8"/><path d="M2 8h26" stroke="var(--road)" stroke-width="6"/><path d="M15 2v12" stroke="var(--gate)" stroke-width="1.8"/><circle cx="15" cy="2" r="1.7" fill="var(--gate)"/><circle cx="15" cy="14" r="1.7" fill="var(--gate)"/></svg>брама, ворота</li>''')
+rep('''<li><svg viewBox="0 0 30 16"><circle cx="15" cy="8" r="3.8" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.5"/></svg>двері, вхід до відділення</li>''',
+    '''<li><svg viewBox="-15 -8 30 16"><circle r="6.6" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.3"/><path d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3" fill="none" stroke="var(--key-t)" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>вхід (двері) до корпусу чи відділення</li>''')
+rep('OpenStreetMap</a>, звірено із супутниковим знімком 15.11.2026.','OpenStreetMap</a>, звірено із супутниковим знімком 15.11.2026. Газони й зелень — за супутниковим знімком (© Esri, Maxar, Earthstar Geographics), оброблено 16.11.2026.',2)
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
