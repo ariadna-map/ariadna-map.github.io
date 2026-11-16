@@ -263,8 +263,7 @@ s=s[:j]+';--lawn:#31473a;--lawn-edge:#3a5244;--gate:#d8cab2'+s[j:]
 rep('--path:#b5bcb6; --steps:#8d958f;','--path:#b5bcb6; --steps:#8d958f; --lawn:#d4e5c6; --lawn-edge:#c4dab4; --gate:#5d4c3c;')
 rep('.fw{fill:none;stroke:var(--path);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3 2.4}',
     '.lawn{fill:var(--lawn);stroke:var(--lawn-edge);stroke-width:.5;stroke-linejoin:round}\n.fw-e{fill:none;stroke:var(--road-edge);stroke-width:3.9;stroke-linecap:round;stroke-linejoin:round}\n.fw{fill:none;stroke:var(--road);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}\n.stp-b{fill:none;stroke:var(--road);stroke-width:3.6}')
-rep("h+='<polygon class=\"terr\" points=\"'+TERR+'\"/>';","h+='<polygon class=\"terr\" points=\"'+TERR+'\"/><path class=\"lawn\" fill-rule=\"evenodd\" d=\"'+LAWNS+'\"/>';")
-rep('var GATES=','var LAWNS="/*LAWNS*/";\nvar GATES=')
+rep('.terr{fill:var(--terr);stroke:var(--terr-edge);','.terr{fill:var(--lawn);stroke:var(--terr-edge);')
 rep('''var rd="",rde="",fw="",stp="";''','''var rd="",rde="",fw="",fwe="",stp="",stb="";''')
 rep('''  else if(c==="s")stp+='<polyline class="stp" points="'+p+'"/>'; else fw+='<polyline class="fw" points="'+p+'"/>'});
 h+=rde+rd+fw+stp;''','''  else if(c==="s"){stb+='<polyline class="stp-b" points="'+p+'"/>';stp+='<polyline class="stp" points="'+p+'"/>'}
@@ -300,7 +299,15 @@ rep('''<li><svg viewBox="0 0 30 16"><rect x="11" y="4" width="8" height="8" rx="
     '''<li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--road-edge)" stroke-width="8"/><path d="M2 8h26" stroke="var(--road)" stroke-width="6"/><path d="M15 2v12" stroke="var(--gate)" stroke-width="1.8"/><circle cx="15" cy="2" r="1.7" fill="var(--gate)"/><circle cx="15" cy="14" r="1.7" fill="var(--gate)"/></svg>брама, ворота</li>''')
 rep('''<li><svg viewBox="0 0 30 16"><circle cx="15" cy="8" r="3.8" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.5"/></svg>двері, вхід до відділення</li>''',
     '''<li><svg viewBox="-15 -8 30 16"><circle r="6.6" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.3"/><path d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3" fill="none" stroke="var(--key-t)" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>вхід (двері) до корпусу чи відділення</li>''')
-rep('OpenStreetMap</a>, звірено із супутниковим знімком 15.11.2026.','OpenStreetMap</a>, звірено із супутниковим знімком 15.11.2026. Газони й зелень — за супутниковим знімком (© Esri, Maxar, Earthstar Geographics), оброблено 16.11.2026.',2)
+# ================= v7 (16.11.2026): значок входу «шпилька»; газон на всій території, крім доріг =================
+cut('Object.keys(ENT).forEach(function(id){var e=ENT[id],a=e.a||"r"','B.forEach(function(b,i){if(!b.k||!b.lab)return;h+=lbl("badge"',open('v7_doors.js',encoding='utf8').read())
+rep('<li><svg viewBox="-15 -8 30 16"><circle r="6.6" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.3"/><path d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3"',
+    '<li><svg viewBox="-15 -8 30 16"><path d="M0 0-6.2-3.6A7.2 7.2 0 1 0-6.2 3.6Z" transform="translate(9 0)" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.3"/><path transform="translate(-3.4 0)" d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3"')
+# двері в наскрізних проходах: шпилька заходить у прохід з дороги
+rep('n:{k:"1",p:[-81.4,43.4],','n:{k:"1",dir:55,ta:"t",p:[-81.4,43.4],')
+rep('s:{k:"1",p:[4.3,109.6],','s:{k:"1",dir:-121,p:[4.3,109.6],')
+# вхід корпусу 11 стоїть на одній лінії з підписом «Приймальне · жін.»: кружечок — вище, підпис лягає поверх хвостика
+rep('  ENT["b"+b.k]={k:b.k,p:b.door,t:"",n:"Вхід до корпусу "+b.k,d:b.n||"головний вхід"}});','  ENT["b"+b.k]={k:b.k,p:b.door,t:"",n:"Вхід до корпусу "+b.k,d:b.n||"головний вхід"}});\nif(ENT.b11)ENT.b11.dir=60;')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
