@@ -312,6 +312,15 @@ rep('  ENT["b"+b.k]={k:b.k,p:b.door,t:"",n:"Вхід до корпусу "+b.k,d
 CHITKYI='--bg:#e8eae4;--land:#e8eae4;--lawn:#b9d7a0;--lawn-edge:#9fc685;--park:#c4dcae;--park-edge:#a9cb8f;--road:#ffffff;--road-edge:#99a39b;--terr-edge:#76847a;--ctx:#d7dad3;--ctx-edge:#b9bdb5;--r-grey:#a8afb3;--r-graph:#7c848a;--r-blue:#a2b4c2;--r-terra:#c8876f;--r-green:#8cb999;--r-dgreen:#5c8d6f;--r-sage:#9fb19f;--b-edge:rgba(16,20,24,.6);--label:#0d1012;--major:#f3d97c;--major-edge:#cdb056;--steps:#5f6862;--wall:#6f5e48;--gate:#3d3026'
 rep('  color-scheme:light;','  /* «Чіткий» (обрано 16.11.2026): контрастніші газон, доріжки й корпуси — карту читають надворі, на сонці */\n  '+CHITKYI+';\n  color-scheme:light;')
 rep('<meta name="theme-color" content="#eef0ea" media="(prefers-color-scheme: light)">','<meta name="theme-color" content="#e8eae4" media="(prefers-color-scheme: light)">')
+# ================= v9 (17.11.2026): темна тема «Графіт»; карту можна наблизити ще в 1,5 раза =================
+GRAPHITE='--bg:#222b31;--land:#232c32;--terr:#2c363d;--terr-edge:#46535b;--park:#26392e;--park-edge:#30473a;--road:#46535c;--road-edge:#232c32;--path:#74828a;--steps:#95a2a9;--ctx:#2f3940;--ctx-edge:#3a454d;--r-grey:#65717a;--r-graph:#4f5961;--r-blue:#677887;--r-terra:#8a5d4f;--r-green:#4a765d;--r-dgreen:#3a5d4b;--r-sage:#617366;--r-white:#7a776c;--glass-tint:rgba(44,52,59,.62);--contour:#5c5745;--hach:#776a56;--label-halo:rgba(35,44,50,.9);--relief:.6'
+rep('/* «Сланець» (обрано 16.11.2026) */\n  '+SLATE,'/* «Графіт» (обрано 17.11.2026; до того був «Сланець») */\n  '+GRAPHITE)
+rep(';--lawn:#31473a;--lawn-edge:#3a5244;--gate:#d8cab2',';--lawn:#24372c;--lawn-edge:#2d4235;--gate:#d8cab2')
+rep('<meta name="theme-color" content="#323c44" media="(prefers-color-scheme: dark)">','<meta name="theme-color" content="#222b31" media="(prefers-color-scheme: dark)">')
+# зум: пальцями чи коліщатком тепер можна наблизити до 73 м по ширині екрана (було 110 м, тобто в 1,5 раза ближче);
+# автоматичне наближення до маршруту чи відділення лишається як було (WFIT=110), щоб картинка після вибору не змінилась
+rep('WMIN=110, WMAX=1250;','WMIN=73, WFIT=110, WMAX=1250;')
+rep('(y1-y0+2*pad)/ah,WMIN/s.w);','(y1-y0+2*pad)/ah,WFIT/s.w);')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#e8eae4" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#323c44" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#222b31" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Ariadna — карта КНП «ПСИХІАТРІЯ» (Київ, вул. Кирилівська, 103): де корпус і відділення, як дійти від зупинки.">
 <title>Ariadna — Карта КНП «ПСИХІАТРІЯ»</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='15' cy='15' r='11' fill='%231d6b66'/%3E%3Cpath d='M7 11c5 1 11 6 13 13M6 17c5 0 10 3 12 8M11 5c4 3 8 9 9 16M18 4c2 4 3 8 2 13' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' opacity='.85'/%3E%3C/svg%3E">
@@ -54,9 +54,9 @@
   --b-edge:rgba(0,0,0,.45); --b-shadow:rgba(0,0,0,.35); --hi:rgba(0,0,0,.18);
   --label:#e3e6e4; --label-halo:rgba(17,23,27,.9);
   color-scheme:dark;
-;--lawn:#31473a;--lawn-edge:#3a5244;--gate:#d8cab2;
-  /* «Сланець» (обрано 16.11.2026) */
-  --bg:#323c44;--land:#343e46;--terr:#3e4951;--terr-edge:#56636c;--park:#33493c;--park-edge:#3e5848;--road:#58656f;--road-edge:#343e46;--path:#88959d;--steps:#a8b3b9;--ctx:#404a52;--ctx-edge:#4b565e;--r-grey:#7a858d;--r-graph:#606a72;--r-blue:#7a8b98;--r-terra:#9e6f5f;--r-green:#5a8a6e;--r-dgreen:#477059;--r-sage:#738679;--r-white:#8c897e;--glass-tint:rgba(56,65,73,.6);--glass-glow:rgba(255,255,255,.11);--contour:#6c6652;--hach:#887b64;--label-halo:rgba(52,62,70,.9);--b-edge:rgba(0,0,0,.38);--relief:.45
+;--lawn:#24372c;--lawn-edge:#2d4235;--gate:#d8cab2;
+  /* «Графіт» (обрано 17.11.2026; до того був «Сланець») */
+  --bg:#222b31;--land:#232c32;--terr:#2c363d;--terr-edge:#46535b;--park:#26392e;--park-edge:#30473a;--road:#46535c;--road-edge:#232c32;--path:#74828a;--steps:#95a2a9;--ctx:#2f3940;--ctx-edge:#3a454d;--r-grey:#65717a;--r-graph:#4f5961;--r-blue:#677887;--r-terra:#8a5d4f;--r-green:#4a765d;--r-dgreen:#3a5d4b;--r-sage:#617366;--r-white:#7a776c;--glass-tint:rgba(44,52,59,.62);--contour:#5c5745;--hach:#776a56;--label-halo:rgba(35,44,50,.9);--relief:.6
 }}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg)}
@@ -893,7 +893,7 @@ var POIS=SCULPT.concat(LAND);
 
 /* ---------- камера: плавна, з межами (карта ніколи не тікає з екрана) ---------- */
 var vb={x:-430,y:-380,w:960,h:700};
-var BOUND={x0:-360,y0:-330,x1:380,y1:300}, WMIN=110, WMAX=1250;
+var BOUND={x0:-360,y0:-330,x1:380,y1:300}, WMIN=73, WFIT=110, WMAX=1250;
 function size(){var r=svg.getBoundingClientRect();return {w:r.width||360,h:r.height||640,l:r.left,t:r.top}}
 function insets(){
   var s=size(),dr=document.getElementById("dock").getBoundingClientRect();
@@ -914,7 +914,7 @@ function apply(){
 function boxView(x0,y0,x1,y1,pad){
   var s=size(),ins=insets();pad=pad||0;
   var aw=Math.max(80,s.w-ins.l-ins.r),ah=Math.max(80,s.h-ins.t-ins.b);
-  var k=Math.max((x1-x0+2*pad)/aw,(y1-y0+2*pad)/ah,WMIN/s.w);
+  var k=Math.max((x1-x0+2*pad)/aw,(y1-y0+2*pad)/ah,WFIT/s.w);
   var cx=(x0+x1)/2,cy=(y0+y1)/2;
   return {w:s.w*k,h:s.h*k,x:cx-(ins.l+aw/2)*k,y:cy-(ins.t+ah/2)*k};
 }
