@@ -179,7 +179,7 @@ function setRes(main,sub,go,more){res.hidden=false;document.getElementById("resB
 
 function render(zoom){
   document.querySelectorAll("#pTo [data-d]").forEach(function(c){c.setAttribute("aria-pressed",c.dataset.d===st.dept?"true":"false")});
-  svg.querySelectorAll(".b").forEach(function(p){p.classList.toggle("on",+p.dataset.b===st.b)});
+  var ARo=st.dept?areaOf(st.dept):null;svg.querySelectorAll(".b").forEach(function(p){p.classList.toggle("on",!ARo&&+p.dataset.b===st.b)});
   svg.querySelectorAll(".badge").forEach(function(p){p.classList.toggle("on",+p.dataset.bb===st.b)});
   var d0=dById(st.dept),onE=d0?(d0.ents||(d0.ent?[d0.ent]:[])).concat(d0.lift?["lift"]:[]):(st.b>=0&&B[st.b].k?Object.keys(ENT).filter(function(k){return ENT[k].k===B[st.b].k}):[]);
   svg.querySelectorAll(".door").forEach(function(p){p.classList.toggle("on",onE.indexOf(p.dataset.en)>=0)});
@@ -222,7 +222,7 @@ function render(zoom){
   else if(s.geo)setRes(GEO.pos&&geoFar()?"Ви за ≈ "+fmtKm(geoFar()):GEO.err?"Геопозиція недоступна":"Визначаю, де ви…",GEO.pos&&geoFar()?"шлях прокладе Google Карти":GEO.err?"оберіть інше «Звідки»":"дозвольте доступ до геопозиції",GL);
   else if(st.noSteps)setRes("Без сходів не пройти","оберіть інше «Звідки»",GL);
   else setRes("Доріжки на карті немає","орієнтуйтеся за номером корпусу",GL);
-  if(d&&(d.fl||d.way||en)){var wy=[];if(d.fl)wy.push("<b>"+flT(d.fl)+".</b>");if(d&&areaOf(d.id))wy.push("Частину корпусу, яку займає відділення, виділено на карті пунктиром.");if(d.way)wy.push(esc(d.way));else if(en&&en.w)wy.push(esc(en.w));
+  if(d&&(d.fl||d.way||en)){var wy=[];if(d.fl)wy.push("<b>"+flT(d.fl)+".</b>");if(d&&areaOf(d.id))wy.push("Частину корпусу, яку займає відділення, обведено на карті.");if(d.way)wy.push(esc(d.way));else if(en&&en.w)wy.push(esc(en.w));
     if(d.lift)wy.push(viaLift?"Маршрут веде до дверей ліфта — вони в дворі між крилами корпусу.":"Є ліфт: окремі двері з двору, на карті підписані «Ліфт». Щоб маршрут вів до них, увімкніть «Маршрут без сходів» у віконці «Звідки».");
     if(wy.length)html+='<p class="note way">'+wy.join(" ")+'</p>'}
   if(d&&d.tel)html+=tels(d.tel);
@@ -233,8 +233,10 @@ function render(zoom){
   html+='<p class="note">Заблукали? Приймальне відділення цілодобово: <a href="tel:+380442938539">'+EM+'</a></p>';
   html+='<div class="acts"><button type="button" class="gbtn" id="shr">'+SHARE+'Поділитися маршрутом</button></div>';
   det.innerHTML=html;document.getElementById("shr").onclick=share;
-  glow.innerHTML='<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
-  var AR=d?areaOf(d.id):null;if(AR)darea.innerHTML='<polygon class="dar" points="'+AR.p+'"/>';
+  /* якщо відомо, яку частину корпусу займає відділення, обводимо тільки її, а не весь корпус */
+  var AR=d?areaOf(d.id):null;
+  glow.innerHTML=AR?"":'<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
+  if(AR)darea.innerHTML='<polygon class="dar-g" points="'+AR.p+'"/><polygon class="dar" points="'+AR.p+'"/>';
   var PINH=lbl("pin",door[0],door[1],0,'<circle class="wave" r="7"/><circle class="core" r="7"/><circle class="hit" r="16" data-pin="1"/>');
   if(r){
     var line=r.path.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join(" "),end=r.path[r.path.length-1];

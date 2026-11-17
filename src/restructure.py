@@ -381,7 +381,7 @@ rep('.b.on{stroke:var(--thread);stroke-width:2.2}','''.b.on{stroke:var(--thread)
 .slope{pointer-events:none}.slp-t{fill:none;stroke:var(--hach);stroke-width:.3;stroke-linecap:round;opacity:.8}
 .bench{fill:var(--wall);pointer-events:none}
 .gz circle{fill:var(--r-white);stroke:var(--b-edge);stroke-width:.35}.gz .gz-c{fill:var(--b-edge);stroke:none}
-.dar{fill:var(--thread);fill-opacity:.38;stroke:var(--thread);stroke-width:1.4;stroke-dasharray:3 1.6;stroke-linejoin:round;pointer-events:none}''')
+.dar{fill:var(--thread);fill-opacity:.3;stroke:var(--thread);stroke-width:2.2;stroke-linejoin:round;pointer-events:none}.dar-g{fill:none;stroke:var(--thread);stroke-width:7;opacity:.22;stroke-linejoin:round;pointer-events:none}''')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
