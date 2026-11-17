@@ -7,17 +7,22 @@
 <meta name="theme-color" content="#222b31" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Ariadna — карта КНП «ПСИХІАТРІЯ» (Київ, вул. Кирилівська, 103): де корпус і відділення, як дійти від зупинки.">
 <title>Ariadna — Карта КНП «ПСИХІАТРІЯ»</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='15' cy='15' r='11' fill='%231d6b66'/%3E%3Cpath d='M7 11c5 1 11 6 13 13M6 17c5 0 10 3 12 8M11 5c4 3 8 9 9 16M18 4c2 4 3 8 2 13' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' opacity='.85'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="brand/ariadna-favicon.svg">
+<link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
+<link rel="preload" href="fonts/FixelText-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/FixelText-Medium.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+/* Fixel (MacPaw × AlfaBravo, SIL OFL 1.1) — лише українська й латиниця, файли в папці fonts */
+@font-face{font-family:"Fixel Text";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/FixelText-Regular.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/FixelText-Medium.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/FixelText-SemiBold.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:700;font-style:normal;font-display:swap;src:url(fonts/FixelText-Bold.woff2) format("woff2")}
 /* Ariadna. Ідея: карта на весь екран і завжди головна; над нею — лише скляні елементи керування.
    Питання «Куди вам потрібно?» відкривається скляним вікном і саме зникає після вибору. */
 :root{
   --bg:#eef0ea; --ink:#16181a; --muted:#5c6166; --faint:#7a8086;
-  --accent:#1d6b66; --accent-ink:#fff; --accent-soft:rgba(29,107,102,.1);
-  --thread:#1d6b66; --thread-soft:rgba(29,107,102,.18); --case:#ffffff; --key-b:#2c3236; --key-t:#ffffff;
+  --accent:#222b31; --accent-ink:#f3efe6; --accent-soft:rgba(34,43,49,.08);
+  --thread:#94702f; --thread-soft:rgba(148,112,47,.2); --case:#ffffff; --key-b:#2c3236; --key-t:#ffffff;
   --glass-tint:rgba(255,255,255,.66); --glass-glow:rgba(255,255,255,.75);
   --rim-hi:rgba(255,255,255,.95); --rim-mid:rgba(255,255,255,.45); --rim-lo:rgba(255,255,255,.14);
   --btn-glass:rgba(255,255,255,.62); --btn-glass-hi:rgba(255,255,255,.88); --btn-in:rgba(22,24,26,.06);
@@ -38,8 +43,8 @@
 }
 @media (prefers-color-scheme:dark){:root{
   --bg:#0e1316; --ink:#eceae5; --muted:#a3a8ae; --faint:#8d939a;
-  --accent:#3ea39b; --accent-ink:#04110f; --accent-soft:rgba(62,163,155,.16);
-  --thread:#45b3a9; --thread-soft:rgba(69,179,169,.22); --case:#0e1316; --key-b:#e3e6e4; --key-t:#15181b;
+  --accent:#cdaa62; --accent-ink:#222b31; --accent-soft:rgba(205,170,98,.16);
+  --thread:#cdaa62; --thread-soft:rgba(205,170,98,.22); --case:#0e1316; --key-b:#e3e6e4; --key-t:#15181b;
   --glass-tint:rgba(30,35,41,.6); --glass-glow:rgba(255,255,255,.09);
   --rim-hi:rgba(255,255,255,.55); --rim-mid:rgba(255,255,255,.16); --rim-lo:rgba(255,255,255,.05);
   --btn-glass:rgba(255,255,255,.08); --btn-glass-hi:rgba(255,255,255,.14); --btn-in:rgba(255,255,255,.08);
@@ -60,7 +65,7 @@
 }}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg)}
-body{position:fixed;inset:0;color:var(--ink);font:15px/1.45 "Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{position:fixed;inset:0;color:var(--ink);font:15px/1.45 "Fixel Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button,a,input,label{touch-action:manipulation}
 button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;-webkit-user-select:none;user-select:none}
 [hidden]{display:none!important}
@@ -70,7 +75,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 /* ---------- map ---------- */
 #map{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;background:var(--land)}
 #map.drag{cursor:grabbing}
-#map text{font-family:"Onest",system-ui,sans-serif;paint-order:stroke;stroke:var(--label-halo);stroke-width:3.2px;stroke-linejoin:round;fill:var(--label);pointer-events:none}
+#map text{font-family:"Fixel Text",system-ui,sans-serif;paint-order:stroke;stroke:var(--label-halo);stroke-width:3.2px;stroke-linejoin:round;fill:var(--label);pointer-events:none}
 .land{fill:var(--land)} .park{fill:var(--park);stroke:var(--park-edge);stroke-width:1}
 .major-e{fill:none;stroke:var(--major-edge);stroke-linecap:round;stroke-linejoin:round}
 .major{fill:none;stroke:var(--major);stroke-linecap:round;stroke-linejoin:round}
@@ -101,7 +106,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .slope{pointer-events:none}.slp-t{fill:none;stroke:var(--hach);stroke-width:.3;stroke-linecap:round;opacity:.8}
 .bench{fill:var(--wall);pointer-events:none}
 .gz circle{fill:var(--r-white);stroke:var(--b-edge);stroke-width:.35}.gz .gz-c{fill:var(--b-edge);stroke:none}
-.dar{fill:var(--thread);fill-opacity:.3;stroke:var(--thread);stroke-width:2.2;stroke-linejoin:round;pointer-events:none}.dar-g{fill:none;stroke:var(--thread);stroke-width:7;opacity:.22;stroke-linejoin:round;pointer-events:none}
+.dar{fill:var(--accent);fill-opacity:.1;stroke:var(--thread);stroke-width:2.2;stroke-linejoin:round;pointer-events:none}.dar-g{fill:none;stroke:var(--thread);stroke-width:7;opacity:.22;stroke-linejoin:round;pointer-events:none}
 .glow{fill:none;stroke:var(--thread);stroke-width:7;opacity:.22;pointer-events:none;stroke-linejoin:round}
 /* проходи крізь будівлі — відкриті галереї під верхнім поверхом */
 .gal-b{fill:none;stroke:var(--terr);stroke-width:6.5;stroke-linecap:butt;pointer-events:none}
@@ -125,15 +130,15 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .badge.key circle{fill:var(--key-b);stroke:rgba(255,255,255,.9);stroke-width:1.6}
 .badge.key text{fill:var(--key-t)}
 .badge.sec circle{fill:rgba(255,255,255,.88)} .badge.sec text{font-size:10.5px;font-weight:600;fill:#4b5257}
-.badge.on circle{fill:var(--thread);stroke:#fff;stroke-width:2}
-.badge.on text{fill:#fff}
+.badge.on circle{fill:var(--accent);stroke:var(--thread);stroke-width:2.6}
+.badge.on text{fill:var(--accent-ink)}
 .badge .pulse{fill:none;stroke:var(--thread);stroke-width:2;opacity:0}
 .badge.on .pulse{animation:pulse 2.2s cubic-bezier(.2,.7,.3,1) infinite}
 @keyframes pulse{0%{r:13;opacity:.55}100%{r:30;opacity:0}}
 .poi .dot{fill:#fff;stroke:var(--b-edge);stroke-width:.8}
 .poi path{fill:none;stroke:#5b4c3f;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.poi.lm path{stroke:var(--accent)}
-.poi .f{fill:#5b4c3f;stroke:none}.poi.lm .f{fill:var(--accent)}
+.poi.lm path{stroke:#222b31}
+.poi .f{fill:#5b4c3f;stroke:none}.poi.lm .f{fill:#222b31}
 #map.mid .amen{display:none}
 .poi text{font-size:11px;font-weight:500}
 .hit{fill:transparent;stroke:none;pointer-events:all;cursor:pointer}
@@ -143,7 +148,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .stop path{fill:#fff}
 .stop text{font-size:11.5px;font-weight:600}
 .stop.on rect{fill:var(--thread);stroke-width:2.4}
-.stop.here rect{fill:var(--accent)}
+.stop.here rect{fill:var(--accent)}.stop.here path,.stop.on path{fill:var(--accent-ink)}
 .me .dot{fill:#2f7cf6;stroke:#fff;stroke-width:2.6}
 .me .wave{fill:#2f7cf6;opacity:.25;animation:wave 2s ease-out infinite}
 .acc{fill:rgba(47,124,246,.1);stroke:rgba(47,124,246,.4);stroke-width:.8;pointer-events:none}
@@ -157,7 +162,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .door .dg{fill:none;stroke:var(--key-t);stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
 .door text{font-size:10.5px;font-weight:600}
 .door.on .dr{fill:var(--thread);stroke:#fff}
-.door.on .dg{stroke:#fff}
+.door.on .dg{stroke:var(--accent-ink)}
 #map.mid .door:not(.on) text{display:none}
 #map.far .door.on{display:inline}
 
@@ -175,10 +180,16 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 @media (hover:hover){.gbtn:hover{background:var(--btn-sheen),var(--btn-glass-hi)}}
 .gbtn:active,.tile:active,.num:active,.from button:active,.dk:active,.found button:active{transform:scale(.97)}
 .gbtn svg{width:20px;height:20px;flex:none}
-.gbtn.prime{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px rgba(18,67,63,.65)}
-.gbtn.thread{background:var(--thread);color:#fff;box-shadow:0 10px 24px -12px rgba(18,67,63,.6)}
+.gbtn.prime{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px rgba(20,26,30,.5)}
+.gbtn.thread{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px rgba(20,26,30,.5)}
 
 /* ---------- нижні кнопки «Куди» і «Звідки» та смужка з відповіддю ---------- */
+.mast{position:absolute;z-index:14;transition:opacity .2s,transform .2s;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:15px;pointer-events:none;max-width:calc(100vw - 92px)}
+body.popping .mast{opacity:0;transform:translateY(-6px)}
+.mast .bi{width:34px;height:34px;flex:none;border-radius:9px}
+.mast .bt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.mast .bw{display:block;width:auto;height:13px}
+.mast .bs{font-size:11px;line-height:1.15;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dock{position:absolute;z-index:32;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .dock>*{pointer-events:auto}
 .res{display:flex;align-items:center;gap:10px;border-radius:22px;padding:8px 8px 8px 16px;min-height:60px;cursor:pointer;animation:rise .45s cubic-bezier(.32,.72,0,1) both}
@@ -189,7 +200,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .res .s span{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .res .s svg{width:13px;height:13px;flex:none;transition:transform .3s}
 .res[aria-expanded=true] .s svg{transform:rotate(180deg)}
-.res[aria-expanded=true],.dk[aria-expanded=true]{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--thread)}
+.res[aria-expanded=true],.dk[aria-expanded=true]{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--accent)}
 .dk-row{display:flex;gap:8px}
 .dk{flex:1;min-width:0;display:flex;align-items:center;gap:8px;text-align:left;border-radius:22px;padding:9px 12px 9px 9px;min-height:58px;transition:transform .12s,box-shadow .2s}
 .dk.to{flex:1.3}
@@ -197,7 +208,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 @media (max-width:379px){.dk.to{flex:1.45;padding-right:10px}.dk .v{font-size:14px}.dk.empty .v{font-size:15px}.dk.to .ic{width:32px;height:32px;border-radius:11px}.dk.to .ic svg{width:18px;height:18px}.dk.frm .ic{display:none}.dk.frm{padding-left:14px}}
 .dk.frm .v{font-size:14px}
 .note a,.pk-note a{color:var(--accent);text-underline-offset:2px}
-.dk .ic{width:36px;height:36px;flex:none;border-radius:13px;display:grid;place-items:center;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line);color:var(--thread)}
+.dk .ic{width:36px;height:36px;flex:none;border-radius:13px;display:grid;place-items:center;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line);color:var(--accent)}
 .dk .ic svg{width:20px;height:20px}
 .dk .ic.sm{width:30px;height:30px;border-radius:10px;color:var(--muted)}
 .dk .ic.sm svg{width:17px;height:17px}
@@ -208,9 +219,9 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .dk .v{font-size:15px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dk.empty .c{display:none}
 .dk.empty .v{font-size:16px}
-.dk.ask{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--thread);animation:nudge 1.6s ease-in-out 2}
+.dk.ask{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--accent);animation:nudge 1.6s ease-in-out 2}
 @keyframes nudge{0%,100%{transform:none}50%{transform:translateY(-3px)}}
-.logo{width:42px;height:42px;flex:none;border-radius:14px;display:grid;place-items:center;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line)}
+.logo{width:42px;height:42px;flex:none;border-radius:11px;display:grid;place-items:center;overflow:hidden}.logo img{width:42px;height:42px;display:block}.brand .wm{display:block;width:auto;height:15px;margin:2px 0 5px}
 .logo svg{width:28px;height:28px}
 
 /* ---------- map controls ---------- */
@@ -242,7 +253,7 @@ body.popping .scrim{opacity:1;pointer-events:auto}
 .srch>svg{width:19px;height:19px;flex:none;color:var(--muted)}
 .srch input{flex:1;min-width:0;height:100%;border:0;background:none;outline:none;font:inherit;font-size:16px;color:var(--ink);-webkit-appearance:none;appearance:none}
 .srch input::placeholder{color:var(--faint)}
-.srch:focus-within{box-shadow:inset 0 0 0 1.6px var(--thread)}
+.srch:focus-within{box-shadow:inset 0 0 0 1.6px var(--accent)}
 .srch .x{width:38px;height:38px;border-radius:12px;display:none;place-items:center;color:var(--muted)}
 .srch .x svg{width:18px;height:18px}
 .srch.has .x{display:grid}
@@ -263,17 +274,17 @@ body.popping .scrim{opacity:1;pointer-events:auto}
 .tile b{display:block;font-size:14px;font-weight:600;line-height:1.2}
 .tile small{display:block;font-size:12px;color:var(--muted);line-height:1.25;margin-top:2px}
 .tile.wide{grid-column:1/-1}
-.tile[aria-pressed=true]{box-shadow:inset 0 0 0 1.6px var(--thread);background:var(--btn-sheen),var(--thread-soft)}
+.tile[aria-pressed=true]{box-shadow:inset 0 0 0 1.6px var(--accent);background:var(--btn-sheen),var(--accent-soft)}
 .nums{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
 .num{height:48px;border-radius:14px;font-weight:600;font-size:16px;font-variant-numeric:tabular-nums;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line);transition:transform .12s}
-.num[aria-pressed=true]{background:var(--thread);color:#fff;box-shadow:none}
-@media (hover:hover){.tile:hover,.num:hover{background:var(--btn-sheen),var(--btn-glass-hi)}.num[aria-pressed=true]:hover{background:var(--thread)}}
+.num[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+@media (hover:hover){.tile:hover,.num:hover{background:var(--btn-sheen),var(--btn-glass-hi)}.num[aria-pressed=true]:hover{background:var(--accent)}}
 .pk-note{font-size:12.5px;color:var(--muted);margin:14px 4px 2px;line-height:1.45}
 .pk-note a{color:inherit}
 
 /* ---------- вміст віконець ---------- */
 .head{display:flex;align-items:center;gap:12px}
-.kb{width:50px;height:50px;flex:none;border-radius:16px;display:grid;place-items:center;background:var(--thread);color:#fff;font-weight:700;font-size:20px;box-shadow:0 10px 22px -12px rgba(18,67,63,.7)}
+.kb{width:50px;height:50px;flex:none;border-radius:16px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:20px;box-shadow:0 10px 22px -12px rgba(20,26,30,.55)}
 .kb small{display:block;font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-bottom:-6px;text-align:center}
 .kb.none{background:var(--btn-in);color:var(--muted);box-shadow:none;font-size:18px}
 .head .tx{flex:1;min-width:0}
@@ -283,15 +294,15 @@ body.popping .scrim{opacity:1;pointer-events:auto}
 .blk h3{font-size:12.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 2px 8px}
 .from{display:flex;flex-direction:column;gap:6px}
 .from button{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:16px;background:var(--btn-in);transition:transform .12s,background-color .15s}
-.from button[aria-pressed=true]{background:var(--thread-soft);box-shadow:inset 0 0 0 1.5px var(--thread)}
+.from button[aria-pressed=true]{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)}
 .from .bus{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;background:#2f6db5;color:#fff}
-.from .here .bus{background:var(--accent)}
+.from .here .bus{background:var(--accent);color:var(--accent-ink)}
 .from .bus svg{width:17px;height:17px}
 .from .ft{flex:1;min-width:0}
 .from .ft b{display:block;font-size:14px;font-weight:600;line-height:1.25}
 .from .ft small{display:block;font-size:12px;color:var(--muted);line-height:1.3}
 .from .m{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
-.from button[aria-pressed=true] .m{color:var(--thread)}
+.from button[aria-pressed=true] .m{color:var(--accent)}
 .sw{display:flex;align-items:center;gap:12px;padding:12px 4px 2px;cursor:pointer;-webkit-user-select:none;user-select:none}
 .sw input{position:absolute;opacity:0;pointer-events:none}
 .sw .k{width:46px;height:28px;flex:none;border-radius:20px;background:var(--btn-in);box-shadow:inset 0 0 0 1px var(--line);position:relative;transition:background-color .2s}
@@ -336,6 +347,7 @@ body.popping .scrim{opacity:1;pointer-events:auto}
 </head>
 <body>
 <svg id="map" role="img" aria-label="Карта території лікарні: корпуси, доріжки, проходи, зупинки"></svg>
+<div class="mast glass" id="mast"><img class="bi" src="brand/ariadna-favicon.svg" alt="" width="34" height="34"><span class="bt"><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="bw" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="92" height="15"></picture><span class="bs">КНП «ПСИХІАТРІЯ» · Кирилівська, 103</span></span></div>
 
 <div class="ctl" id="ctl">
   <button type="button" class="gbtn" id="info" aria-label="Як читати карту" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg></button>
@@ -370,7 +382,7 @@ body.popping .scrim{opacity:1;pointer-events:auto}
 <section class="pop glass" id="pTo" tabindex="-1" role="dialog" aria-label="Куди вам потрібно?">
   <button type="button" class="pclose" id="pToX" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <div class="pk-body">
-    <div class="brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="15" cy="15" r="11" fill="var(--thread)"/><path d="M7 11c5 1 11 6 13 13M6 17c5 0 10 3 12 8M11 5c4 3 8 9 9 16M18 4c2 4 3 8 2 13" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".85"/><path d="M25 22c3 2 4 5 2 7" fill="none" stroke="var(--thread)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span><b>Ariadna</b><small>КНП «ПСИХІАТРІЯ» · Кирилівська, 103</small></span></div>
+    <div class="brand"><span class="logo" aria-hidden="true"><img src="brand/ariadna-favicon.svg" alt="" width="42" height="42"></span><span><b><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="wm" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="104" height="17"></picture></b><small>КНП «ПСИХІАТРІЯ» · Кирилівська, 103</small></span></div>
     <label class="srch" id="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="q" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Номер, назва або корпус" aria-label="Пошук: номер відділення, назва або корпус"><button type="button" class="x" id="qx" aria-label="Очистити пошук"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></label>
     <div class="found" id="found" hidden></div>
     <div id="pkMain">
@@ -945,7 +957,8 @@ var BOUND={x0:-360,y0:-330,x1:380,y1:300}, WMIN=73, WFIT=110, WMAX=1250;
 function size(){var r=svg.getBoundingClientRect();return {w:r.width||360,h:r.height||640,l:r.left,t:r.top}}
 function insets(){
   var s=size(),dr=document.getElementById("dock").getBoundingClientRect();
-  return {t:14,b:Math.max(14,s.h-(dr.top-s.t)+10),l:14,r:70};
+  var hb=document.getElementById("mast").getBoundingClientRect();
+  return {t:Math.max(14,hb.bottom-s.t+10),b:Math.max(14,s.h-(dr.top-s.t)+10),l:14,r:70};
 }
 function clamp(v){
   var s=size();v.w=Math.min(WMAX,WMAX*s.w/s.h,Math.max(WMIN,v.w));v.h=v.w*s.h/s.w;

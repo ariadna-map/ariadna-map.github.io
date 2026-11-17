@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512" role="img" aria-label="Ariadna">
+<title>Ariadna</title>
+<g transform="translate(2 0)">
+<path fill="#222B31" d="M56.6 0 L39.4 0 L0 100 L17.2 100 L48 21.82 L62.41 58.4 L79.61 58.4 Z M78.8 100 L96 100 L84.02 69.6 L66.82 69.6 Z"/>
+<path fill="#222B31" d="M35.36 61 L93 61 A3 3 0 0 1 93 67 L32.99 67 Z"/>
+</g></svg>

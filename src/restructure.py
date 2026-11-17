@@ -415,6 +415,65 @@ rep("""BENCH.forEach(function(b){h+='<rect class="bench" x="'+(b[0]-.4)+'" y="'+
 rep('/* входи: «шпилька»',"""BENCH.forEach(function(b){h+=lbl("poi amen",b[0],b[1],0,'<circle class="dot" r="7"/><g>'+IC.bn+'</g><title>Лавка</title>')});
 GAZEBO.forEach(function(g){h+=lbl("poi amen",g[0],g[1],0,'<circle class="dot" r="7.5"/><g>'+IC.gz+'</g><title>Бесідка</title>')});
 /* входи: «шпилька»""")
+# ================= v13 (18.11.2026): айдентика Ariadna — знак у шапці, фавікон, золота нитка, шрифт Fixel =================
+# фавікон і іконка для екрана «Додому»; шрифт — свій (Fixel, OFL), без запитів до Google
+rep(s[s.index('<link rel="icon" href="data:image/svg+xml'):s.index('<style>')],
+    '<link rel="icon" type="image/svg+xml" href="brand/ariadna-favicon.svg">\n'
+    '<link rel="apple-touch-icon" href="brand/apple-touch-icon.png">\n'
+    '<link rel="preload" href="fonts/FixelText-Regular.woff2" as="font" type="font/woff2" crossorigin>\n'
+    '<link rel="preload" href="fonts/FixelText-Medium.woff2" as="font" type="font/woff2" crossorigin>\n')
+rep('<style>\n','''<style>
+/* Fixel (MacPaw × AlfaBravo, SIL OFL 1.1) — лише українська й латиниця, файли в папці fonts */
+@font-face{font-family:"Fixel Text";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/FixelText-Regular.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/FixelText-Medium.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/FixelText-SemiBold.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:700;font-style:normal;font-display:swap;src:url(fonts/FixelText-Bold.woff2) format("woff2")}
+''',)
+rep('font:15px/1.45 "Onest",system-ui,','font:15px/1.45 "Fixel Text",system-ui,')
+rep('#map text{font-family:"Onest",system-ui,sans-serif;','#map text{font-family:"Fixel Text",system-ui,sans-serif;')
+# кольори: золото — лише нитка (маршрут і все, що до нього належить); акценти інтерфейсу — графіт (на темному — золото)
+rep('--accent:#1d6b66; --accent-ink:#fff; --accent-soft:rgba(29,107,102,.1);','--accent:#222b31; --accent-ink:#f3efe6; --accent-soft:rgba(34,43,49,.08);')
+rep('--thread:#1d6b66; --thread-soft:rgba(29,107,102,.18);','--thread:#94702f; --thread-soft:rgba(148,112,47,.2);')
+rep('--accent:#3ea39b; --accent-ink:#04110f; --accent-soft:rgba(62,163,155,.16);','--accent:#cdaa62; --accent-ink:#222b31; --accent-soft:rgba(205,170,98,.16);')
+rep('--thread:#45b3a9; --thread-soft:rgba(69,179,169,.22);','--thread:#cdaa62; --thread-soft:rgba(205,170,98,.22);')
+rep('.gbtn.prime{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px rgba(18,67,63,.65)}','.gbtn.prime{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px rgba(20,26,30,.5)}')
+rep('.gbtn.thread{background:var(--thread);color:#fff;box-shadow:0 10px 24px -12px rgba(18,67,63,.6)}','.gbtn.thread{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px rgba(20,26,30,.5)}')
+rep('place-items:center;background:var(--thread);color:#fff;font-weight:700;font-size:20px;box-shadow:0 10px 22px -12px rgba(18,67,63,.7)','place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:20px;box-shadow:0 10px 22px -12px rgba(20,26,30,.55)')
+rep('.res[aria-expanded=true],.dk[aria-expanded=true]{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--thread)}','.res[aria-expanded=true],.dk[aria-expanded=true]{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--accent)}')
+rep('box-shadow:0 0 0 .5px var(--line);color:var(--thread)}','box-shadow:0 0 0 .5px var(--line);color:var(--accent)}')
+rep('.dk.ask{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--thread);','.dk.ask{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--accent);')
+rep('.srch:focus-within{box-shadow:inset 0 0 0 1.6px var(--thread)}','.srch:focus-within{box-shadow:inset 0 0 0 1.6px var(--accent)}')
+rep('.tile[aria-pressed=true]{box-shadow:inset 0 0 0 1.6px var(--thread);background:var(--btn-sheen),var(--thread-soft)}','.tile[aria-pressed=true]{box-shadow:inset 0 0 0 1.6px var(--accent);background:var(--btn-sheen),var(--accent-soft)}')
+rep('.num[aria-pressed=true]{background:var(--thread);color:#fff;box-shadow:none}','.num[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);box-shadow:none}')
+rep('.num[aria-pressed=true]:hover{background:var(--thread)}','.num[aria-pressed=true]:hover{background:var(--accent)}')
+rep('.from button[aria-pressed=true]{background:var(--thread-soft);box-shadow:inset 0 0 0 1.5px var(--thread)}','.from button[aria-pressed=true]{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)}')
+rep('.from button[aria-pressed=true] .m{color:var(--thread)}','.from button[aria-pressed=true] .m{color:var(--accent)}')
+rep('.from .here .bus{background:var(--accent)}','.from .here .bus{background:var(--accent);color:var(--accent-ink)}')
+rep('.stop.here rect{fill:var(--accent)}','.stop.here rect{fill:var(--accent)}.stop.here path,.stop.on path{fill:var(--accent-ink)}')
+rep('.badge.on circle{fill:var(--thread);stroke:#fff;stroke-width:2}','.badge.on circle{fill:var(--accent);stroke:var(--thread);stroke-width:2.6}')
+rep('.badge.on text{fill:#fff}','.badge.on text{fill:var(--accent-ink)}')
+rep('.door.on .dg{stroke:#fff}','.door.on .dg{stroke:var(--accent-ink)}')
+rep('.poi.lm path{stroke:var(--accent)}','.poi.lm path{stroke:#222b31}')
+rep('.poi.lm .f{fill:var(--accent)}','.poi.lm .f{fill:#222b31}')
+rep('.dar{fill:var(--thread);fill-opacity:.3;','.dar{fill:var(--accent);fill-opacity:.1;')
+# знак у шапці: іконка + вордмарк ARIADNA + підпис (у темній темі — світлий вордмарк)
+rep('<svg id="map" role="img" aria-label="Карта території лікарні: корпуси, доріжки, проходи, зупинки"></svg>\n',
+    '<svg id="map" role="img" aria-label="Карта території лікарні: корпуси, доріжки, проходи, зупинки"></svg>\n'
+    '<div class="mast glass" id="mast"><img class="bi" src="brand/ariadna-favicon.svg" alt="" width="34" height="34">'
+    '<span class="bt"><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)">'
+    '<img class="bw" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="92" height="15"></picture>'
+    '<span class="bs">КНП «ПСИХІАТРІЯ» · Кирилівська, 103</span></span></div>\n')
+rep('.dock{position:absolute;z-index:32;','''.mast{position:absolute;z-index:14;transition:opacity .2s,transform .2s;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:15px;pointer-events:none;max-width:calc(100vw - 92px)}
+body.popping .mast{opacity:0;transform:translateY(-6px)}
+.mast .bi{width:34px;height:34px;flex:none;border-radius:9px}
+.mast .bt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.mast .bw{display:block;width:auto;height:13px}
+.mast .bs{font-size:11px;line-height:1.15;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock{position:absolute;z-index:32;''')
+# карта при наближенні до маршруту не ховає його під шапкою
+rep('return {t:14,b:Math.max(14,s.h-(dr.top-s.t)+10),l:14,r:70};','var hb=document.getElementById("mast").getBoundingClientRect();\n  return {t:Math.max(14,hb.bottom-s.t+10),b:Math.max(14,s.h-(dr.top-s.t)+10),l:14,r:70};')
+rep('<span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="15" cy="15" r="11" fill="var(--thread)"/><path d="M7 11c5 1 11 6 13 13M6 17c5 0 10 3 12 8M11 5c4 3 8 9 9 16M18 4c2 4 3 8 2 13" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".85"/><path d="M25 22c3 2 4 5 2 7" fill="none" stroke="var(--thread)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span><b>Ariadna</b><small>','<span class="logo" aria-hidden="true"><img src="brand/ariadna-favicon.svg" alt="" width="42" height="42"></span><span><b><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="wm" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="104" height="17"></picture></b><small>')
+rep('.logo{width:42px;height:42px;flex:none;border-radius:14px;display:grid;place-items:center;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line)}','.logo{width:42px;height:42px;flex:none;border-radius:11px;display:grid;place-items:center;overflow:hidden}.logo img{width:42px;height:42px;display:block}.brand .wm{display:block;width:auto;height:15px;margin:2px 0 5px}')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
