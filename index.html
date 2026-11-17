@@ -97,6 +97,11 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .hi{fill:var(--hi);pointer-events:none}
 .ring{fill:none;stroke:var(--b-edge);stroke-width:.6;pointer-events:none}
 .b.on{stroke:var(--thread);stroke-width:2.2}
+.pave{fill:var(--road);stroke:var(--road-edge);stroke-width:.3;pointer-events:none}
+.slope{pointer-events:none}.slp-t{fill:none;stroke:var(--hach);stroke-width:.3;stroke-linecap:round;opacity:.8}
+.bench{fill:var(--wall);pointer-events:none}
+.gz circle{fill:var(--r-white);stroke:var(--b-edge);stroke-width:.35}.gz .gz-c{fill:var(--b-edge);stroke:none}
+.dar{fill:var(--thread);fill-opacity:.38;stroke:var(--thread);stroke-width:1.4;stroke-dasharray:3 1.6;stroke-linejoin:round;pointer-events:none}
 .glow{fill:none;stroke:var(--thread);stroke-width:7;opacity:.22;pointer-events:none;stroke-linejoin:round}
 /* проходи крізь будівлі — відкриті галереї під верхнім поверхом */
 .gal-b{fill:none;stroke:var(--terr);stroke-width:6.5;stroke-linecap:butt;pointer-events:none}
@@ -575,13 +580,14 @@ var ENT={
  v4:{k:"1",p:[-42.8,81.6],t:"4",a:"l",n:"Вхід до відділення 4",d:"двері з двору корпусу 1",w:"Двері — у дворі між крилами корпусу, у куті біля галереї."},
  lift:{k:"1",p:[-39.9,91.4],t:"Ліфт",a:"l",n:"Ліфт",d:"до відділень 7, 15 і 16 · двері з двору корпусу 1",w:"Двері ліфта — у дворі між крилами корпусу."},
  s:{k:"1",dir:-121,p:[4.3,109.6],t:"3 · 16 · 23 · 24",a:"l",n:"Вхід до відділень 3, 16, 23 і 24",d:"двері в проході крізь корпус · 16 і 24 — 3 поверх, 3 і 23 — 2 поверх",w:"Двері — у наскрізному проході крізь південне крило корпусу; на карті це пунктирний канал."},
- pnd:{k:"1",p:[-22.5,125.7],t:"ПНД",a:"b",n:"ПНД",d:"двері з південного боку корпусу 1",w:"Двері — з південного боку корпусу, з дороги."},
- w19:{k:"1",p:[-145.1,99.3],t:"19",a:"t",n:"Вхід до відділення 19",d:"двері із західного краю корпусу 1",w:"Двері — із західного краю корпусу."},
+ pnd:{k:"1",p:[-22.5,125.7],t:"ПНД",a:"b",n:"ПНД",d:"двері з південного боку корпусу 1 · 1 поверх",w:"Двері — з південного боку корпусу, з дороги."},
+ w19:{k:"1",p:[-145.1,99.3],t:"19 · 18 · 20",a:"t",n:"Вхід до відділень 19, 18 і 20",d:"двері із західного краю корпусу 1 · 19 — 1–2 поверхи, 18 і 20 — 3 поверх",w:"Двері — із західного краю корпусу."},
  arh:{k:"1",p:[21.7,53.8],t:"Архів",a:"r",n:"Архів",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
  prm:{k:"1",p:[25.3,65.7],t:"Приймальне · чол.",a:"r",n:"Приймальне — чоловічий блок",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
  prw:{k:"1",p:[29.7,80.6],t:"Приймальне · жін.",a:"r",n:"Приймальне — жіночий блок",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
  g4:{k:"1",p:[34.4,96.5],t:"",n:"Двері в галереї",d:"корпус 1"},
  k2:{k:"2",p:[69.3,-38],t:"6 · 9",a:"r",n:"Вхід до відділень 6 і 9",d:"двері зі східного торця корпусу 2",w:"Двері — зі східного торця корпусу; від дороги до них ведуть сходинки."},
+ k8:{k:"8",p:[220.5,-225.3],t:"8 · 10",a:"l",n:"Вхід до відділень 8 і 10",d:"єдиний вхід у корпус 8",w:"Це єдині двері корпусу 8: через них і до 8-го, і до 10-го відділення."},
  mkz:{k:"12",p:[127,-12],t:"Мала конференц-зала",a:"r",n:"Мала конференц-зала",d:"вхід зі східного боку корпусу 12",w:"Вхід — зі східного боку корпусу."}
 };
 B.forEach(function(b){if(!b.k||b.k==="1"||!b.door)return;
@@ -682,7 +688,12 @@ f 136,-236 108,-267
 s 138,-260 138,-234
 s 138,-234 129,-224
 f -143,93 -101,81
-f -101,81 -88,77
+s -101,81 -97,79.8
+f -97,79.8 -88,77
+f -138.8,91.8 -139,84 -137.2,77.8 -133.6,74.5 -128,74.5 -124.4,77.8 -122.8,83 -123,87.3
+f -56.3,66.6 -55,78.4
+f -46.5,97.9 -45.2,108.1
+f -34,27.6 -29.5,42 -22.5,78 -18.5,103
 f -88,77 -74,72
 v 153,52 133,32
 s 9,119 29,113 41,114
@@ -700,10 +711,32 @@ var STARTS={
  st:{at:[93,10],stop:[86.7,16.9],here:1,name:"Ви біля стенда зі схемою",cap:"Звідки",short:"Від стенда",street:"на території лікарні, біля адміністрації",tr:"",
      hint:"Ви вже на території. Ідіть уздовж червоної лінії."}
 };
+/* частини корпусу, які займають відділення (обведено на роздруківці 17.11.2026): ids — відділення, поверхи — у D */
+var AREAS={
+ n:{ids:["4","7","15"],p:"-79.5,37.2 -45.3,26.9 -31.5,72.8 -44.6,75.5 -54.4,42.6 -79.5,50.2"},
+ s:{ids:["16","3","pnd"],p:"-43.4,79.7 -30.2,77.2 -27.1,87.6 -20,111.5 -4.5,106.9 -2,119.6 -18.6,124.5 -29,127.7 -39.9,91.4 -42.8,81.6"},
+ e:{ids:["23","24","pr","prm","prw","arh"],p:"1.6,44.1 21.2,38.2 33.1,78.1 41.6,106.6 34.7,108.6 8.5,116.5 5,104.1 18.3,100.1 8.1,65.8 6.8,61.4 5.2,56.1"},
+ w:{ids:["19","18","20"],p:"-151.6,101.2 -145.1,99.3 -138.6,97.3 -137.1,102.5 -136,106.2 -125.6,140.9 -86.3,129.2 -73.9,125.5 -70.2,137.8 -94.2,145 -134.9,157.1"}
+};
+function areaOf(id){for(var k in AREAS)if(AREAS[k].ids.indexOf(id)>=0)return AREAS[k];return null}
+/* заасфальтовані майданчики (решта території — газон) */
+var PAVE=["-83.9,91.8 -69.2,87.4 -68,91 -72,95 -59,139 -70.2,144.3 -70.2,137.8",
+ "-69.2,87.4 -43.4,79.7 -42.8,81.6 -39.9,91.4 -38.1,97.4 -45.6,97.6 -65.2,103.5 -69.6,104 -72,95 -68,91",
+ "-38.1,97.4 -29,127.7 -32,128.6 -41,98.3",
+ "-22.7,31 -18,32 -7,43 -6,60.5 -15.7,60.4",
+ "-7,43 -2,42 1.6,44.1 5.2,56.1 6.8,61.4 8.1,65.8 18.3,100.1 5,104.1 -5,70 -6,65"];
+/* схили: a — напрямок горизонталі, штрихи йдуть униз по схилу */
+var SLOPES=[{a:-15.4,p:"-151.2,41.6 -32.2,8.8 -30.7,12.5 -47,24 -86,35 -151,53.7"},
+ {a:18.7,p:"-30.7,12.5 13.8,27.6 15.8,33.5 19,37 -2,42 -7,43 -18,32 -47,24"},
+ {a:73.3,p:"-44.5,29.5 -31.5,72.8 -27.1,87.6 -24.9,95 -21.1,93.9 -23.3,86.5 -27.7,71.7 -40.7,28.4"}];
+/* сходинки всередині наскрізного проходу (малюються поверх корпусу) */
+var STEPS_IN=["-101,81 -97,79.8"];
+var BENCH=[[-140.6,83.5],[-121.3,79.5]];
+var GAZEBO=[[-56.2,64.2],[-44.4,110.4]];
 var SCULPT=[
  {n:"Дон Кіхот",d:"кована скульптура; поруч — Санчо Панса та віслюк",x:142,y:-31,ic:"st"},
  {n:"Статуя",d:"у внутрішньому дворі корпусу 1",x:-76.2,y:65.8,ic:"st"},
- {n:"Лаокоон і його сини",d:"копія античної скульптури, встановлена 2025 року",x:-136,y:71,ic:"st"},
+ {n:"Лаокоон і його сини",d:"копія античної скульптури, встановлена 2025 року",x:-130.8,y:82,ic:"st"},
  {n:"Стела «Фахівцям лікарні»",d:"пам’ятний знак працівникам",x:137.7,y:66.7,ic:"sl"},
  {n:"Пам’ятний знак 1806 року",d:"тут стояв перший у Києві будинок для психічнохворих",x:143.3,y:52.8,ic:"sl"},
  {n:"Хрест пам’яті жертв Куренівської катастрофи",d:"біля Кирилівської церкви",x:145.5,y:-178.5,ic:"cr"}
@@ -729,24 +762,24 @@ var D=[
  {id:"1",k:"5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
  {id:"2",k:"5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
  {id:"3",k:"1",fl:2,ent:"s",d:"Активної терапії гострих психозів",tel:["(044) 503-87-03","(044) 293-85-43"]},
- {id:"4",k:"1",ent:"v4",d:"Лікувально-діагностичне",tel:["(044) 503-87-04","(044) 503-87-05"]},
+ {id:"4",k:"1",fl:1,ent:"v4",d:"Лікувально-діагностичне",tel:["(044) 503-87-04","(044) 503-87-05"]},
  {id:"5",k:"11",d:"Лікувально-діагностичне",tel:["(044) 293-64-65"]},
  {id:"6",k:"2",ent:"k2",note:"переїхало з корпусу 7: старі корпуси закривають на капітальний ремонт",d:"Лікувально-діагностичне",tel:["(044) 293-64-52","(044) 293-64-53"]},
- {id:"7",k:"1",fl:2,ent:"n",lift:1},{id:"8",k:"8"},
+ {id:"7",k:"1",fl:2,ent:"n",lift:1},{id:"8",k:"8",ent:"k8"},
  {id:"9",k:"2",ent:"k2",note:"переїхало в корпус 2: старі корпуси закривають на капітальний ремонт"},
- {id:"10",k:"8"},{id:"11",k:"2"},{id:"12",k:"2"},
+ {id:"10",k:"8",ent:"k8"},{id:"11",k:"2"},{id:"12",k:"2"},
  {id:"13",k:"3",d:"Комплексної терапії резистентних форм хімічної залежності"},
  {id:"14",k:"3",d:"Інфекційне",tel:["(044) 503-87-14"]},
  {id:"15",k:"1",fl:3,ent:"n",lift:1,d:"Психіатричної та паліативної допомоги",tel:["(044) 503-87-29","(044) 293-64-61"]},
  {id:"16",k:"1",fl:3,ent:"s",lift:1,d:"Для хворих із супутньою соматичною патологією",tel:["(044) 503-87-16"]},
- {id:"18",k:"1",d:"Геронтологічне",tel:["(044) 293-64-62"]},
- {id:"19",k:"1",d:"Для хворих на епілепсію",tel:["(044) 293-85-36","(044) 293-64-63"],ent:"w19"},
- {id:"20",k:"1"},{id:"22",k:"11"},{id:"23",k:"1",fl:2,ent:"s"},{id:"24",k:"1",fl:3,ent:"s"},
+ {id:"18",k:"1",fl:3,ent:"w19",d:"Геронтологічне",tel:["(044) 293-64-62"]},
+ {id:"19",k:"1",fl:"1–2",d:"Для хворих на епілепсію",tel:["(044) 293-85-36","(044) 293-64-63"],ent:"w19"},
+ {id:"20",k:"1",fl:3,ent:"w19"},{id:"22",k:"11"},{id:"23",k:"1",fl:2,ent:"s"},{id:"24",k:"1",fl:3,ent:"s"},
  /* x — не відділення з номером: шукаються текстом, у плитках і номерах їх немає */
  {id:"prm",x:1,t:"Приймальне — чоловічий блок",short:"Приймальне (чол.)",k:"1",ent:"prm",kw:"чоловіки",note:"працює цілодобово",tel:[EM]},
  {id:"prw",x:1,t:"Приймальне — жіночий блок",short:"Приймальне (жін.)",k:"1",ent:"prw",kw:"жінки",note:"працює цілодобово",tel:[EM]},
  {id:"arh",x:1,t:"Архів",k:"1",ent:"arh",note:"двері в галереї під навісом"},
- {id:"pnd",x:1,t:"ПНД",k:"1",ent:"pnd",kw:"диспансер",note:"двері з південного боку корпусу"},
+ {id:"pnd",x:1,t:"ПНД",k:"1",fl:1,ent:"pnd",kw:"диспансер",note:"двері з південного боку корпусу"},
  {id:"ekopfo",x:1,t:"ЕКОПФО",short:"ЕКОПФО",full:"ЕКОПФО — експертна команда з оцінювання повсякденного функціонування особи",k:"1",fl:1,ent:"n",kw:"експертна команда оцінювання повсякденного функціонування особи мсек інвалідність",note:"вхід той самий, що до відділень 7 і 15"},
  {id:"lift",x:1,t:"Ліфт корпусу 1",short:"Ліфт",k:"1",ent:"lift",note:"до відділень 7, 15 і 16"},
  {id:"mkz",x:1,t:"Мала конференц-зала",short:"Мала конф.-зала",k:"12",ent:"mkz",kw:"конференція зал",note:"вхід зі східного боку корпусу"}
@@ -822,12 +855,16 @@ var SUN=[.55,.66];
 function shadowOf(poly,hgt){var out="",n=4;for(var k=1;k<=n;k++){var d=hgt*.62*k/n;out+='<path class="shd" transform="translate('+(SUN[0]*d).toFixed(2)+' '+(SUN[1]*d).toFixed(2)+')" d="'+poly+'"/>'}return out}
 var ctxS="",ctxB="";CTX.trim().split("\n").forEach(function(p){var d="M"+p.trim().split(/\s+/).join("L")+"Z";ctxS+='<path class="shd" transform="translate(4.4 5.3)" d="'+d+'"/>';ctxB+='<path class="ctx" d="'+d+'"/>'});
 h+='<g class="shg ctxs">'+ctxS+'</g>'+ctxB;
+PAVE.forEach(function(p){h+='<polygon class="pave" points="'+p+'"/>'});
+SLOPES.forEach(function(sl,i){h+='<pattern id="slp'+i+'" width="2.6" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate('+sl.a+')"><path class="slp-t" d="M1.3 .5v1.3"/></pattern><polygon class="slope" fill="url(#slp'+i+')" points="'+sl.p+'"/>'});
 var rd="",rde="",fw="",fwe="",stp="",stb="";
 WAYS.split("\n").forEach(function(line){var sp=line.indexOf(" "),c=line.charAt(0),p=line.slice(sp+1);
   if(c==="v"){rde+='<polyline class="rd-e" points="'+p+'"/>';rd+='<polyline class="rd" points="'+p+'"/>'}
   else if(c==="s"){stb+='<polyline class="stp-b" points="'+p+'"/>';stp+='<polyline class="stp" points="'+p+'"/>'}
   else{fwe+='<polyline class="fw-e" points="'+p+'"/>';fw+='<polyline class="fw" points="'+p+'"/>'}});
 h+=rde+fwe+rd+fw+stb+stp;
+BENCH.forEach(function(b){h+='<rect class="bench" x="'+(b[0]-.4)+'" y="'+(b[1]-1.2)+'" width=".8" height="2.4" rx=".2"><title>Лавка</title></rect>'});
+GAZEBO.forEach(function(g){h+='<g class="gz"><circle cx="'+g[0]+'" cy="'+g[1]+'" r="2.3"/><circle class="gz-c" cx="'+g[0]+'" cy="'+g[1]+'" r=".55"/><title>Бесідка</title></g>'});
 /* уступи й підпірні стіни: лінія з зубцями в бік спуску */
 WALLS.forEach(function(w){var p=pts(w),t="";for(var i=1;i<p.length;i++){var a=p[i-1],b=p[i],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,nx=-uy,ny=ux;for(var q=2;q<L-1;q+=3.2){var x=a[0]+ux*q,y=a[1]+uy*q;t+="M"+x.toFixed(1)+" "+y.toFixed(1)+"l"+(nx*-2.4).toFixed(1)+" "+(ny*-2.4).toFixed(1)}}
   h+='<path class="cliff-t" d="'+t+'"/><polyline class="cliff" points="'+w+'"/>'});
@@ -851,6 +888,7 @@ B.forEach(function(b,i){var d=ringsPath(b.p);
     bb+='<g class="shg" style="opacity:.2">'+shadowOf(pd,dl*3.3)+'</g><path class="b hib '+b.r+'" d="'+pd+'"/><path d="'+pd+'" fill="rgba(255,255,255,'+Math.min(.28,dl*.045).toFixed(2)+')" class="hib"/>'});
   if(b.ring)bb+='<polygon class="ring" points="'+b.ring+'"/>';});
 h+=bb;
+h+='<g id="darea"></g>';
 GAL.forEach(function(g){var p=pts(g),a=p[0],b=p[1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),nx=-dy/L*2.6,ny=dx/L*2.6,ex=dx/L*1.2,ey=dy/L*1.2;
   var A=[a[0]-ex,a[1]-ey],Z=[b[0]+ex,b[1]+ey];
   h+='<polyline class="gal-b" points="'+A+" "+Z+'"/>';
@@ -859,6 +897,7 @@ GALF.forEach(function(g){var dx=g.b[0]-g.a[0],dy=g.b[1]-g.a[1],L=Math.hypot(dx,d
   function off(p,o){return (p[0]+ix*o).toFixed(1)+","+(p[1]+iy*o).toFixed(1)}
   h+='<polyline class="gal-b" style="stroke-width:'+(w+.6)+'" points="'+off(A,w/2-.3)+" "+off(Z,w/2-.3)+'"/>';
   h+='<polyline class="gal-d" points="'+off(A,0)+" "+off(Z,0)+'"/><polyline class="gal-d" points="'+off(A,w)+" "+off(Z,w)+'"/>'});
+STEPS_IN.forEach(function(p){h+='<polyline class="stp-b" points="'+p+'"/><polyline class="stp" points="'+p+'"/>'});
 h+='<g id="route"></g>';
 STREETS.forEach(function(s){h+=lbl("stn sec",s[1],s[2],s[3],'<text text-anchor="middle">'+esc(s[0])+'</text>')});
 GATES.forEach(function(g){var best=null;WAYS.split("\n").forEach(function(line){var sp=line.indexOf(" "),c=line.charAt(0),p=pts(line.slice(sp+1));
@@ -1076,13 +1115,14 @@ D.forEach(function(d){
   else{b.className="num";b.textContent=d.id;b.setAttribute("aria-label","Відділення номер "+d.id);nums.appendChild(b)}
   b.onclick=function(){choose(d.id)};
 });
+function flT(f){return f+(typeof f==="string"?" поверхи":" поверх")}
 function choose(id){var d=dById(id);st.dept=id;st.b=d.k===null?-1:bIndex(d.k);pop(null);render(true);syncUrl()}
 
 /* пошук: номер, назва, корпус, скульптура */
 function norm(s){return String(s).toLowerCase().replace(/[’'`ʼ"«»№#.,()—–-]/g," ").replace(/\s+/g," ").trim()}
 var IDX=[];
 D.forEach(function(d){
-  IDX.push({t:dTitle(d),s:[(d.k?"корпус "+d.k:"корпус не вказано"),d.fl?d.fl+" поверх":"",d.q||d.x?(d.note||""):(d.d||"")].filter(Boolean).join(" · "),num:d.q||d.x?null:d.id,q:d.q,x:d.x,ck:d.k||null,
+  IDX.push({t:dTitle(d),s:[(d.k?"корпус "+d.k:"корпус не вказано"),d.fl?flT(d.fl):"",d.q||d.x?(d.note||""):(d.d||"")].filter(Boolean).join(" · "),num:d.q||d.x?null:d.id,q:d.q,x:d.x,ck:d.k||null,
     h:norm([d.t||"",d.full||"",d.d||"",d.kw||"",d.q||d.x?"":"відділення відділ "+d.id,d.k?"корпус "+d.k:""].join(" ")),go:function(){choose(d.id)}})});
 B.forEach(function(b,i){if(!b.k&&!b.n)return;var inside=inK(b.k).map(dName);
   IDX.push({t:b.k?"Корпус "+b.k:b.n,s:b.k?(b.n||(inside.length?"тут: "+inside.join(", "):"")):"",bk:b.k||null,
@@ -1154,7 +1194,7 @@ function render(zoom){
   svg.querySelectorAll(".badge").forEach(function(p){p.classList.toggle("on",+p.dataset.bb===st.b)});
   var d0=dById(st.dept),onE=d0?(d0.ents||(d0.ent?[d0.ent]:[])).concat(d0.lift?["lift"]:[]):(st.b>=0&&B[st.b].k?Object.keys(ENT).filter(function(k){return ENT[k].k===B[st.b].k}):[]);
   svg.querySelectorAll(".door").forEach(function(p){p.classList.toggle("on",onE.indexOf(p.dataset.en)>=0)});
-  var rg=document.getElementById("route"),pin=document.getElementById("pin"),glow=document.getElementById("glow");rg.innerHTML="";pin.innerHTML="";glow.innerHTML="";
+  var rg=document.getElementById("route"),pin=document.getElementById("pin"),glow=document.getElementById("glow"),darea=document.getElementById("darea");darea.innerHTML="";rg.innerHTML="";pin.innerHTML="";glow.innerHTML="";
   var d=dById(st.dept),det=document.getElementById("detBody"),toC=document.getElementById("toC"),toV=document.getElementById("toV");
   STARTS.geo.at=GEO.pos;STARTS.geo.stop=GEO.pos;STARTS.geo.street=geoText();
   function done(){svg.querySelectorAll(".stop").forEach(function(p){p.classList.toggle("on",p.dataset.e===st.start)});setFrom();bFrom.classList.toggle("ask",!st.start&&(st.b>=0||!!d));dockH();if(cur==="from")drawFrom()}
@@ -1186,14 +1226,14 @@ function render(zoom){
   var s=st.start?STARTS[st.start]:null,r=s?routes[st.start]:null;
   var lat=(LAT0-door[1]/KY).toFixed(6),lon=(LON0+door[0]/KX).toFixed(6);
   var GL='<a class="gbtn thread" href="https://www.google.com/maps/dir/?api=1&amp;destination='+lat+','+lon+'&amp;travelmode=walking" target="_blank" rel="noopener">'+NAV+'Вести</a>';
-  var FL=d&&d.fl?d.fl+" поверх"+(viaLift?", ліфтом":"")+" · ":"";
+  var FL=d&&d.fl?flT(d.fl)+(viaLift?", ліфтом":"")+" · ":"";
   if(b.priv)setRes("Закрита територія","вхід лише за дозволом");
   else if(r)setRes("≈ "+mins(r.len)+" хв · "+Math.round(r.len/10)*10+" м",FL+(s.geo?"від вас":s.here?"від стенда":"від зупинки"),GL);
   else if(!s)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
   else if(s.geo)setRes(GEO.pos&&geoFar()?"Ви за ≈ "+fmtKm(geoFar()):GEO.err?"Геопозиція недоступна":"Визначаю, де ви…",GEO.pos&&geoFar()?"шлях прокладе Google Карти":GEO.err?"оберіть інше «Звідки»":"дозвольте доступ до геопозиції",GL);
   else if(st.noSteps)setRes("Без сходів не пройти","оберіть інше «Звідки»",GL);
   else setRes("Доріжки на карті немає","орієнтуйтеся за номером корпусу",GL);
-  if(d&&(d.fl||d.way||en)){var wy=[];if(d.fl)wy.push("<b>"+d.fl+" поверх.</b>");if(d.way)wy.push(esc(d.way));else if(en&&en.w)wy.push(esc(en.w));
+  if(d&&(d.fl||d.way||en)){var wy=[];if(d.fl)wy.push("<b>"+flT(d.fl)+".</b>");if(d&&areaOf(d.id))wy.push("Частину корпусу, яку займає відділення, виділено на карті пунктиром.");if(d.way)wy.push(esc(d.way));else if(en&&en.w)wy.push(esc(en.w));
     if(d.lift)wy.push(viaLift?"Маршрут веде до дверей ліфта — вони в дворі між крилами корпусу.":"Є ліфт: окремі двері з двору, на карті підписані «Ліфт». Щоб маршрут вів до них, увімкніть «Маршрут без сходів» у віконці «Звідки».");
     if(wy.length)html+='<p class="note way">'+wy.join(" ")+'</p>'}
   if(d&&d.tel)html+=tels(d.tel);
@@ -1205,6 +1245,7 @@ function render(zoom){
   html+='<div class="acts"><button type="button" class="gbtn" id="shr">'+SHARE+'Поділитися маршрутом</button></div>';
   det.innerHTML=html;document.getElementById("shr").onclick=share;
   glow.innerHTML='<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
+  var AR=d?areaOf(d.id):null;if(AR)darea.innerHTML='<polygon class="dar" points="'+AR.p+'"/>';
   var PINH=lbl("pin",door[0],door[1],0,'<circle class="wave" r="7"/><circle class="core" r="7"/><circle class="hit" r="16" data-pin="1"/>');
   if(r){
     var line=r.path.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join(" "),end=r.path[r.path.length-1];
@@ -1217,6 +1258,7 @@ function render(zoom){
     pin.innerHTML=PINH;
     lastBox=[door[0]-110,door[1]-110,door[0]+110,door[1]+110,0];
   }
+  if(AR)pts(AR.p).forEach(function(q){lastBox[0]=Math.min(lastBox[0],q[0]);lastBox[1]=Math.min(lastBox[1],q[1]);lastBox[2]=Math.max(lastBox[2],q[0]);lastBox[3]=Math.max(lastBox[3],q[1])});
   done();
   if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();
 }

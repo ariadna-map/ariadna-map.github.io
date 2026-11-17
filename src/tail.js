@@ -104,13 +104,14 @@ D.forEach(function(d){
   else{b.className="num";b.textContent=d.id;b.setAttribute("aria-label","Відділення номер "+d.id);nums.appendChild(b)}
   b.onclick=function(){choose(d.id)};
 });
+function flT(f){return f+(typeof f==="string"?" поверхи":" поверх")}
 function choose(id){var d=dById(id);st.dept=id;st.b=d.k===null?-1:bIndex(d.k);pop(null);render(true);syncUrl()}
 
 /* пошук: номер, назва, корпус, скульптура */
 function norm(s){return String(s).toLowerCase().replace(/[’'`ʼ"«»№#.,()—–-]/g," ").replace(/\s+/g," ").trim()}
 var IDX=[];
 D.forEach(function(d){
-  IDX.push({t:dTitle(d),s:[(d.k?"корпус "+d.k:"корпус не вказано"),d.fl?d.fl+" поверх":"",d.q||d.x?(d.note||""):(d.d||"")].filter(Boolean).join(" · "),num:d.q||d.x?null:d.id,q:d.q,x:d.x,ck:d.k||null,
+  IDX.push({t:dTitle(d),s:[(d.k?"корпус "+d.k:"корпус не вказано"),d.fl?flT(d.fl):"",d.q||d.x?(d.note||""):(d.d||"")].filter(Boolean).join(" · "),num:d.q||d.x?null:d.id,q:d.q,x:d.x,ck:d.k||null,
     h:norm([d.t||"",d.full||"",d.d||"",d.kw||"",d.q||d.x?"":"відділення відділ "+d.id,d.k?"корпус "+d.k:""].join(" ")),go:function(){choose(d.id)}})});
 B.forEach(function(b,i){if(!b.k&&!b.n)return;var inside=inK(b.k).map(dName);
   IDX.push({t:b.k?"Корпус "+b.k:b.n,s:b.k?(b.n||(inside.length?"тут: "+inside.join(", "):"")):"",bk:b.k||null,
@@ -182,7 +183,7 @@ function render(zoom){
   svg.querySelectorAll(".badge").forEach(function(p){p.classList.toggle("on",+p.dataset.bb===st.b)});
   var d0=dById(st.dept),onE=d0?(d0.ents||(d0.ent?[d0.ent]:[])).concat(d0.lift?["lift"]:[]):(st.b>=0&&B[st.b].k?Object.keys(ENT).filter(function(k){return ENT[k].k===B[st.b].k}):[]);
   svg.querySelectorAll(".door").forEach(function(p){p.classList.toggle("on",onE.indexOf(p.dataset.en)>=0)});
-  var rg=document.getElementById("route"),pin=document.getElementById("pin"),glow=document.getElementById("glow");rg.innerHTML="";pin.innerHTML="";glow.innerHTML="";
+  var rg=document.getElementById("route"),pin=document.getElementById("pin"),glow=document.getElementById("glow"),darea=document.getElementById("darea");darea.innerHTML="";rg.innerHTML="";pin.innerHTML="";glow.innerHTML="";
   var d=dById(st.dept),det=document.getElementById("detBody"),toC=document.getElementById("toC"),toV=document.getElementById("toV");
   STARTS.geo.at=GEO.pos;STARTS.geo.stop=GEO.pos;STARTS.geo.street=geoText();
   function done(){svg.querySelectorAll(".stop").forEach(function(p){p.classList.toggle("on",p.dataset.e===st.start)});setFrom();bFrom.classList.toggle("ask",!st.start&&(st.b>=0||!!d));dockH();if(cur==="from")drawFrom()}
@@ -214,14 +215,14 @@ function render(zoom){
   var s=st.start?STARTS[st.start]:null,r=s?routes[st.start]:null;
   var lat=(LAT0-door[1]/KY).toFixed(6),lon=(LON0+door[0]/KX).toFixed(6);
   var GL='<a class="gbtn thread" href="https://www.google.com/maps/dir/?api=1&amp;destination='+lat+','+lon+'&amp;travelmode=walking" target="_blank" rel="noopener">'+NAV+'Вести</a>';
-  var FL=d&&d.fl?d.fl+" поверх"+(viaLift?", ліфтом":"")+" · ":"";
+  var FL=d&&d.fl?flT(d.fl)+(viaLift?", ліфтом":"")+" · ":"";
   if(b.priv)setRes("Закрита територія","вхід лише за дозволом");
   else if(r)setRes("≈ "+mins(r.len)+" хв · "+Math.round(r.len/10)*10+" м",FL+(s.geo?"від вас":s.here?"від стенда":"від зупинки"),GL);
   else if(!s)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
   else if(s.geo)setRes(GEO.pos&&geoFar()?"Ви за ≈ "+fmtKm(geoFar()):GEO.err?"Геопозиція недоступна":"Визначаю, де ви…",GEO.pos&&geoFar()?"шлях прокладе Google Карти":GEO.err?"оберіть інше «Звідки»":"дозвольте доступ до геопозиції",GL);
   else if(st.noSteps)setRes("Без сходів не пройти","оберіть інше «Звідки»",GL);
   else setRes("Доріжки на карті немає","орієнтуйтеся за номером корпусу",GL);
-  if(d&&(d.fl||d.way||en)){var wy=[];if(d.fl)wy.push("<b>"+d.fl+" поверх.</b>");if(d.way)wy.push(esc(d.way));else if(en&&en.w)wy.push(esc(en.w));
+  if(d&&(d.fl||d.way||en)){var wy=[];if(d.fl)wy.push("<b>"+flT(d.fl)+".</b>");if(d&&areaOf(d.id))wy.push("Частину корпусу, яку займає відділення, виділено на карті пунктиром.");if(d.way)wy.push(esc(d.way));else if(en&&en.w)wy.push(esc(en.w));
     if(d.lift)wy.push(viaLift?"Маршрут веде до дверей ліфта — вони в дворі між крилами корпусу.":"Є ліфт: окремі двері з двору, на карті підписані «Ліфт». Щоб маршрут вів до них, увімкніть «Маршрут без сходів» у віконці «Звідки».");
     if(wy.length)html+='<p class="note way">'+wy.join(" ")+'</p>'}
   if(d&&d.tel)html+=tels(d.tel);
@@ -233,6 +234,7 @@ function render(zoom){
   html+='<div class="acts"><button type="button" class="gbtn" id="shr">'+SHARE+'Поділитися маршрутом</button></div>';
   det.innerHTML=html;document.getElementById("shr").onclick=share;
   glow.innerHTML='<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
+  var AR=d?areaOf(d.id):null;if(AR)darea.innerHTML='<polygon class="dar" points="'+AR.p+'"/>';
   var PINH=lbl("pin",door[0],door[1],0,'<circle class="wave" r="7"/><circle class="core" r="7"/><circle class="hit" r="16" data-pin="1"/>');
   if(r){
     var line=r.path.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join(" "),end=r.path[r.path.length-1];
@@ -245,6 +247,7 @@ function render(zoom){
     pin.innerHTML=PINH;
     lastBox=[door[0]-110,door[1]-110,door[0]+110,door[1]+110,0];
   }
+  if(AR)pts(AR.p).forEach(function(q){lastBox[0]=Math.min(lastBox[0],q[0]);lastBox[1]=Math.min(lastBox[1],q[1]);lastBox[2]=Math.max(lastBox[2],q[0]);lastBox[3]=Math.max(lastBox[3],q[1])});
   done();
   if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();
 }
