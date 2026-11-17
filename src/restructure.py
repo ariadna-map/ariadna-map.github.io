@@ -348,7 +348,7 @@ f -34,27.6 -29.5,42 -22.5,78 -18.5,103
 rep('var SCULPT=[','''/* частини корпусу, які займають відділення (обведено на роздруківці 17.11.2026): ids — відділення, поверхи — у D */
 var AREAS={
  n:{ids:["4","7","15"],p:"-79.5,37.2 -45.3,26.9 -31.5,72.8 -44.6,75.5 -54.4,42.6 -79.5,50.2"},
- s:{ids:["16","3","pnd"],p:"-43.4,79.7 -30.2,77.2 -27.1,87.6 -20,111.5 -4.5,106.9 -2,119.6 -18.6,124.5 -29,127.7 -39.9,91.4 -42.8,81.6"},
+ s:{ids:["16","3","amb"],p:"-43.4,79.7 -30.2,77.2 -27.1,87.6 -20,111.5 -4.5,106.9 -2,119.6 -18.6,124.5 -29,127.7 -39.9,91.4 -42.8,81.6"},
  e:{ids:["23","24","pr","prm","prw","arh"],p:"1.6,44.1 21.2,38.2 33.1,78.1 41.6,106.6 34.7,108.6 8.5,116.5 5,104.1 18.3,100.1 8.1,65.8 6.8,61.4 5.2,56.1"},
  w:{ids:["19","18","20"],p:"-151.6,101.2 -145.1,99.3 -138.6,97.3 -137.1,102.5 -136,106.2 -125.6,140.9 -86.3,129.2 -73.9,125.5 -70.2,137.8 -94.2,145 -134.9,157.1"}
 };
@@ -382,6 +382,39 @@ rep('.b.on{stroke:var(--thread);stroke-width:2.2}','''.b.on{stroke:var(--thread)
 .bench{fill:var(--wall);pointer-events:none}
 .gz circle{fill:var(--r-white);stroke:var(--b-edge);stroke-width:.35}.gz .gz-c{fill:var(--b-edge);stroke:none}
 .dar{fill:var(--thread);fill-opacity:.3;stroke:var(--thread);stroke-width:2.2;stroke-linejoin:round;pointer-events:none}.dar-g{fill:none;stroke:var(--thread);stroke-width:7;opacity:.22;stroke-linejoin:round;pointer-events:none}''')
+# ================= v12 (17.11.2026): корпус 5 — один вхід «1 · 2»; ПНД = Правобережна амбулаторія № 1; без відділення 11;
+#                   тонша нитка; впізнавані значки лавок, бесідок, скульптур і пам'ятників; сходинки на північ від галереї
+rep('{id:"10",k:"8",ent:"k8"},{id:"11",k:"2"},','{id:"10",k:"8",ent:"k8"},')   # відділення 11 у лікарні більше немає
+rep('{id:"1",k:"5",d:','{id:"1",k:"5",ent:"k5",d:')
+rep('{id:"2",k:"5",d:','{id:"2",k:"5",ent:"k5",d:')
+rep(' mkz:{k:"12",',' k5:{k:"5",p:[73.8,-114.1],t:"1 · 2",a:"l",n:"Вхід до відділень 1 і 2",d:"один вхід для обох відділень",w:"Через ці двері — і до 1-го, і до 2-го відділення."},\n mkz:{k:"12",')
+rep('{id:"pnd",x:1,t:"ПНД",k:"1",fl:1,ent:"pnd",kw:"диспансер",note:"двері з південного боку корпусу"},','')
+rep('{id:"amb",q:1,short:"Амбулаторія № 1",t:"Амбулаторія № 1",sub:"Правобережна",ic:"door",full:"Правобережна психіатрична амбулаторія № 1",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 503-87-80","(095) 687-25-90"]},',
+    '{id:"amb",q:1,short:"Амбулаторія № 1",t:"Амбулаторія № 1",sub:"Правобережна",ic:"door",full:"Правобережна психіатрична амбулаторія № 1",k:"1",fl:1,ent:"pnd",kw:"ПНД диспансер реєстратура амбулаторія",note:"реєстратура: Пн–Пт 09:00–16:12, Сб і Нд — вихідні",tel:["(044) 503-87-80","(095) 687-25-90"]},')
+rep(' pnd:{k:"1",p:[-22.5,125.7],t:"ПНД",a:"b",n:"ПНД",d:"двері з південного боку корпусу 1 · 1 поверх",',
+    ' pnd:{k:"1",p:[-22.5,125.7],t:"Амбулаторія № 1",a:"b",n:"Правобережна психіатрична амбулаторія № 1",d:"двері з південного боку корпусу 1 · 1 поверх · реєстратура Пн–Пт 09:00–16:12",')
+# сходинки: зі старих сходів спускаєшся на галерею, ліворуч — сходи на північ до дороги
+rep('f 19,37 26,34\n','f 19,37 26,34\ns 19,36.5 19.4,28.4\nf 19.4,28.4 25,28\n')
+# нитка маршруту: тонка й напівпрозора, однакової товщини на екрані за будь-якого наближення (щоб під нею було видно сходи й дорогу)
+rep('.route.case{stroke:var(--case);stroke-width:8.2;opacity:.95}','.route.case{stroke:var(--case);stroke-width:var(--rw-case,5);opacity:.5}')
+rep('.route.halo{stroke:var(--thread-soft);stroke-width:15}','.route.halo{stroke:var(--thread-soft);stroke-width:var(--rw-halo,11)}')
+rep('.route.main{stroke:var(--thread);stroke-width:4.6}','.route.main{stroke:var(--thread);stroke-width:var(--rw-main,2.8);opacity:.82}')
+rep('.route.flow{stroke:rgba(255,255,255,.85);stroke-width:1.6;','.route.flow{stroke:rgba(255,255,255,.9);stroke-width:var(--rw-flow,1);')
+rep('.route.last{stroke:var(--thread);stroke-width:2.6;stroke-dasharray:2 5}','.route.last{stroke:var(--thread);stroke-width:var(--rw-last,1.8);stroke-dasharray:2 5;opacity:.85}')
+rep('var s=size(),k=vb.w/s.w;svg.classList.toggle("far",k>1.5);','var s=size(),k=vb.w/s.w;[["halo",11],["case",5],["main",2.8],["flow",1],["last",1.8]].forEach(function(r){svg.style.setProperty("--rw-"+r[0],(r[1]*k).toFixed(3))});svg.classList.toggle("far",k>1.5);')
+# значки заливкою, щоб читалися з першого погляду: скульптура — фігура на постаменті, погруддя, стела, хрест; лавка; бесідка
+rep("""st:'<path d="M0-4.6v.1M-1.8-2.2h3.6M0-2.2v4.8M-1.6 2.8h3.2"/>',""","""st:'<circle class="f" cy="-3.9" r="1.15"/><path class="f" d="M-1.7-2.5h3.4l-.45 3H.55V1.7h-1.1V.5h-.7z"/><path class="f" d="M-3 1.9h6v.9h-.6v1.3h.6v.9h-6v-.9h.6V2.8h-.6z"/>',""")
+rep("""bu:'<path d="M0-4.2a1.6 1.6 0 1 1 0 .1M-2.6 1.8c0-2.2 5.2-2.2 5.2 0M-2 3.2h4"/>',""","""bu:'<circle class="f" cy="-3" r="1.5"/><path class="f" d="M-2.7.9c0-1.9 1.1-2.5 2.7-2.5s2.7.6 2.7 2.5zM-1.5.9h3v2.6h-3zM-2.6 3.5h5.2v1h-5.2z"/>',""")
+rep("""sl:'<path d="M-1.4 3.4v-6.2l1.4-1.4 1.4 1.4v6.2zM-2.6 3.4h5.2"/>',""","""sl:'<path class="f" d="M-1.25 3V-2.7L0-4.7l1.25 2V3zM-2.8 3h5.6v1.5h-5.6z"/>',""")
+rep("""cr:'<path d="M0-4.4v8.6M-2.4-1.8h4.8"/>',""","""cr:'<path class="f" d="M-.65-4.8h1.3v2.3h2.3v1.3H.65v4.5H-.65v-4.5h-2.3v-1.3h2.3zM-2.2 3.3h4.4v1.2h-4.4z"/>',
+ bn:'<path class="f" d="M-4-3.1h8v1.2h-8zM-3.3-1.9h1v1.4h-1zM2.3-1.9h1v1.4h-1zM-4.2-.5h8.4v1.3h-8.4zM-3.4.8h1.1v2.8h-1.1zM2.3.8h1.1v2.8H2.3z"/>',
+ gz:'<path class="f" d="M0-5.1l.5.8 4 3.1h-9l4-3.1zM-3.7-1h1v3.9h-1zM-.5-1h1v3.9h-1zM2.7-1h1v3.9h-1zM-4.4 2.9h8.8v1.2h-8.8z"/>',""")
+rep('.poi.lm path{stroke:var(--accent)}','.poi.lm path{stroke:var(--accent)}\n.poi .f{fill:#5b4c3f;stroke:none}.poi.lm .f{fill:var(--accent)}\n#map.mid .amen{display:none}')
+# лавки — значком замість ледь помітного прямокутника; бесідка — слід на землі + значок
+rep("""BENCH.forEach(function(b){h+='<rect class="bench" x="'+(b[0]-.4)+'" y="'+(b[1]-1.2)+'" width=".8" height="2.4" rx=".2"><title>Лавка</title></rect>'});""",'')
+rep('/* входи: «шпилька»',"""BENCH.forEach(function(b){h+=lbl("poi amen",b[0],b[1],0,'<circle class="dot" r="7"/><g>'+IC.bn+'</g><title>Лавка</title>')});
+GAZEBO.forEach(function(g){h+=lbl("poi amen",g[0],g[1],0,'<circle class="dot" r="7.5"/><g>'+IC.gz+'</g><title>Бесідка</title>')});
+/* входи: «шпилька»""")
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()

@@ -109,11 +109,11 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .priv-line{fill:none;stroke:var(--faint);stroke-width:1.2;stroke-dasharray:2 2;opacity:.8}
 /* маршрут — «нитка Аріадни» */
 .route{fill:none;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
-.route.case{stroke:var(--case);stroke-width:8.2;opacity:.95}
-.route.halo{stroke:var(--thread-soft);stroke-width:15}
-.route.main{stroke:var(--thread);stroke-width:4.6}
-.route.flow{stroke:rgba(255,255,255,.85);stroke-width:1.6;stroke-dasharray:2 12;animation:flow 1.1s linear infinite}
-.route.last{stroke:var(--thread);stroke-width:2.6;stroke-dasharray:2 5}
+.route.case{stroke:var(--case);stroke-width:var(--rw-case,5);opacity:.5}
+.route.halo{stroke:var(--thread-soft);stroke-width:var(--rw-halo,11)}
+.route.main{stroke:var(--thread);stroke-width:var(--rw-main,2.8);opacity:.82}
+.route.flow{stroke:rgba(255,255,255,.9);stroke-width:var(--rw-flow,1);stroke-dasharray:2 12;animation:flow 1.1s linear infinite}
+.route.last{stroke:var(--thread);stroke-width:var(--rw-last,1.8);stroke-dasharray:2 5;opacity:.85}
 @keyframes flow{to{stroke-dashoffset:-14}}
 .draw{animation:draw 1s cubic-bezier(.32,.72,0,1) both}
 @keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
@@ -133,6 +133,8 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .poi .dot{fill:#fff;stroke:var(--b-edge);stroke-width:.8}
 .poi path{fill:none;stroke:#5b4c3f;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .poi.lm path{stroke:var(--accent)}
+.poi .f{fill:#5b4c3f;stroke:none}.poi.lm .f{fill:var(--accent)}
+#map.mid .amen{display:none}
 .poi text{font-size:11px;font-weight:500}
 .hit{fill:transparent;stroke:none;pointer-events:all;cursor:pointer}
 .gate-b{stroke:var(--gate);stroke-width:1.3}
@@ -580,7 +582,7 @@ var ENT={
  v4:{k:"1",p:[-42.8,81.6],t:"4",a:"l",n:"Вхід до відділення 4",d:"двері з двору корпусу 1",w:"Двері — у дворі між крилами корпусу, у куті біля галереї."},
  lift:{k:"1",p:[-39.9,91.4],t:"Ліфт",a:"l",n:"Ліфт",d:"до відділень 7, 15 і 16 · двері з двору корпусу 1",w:"Двері ліфта — у дворі між крилами корпусу."},
  s:{k:"1",dir:-121,p:[4.3,109.6],t:"3 · 16 · 23 · 24",a:"l",n:"Вхід до відділень 3, 16, 23 і 24",d:"двері в проході крізь корпус · 16 і 24 — 3 поверх, 3 і 23 — 2 поверх",w:"Двері — у наскрізному проході крізь південне крило корпусу; на карті це пунктирний канал."},
- pnd:{k:"1",p:[-22.5,125.7],t:"ПНД",a:"b",n:"ПНД",d:"двері з південного боку корпусу 1 · 1 поверх",w:"Двері — з південного боку корпусу, з дороги."},
+ pnd:{k:"1",p:[-22.5,125.7],t:"Амбулаторія № 1",a:"b",n:"Правобережна психіатрична амбулаторія № 1",d:"двері з південного боку корпусу 1 · 1 поверх · реєстратура Пн–Пт 09:00–16:12",w:"Двері — з південного боку корпусу, з дороги."},
  w19:{k:"1",p:[-145.1,99.3],t:"19 · 18 · 20",a:"t",n:"Вхід до відділень 19, 18 і 20",d:"двері із західного краю корпусу 1 · 19 — 1–2 поверхи, 18 і 20 — 3 поверх",w:"Двері — із західного краю корпусу."},
  arh:{k:"1",p:[21.7,53.8],t:"Архів",a:"r",n:"Архів",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
  prm:{k:"1",p:[25.3,65.7],t:"Приймальне · чол.",a:"r",n:"Приймальне — чоловічий блок",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
@@ -588,6 +590,7 @@ var ENT={
  g4:{k:"1",p:[34.4,96.5],t:"",n:"Двері в галереї",d:"корпус 1"},
  k2:{k:"2",p:[69.3,-38],t:"6 · 9",a:"r",n:"Вхід до відділень 6 і 9",d:"двері зі східного торця корпусу 2",w:"Двері — зі східного торця корпусу; від дороги до них ведуть сходинки."},
  k8:{k:"8",p:[220.5,-225.3],t:"8 · 10",a:"l",n:"Вхід до відділень 8 і 10",d:"єдиний вхід у корпус 8",w:"Це єдині двері корпусу 8: через них і до 8-го, і до 10-го відділення."},
+ k5:{k:"5",p:[73.8,-114.1],t:"1 · 2",a:"l",n:"Вхід до відділень 1 і 2",d:"один вхід для обох відділень",w:"Через ці двері — і до 1-го, і до 2-го відділення."},
  mkz:{k:"12",p:[127,-12],t:"Мала конференц-зала",a:"r",n:"Мала конференц-зала",d:"вхід зі східного боку корпусу 12",w:"Вхід — зі східного боку корпусу."}
 };
 B.forEach(function(b){if(!b.k||b.k==="1"||!b.door)return;
@@ -654,6 +657,8 @@ s -171,194 -160,197 -155,204
 f -155,204 -150,214
 s 19,37 -2,42
 f 19,37 26,34
+s 19,36.5 19.4,28.4
+f 19.4,28.4 25,28
 f -47,24 -18,32 -7,43 -2,42
 f -7,43 -6,65
 f -86,35 -85,39
@@ -714,7 +719,7 @@ var STARTS={
 /* частини корпусу, які займають відділення (обведено на роздруківці 17.11.2026): ids — відділення, поверхи — у D */
 var AREAS={
  n:{ids:["4","7","15"],p:"-79.5,37.2 -45.3,26.9 -31.5,72.8 -44.6,75.5 -54.4,42.6 -79.5,50.2"},
- s:{ids:["16","3","pnd"],p:"-43.4,79.7 -30.2,77.2 -27.1,87.6 -20,111.5 -4.5,106.9 -2,119.6 -18.6,124.5 -29,127.7 -39.9,91.4 -42.8,81.6"},
+ s:{ids:["16","3","amb"],p:"-43.4,79.7 -30.2,77.2 -27.1,87.6 -20,111.5 -4.5,106.9 -2,119.6 -18.6,124.5 -29,127.7 -39.9,91.4 -42.8,81.6"},
  e:{ids:["23","24","pr","prm","prw","arh"],p:"1.6,44.1 21.2,38.2 33.1,78.1 41.6,106.6 34.7,108.6 8.5,116.5 5,104.1 18.3,100.1 8.1,65.8 6.8,61.4 5.2,56.1"},
  w:{ids:["19","18","20"],p:"-151.6,101.2 -145.1,99.3 -138.6,97.3 -137.1,102.5 -136,106.2 -125.6,140.9 -86.3,129.2 -73.9,125.5 -70.2,137.8 -94.2,145 -134.9,157.1"}
 };
@@ -756,18 +761,18 @@ var EM="(044) 293-85-39";
 var D=[
  {id:"pr",q:1,short:"Приймальне",kw:"приймальня приймальний покій госпіталізація",t:"Приймальне відділення",sub:"цілодобово",ic:"cross",k:"1",door:[27.5,73.2],ents:["prm","prw"],way:"Вхід — із галереї під навісом уздовж корпусу. Двері чоловічого й жіночого блоків підписані на карті.",note:"Працює цілодобово",tel:[EM]},
  {id:"pol",q:1,short:"Поліклініка",kw:"реєстратура консультація",t:"Поліклініка",sub:"Пн–Пт 09:00–16:12",ic:"steth",full:"Міська консультативно-діагностична поліклініка",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 293-64-64","(098) 454-18-39"]},
- {id:"amb",q:1,short:"Амбулаторія № 1",t:"Амбулаторія № 1",sub:"Правобережна",ic:"door",full:"Правобережна психіатрична амбулаторія № 1",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 503-87-80","(095) 687-25-90"]},
+ {id:"amb",q:1,short:"Амбулаторія № 1",t:"Амбулаторія № 1",sub:"Правобережна",ic:"door",full:"Правобережна психіатрична амбулаторія № 1",k:"1",fl:1,ent:"pnd",kw:"ПНД диспансер реєстратура амбулаторія",note:"реєстратура: Пн–Пт 09:00–16:12, Сб і Нд — вихідні",tel:["(044) 503-87-80","(095) 687-25-90"]},
  {id:"adm",q:1,short:"Адміністрація",kw:"директор дирекція головний лікар канцелярія",t:"Адміністрація",sub:"корпус 12",ic:"build",k:"12",wide:0},
  {id:"kab",q:1,short:"Кабінет прийому",t:"Кабінет амбулаторного прийому",sub:"корпус 5",ic:"chair",k:"5"},
- {id:"1",k:"5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
- {id:"2",k:"5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
+ {id:"1",k:"5",ent:"k5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
+ {id:"2",k:"5",ent:"k5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
  {id:"3",k:"1",fl:2,ent:"s",d:"Активної терапії гострих психозів",tel:["(044) 503-87-03","(044) 293-85-43"]},
  {id:"4",k:"1",fl:1,ent:"v4",d:"Лікувально-діагностичне",tel:["(044) 503-87-04","(044) 503-87-05"]},
  {id:"5",k:"11",d:"Лікувально-діагностичне",tel:["(044) 293-64-65"]},
  {id:"6",k:"2",ent:"k2",note:"переїхало з корпусу 7: старі корпуси закривають на капітальний ремонт",d:"Лікувально-діагностичне",tel:["(044) 293-64-52","(044) 293-64-53"]},
  {id:"7",k:"1",fl:2,ent:"n",lift:1},{id:"8",k:"8",ent:"k8"},
  {id:"9",k:"2",ent:"k2",note:"переїхало в корпус 2: старі корпуси закривають на капітальний ремонт"},
- {id:"10",k:"8",ent:"k8"},{id:"11",k:"2"},{id:"12",k:"2"},
+ {id:"10",k:"8",ent:"k8"},{id:"12",k:"2"},
  {id:"13",k:"3",d:"Комплексної терапії резистентних форм хімічної залежності"},
  {id:"14",k:"3",d:"Інфекційне",tel:["(044) 503-87-14"]},
  {id:"15",k:"1",fl:3,ent:"n",lift:1,d:"Психіатричної та паліативної допомоги",tel:["(044) 503-87-29","(044) 293-64-61"]},
@@ -779,7 +784,7 @@ var D=[
  {id:"prm",x:1,t:"Приймальне — чоловічий блок",short:"Приймальне (чол.)",k:"1",ent:"prm",kw:"чоловіки",note:"працює цілодобово",tel:[EM]},
  {id:"prw",x:1,t:"Приймальне — жіночий блок",short:"Приймальне (жін.)",k:"1",ent:"prw",kw:"жінки",note:"працює цілодобово",tel:[EM]},
  {id:"arh",x:1,t:"Архів",k:"1",ent:"arh",note:"двері в галереї під навісом"},
- {id:"pnd",x:1,t:"ПНД",k:"1",fl:1,ent:"pnd",kw:"диспансер",note:"двері з південного боку корпусу"},
+ 
  {id:"ekopfo",x:1,t:"ЕКОПФО",short:"ЕКОПФО",full:"ЕКОПФО — експертна команда з оцінювання повсякденного функціонування особи",k:"1",fl:1,ent:"n",kw:"експертна команда оцінювання повсякденного функціонування особи мсек інвалідність",note:"вхід той самий, що до відділень 7 і 15"},
  {id:"lift",x:1,t:"Ліфт корпусу 1",short:"Ліфт",k:"1",ent:"lift",note:"до відділень 7, 15 і 16"},
  {id:"mkz",x:1,t:"Мала конференц-зала",short:"Мала конф.-зала",k:"12",ent:"mkz",kw:"конференція зал",note:"вхід зі східного боку корпусу"}
@@ -833,10 +838,12 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 function lbl(cls,x,y,rot,inner,attrs){return '<g class="lb '+cls+'" data-x="'+x+'" data-y="'+y+'" data-r="'+(rot||0)+'" '+(attrs||"")+'>'+inner+'</g>'}
 function ringsPath(rs){return rs.map(function(r){return "M"+r.trim().split(/\s+/).join("L")+"Z"}).join("")}
 var IC={
- st:'<path d="M0-4.6v.1M-1.8-2.2h3.6M0-2.2v4.8M-1.6 2.8h3.2"/>',
- bu:'<path d="M0-4.2a1.6 1.6 0 1 1 0 .1M-2.6 1.8c0-2.2 5.2-2.2 5.2 0M-2 3.2h4"/>',
- sl:'<path d="M-1.4 3.4v-6.2l1.4-1.4 1.4 1.4v6.2zM-2.6 3.4h5.2"/>',
- cr:'<path d="M0-4.4v8.6M-2.4-1.8h4.8"/>',
+ st:'<circle class="f" cy="-3.9" r="1.15"/><path class="f" d="M-1.7-2.5h3.4l-.45 3H.55V1.7h-1.1V.5h-.7z"/><path class="f" d="M-3 1.9h6v.9h-.6v1.3h.6v.9h-6v-.9h.6V2.8h-.6z"/>',
+ bu:'<circle class="f" cy="-3" r="1.5"/><path class="f" d="M-2.7.9c0-1.9 1.1-2.5 2.7-2.5s2.7.6 2.7 2.5zM-1.5.9h3v2.6h-3zM-2.6 3.5h5.2v1h-5.2z"/>',
+ sl:'<path class="f" d="M-1.25 3V-2.7L0-4.7l1.25 2V3zM-2.8 3h5.6v1.5h-5.6z"/>',
+ cr:'<path class="f" d="M-.65-4.8h1.3v2.3h2.3v1.3H.65v4.5H-.65v-4.5h-2.3v-1.3h2.3zM-2.2 3.3h4.4v1.2h-4.4z"/>',
+ bn:'<path class="f" d="M-4-3.1h8v1.2h-8zM-3.3-1.9h1v1.4h-1zM2.3-1.9h1v1.4h-1zM-4.2-.5h8.4v1.3h-8.4zM-3.4.8h1.1v2.8h-1.1zM2.3.8h1.1v2.8H2.3z"/>',
+ gz:'<path class="f" d="M0-5.1l.5.8 4 3.1h-9l4-3.1zM-3.7-1h1v3.9h-1zM-.5-1h1v3.9h-1zM2.7-1h1v3.9h-1zM-4.4 2.9h8.8v1.2h-8.8z"/>',
  ch:'<path d="M0-4.8v1.6M-1 -4h2M-2.6 3.6v-3.4l2.6-2.4 2.6 2.4v3.4zM-.9 3.6v-1.8h1.8v1.8"/>',
  tw:'<path d="M-2.2 3.6v-6.2h4.4v6.2zM-2.2-2.6l2.2-2 2.2 2"/>',
  in:'<path d="M-3 -3h6v4.4h-6zM0 1.4v2.4"/>',
@@ -863,7 +870,7 @@ WAYS.split("\n").forEach(function(line){var sp=line.indexOf(" "),c=line.charAt(0
   else if(c==="s"){stb+='<polyline class="stp-b" points="'+p+'"/>';stp+='<polyline class="stp" points="'+p+'"/>'}
   else{fwe+='<polyline class="fw-e" points="'+p+'"/>';fw+='<polyline class="fw" points="'+p+'"/>'}});
 h+=rde+fwe+rd+fw+stb+stp;
-BENCH.forEach(function(b){h+='<rect class="bench" x="'+(b[0]-.4)+'" y="'+(b[1]-1.2)+'" width=".8" height="2.4" rx=".2"><title>Лавка</title></rect>'});
+
 GAZEBO.forEach(function(g){h+='<g class="gz"><circle cx="'+g[0]+'" cy="'+g[1]+'" r="2.3"/><circle class="gz-c" cx="'+g[0]+'" cy="'+g[1]+'" r=".55"/><title>Бесідка</title></g>'});
 /* уступи й підпірні стіни: лінія з зубцями в бік спуску */
 WALLS.forEach(function(w){var p=pts(w),t="";for(var i=1;i<p.length;i++){var a=p[i-1],b=p[i],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,nx=-uy,ny=ux;for(var q=2;q<L-1;q+=3.2){var x=a[0]+ux*q,y=a[1]+uy*q;t+="M"+x.toFixed(1)+" "+y.toFixed(1)+"l"+(nx*-2.4).toFixed(1)+" "+(ny*-2.4).toFixed(1)}}
@@ -907,6 +914,8 @@ GATES.forEach(function(g){var best=null;WAYS.split("\n").forEach(function(line){
   h+='<g class="gate"><line class="gate-b" x1="'+A[0].toFixed(1)+'" y1="'+A[1].toFixed(1)+'" x2="'+Z[0].toFixed(1)+'" y2="'+Z[1].toFixed(1)+'"/><circle class="gate-p" cx="'+A[0].toFixed(1)+'" cy="'+A[1].toFixed(1)+'" r="1.15"/><circle class="gate-p" cx="'+Z[0].toFixed(1)+'" cy="'+Z[1].toFixed(1)+'" r="1.15"/></g>'});
 SCULPT.concat(LAND).forEach(function(p,i){var lm=i>=SCULPT.length;
   h+=lbl("poi"+(lm?" lm":"")+(p.show?"":" sec"),p.x,p.y,0,'<circle class="dot" r="7"/><g>'+IC[p.ic]+'</g><text x="10" y="4">'+esc(p.n)+'</text><circle class="hit" r="15" data-poi="'+i+'"/>')});
+BENCH.forEach(function(b){h+=lbl("poi amen",b[0],b[1],0,'<circle class="dot" r="7"/><g>'+IC.bn+'</g><title>Лавка</title>')});
+GAZEBO.forEach(function(g){h+=lbl("poi amen",g[0],g[1],0,'<circle class="dot" r="7.5"/><g>'+IC.gz+'</g><title>Бесідка</title>')});
 /* входи: «шпилька» — кружечок зі значком «вхід» стоїть зовні, гострий кінчик торкається дверей.
    Напрямок — усередину до найближчої стіни свого корпусу; dir — ручний напрямок у градусах (0 — на схід, 90 — на південь); ta — бік підпису (l, r, t, b) */
 function inRings(rs,x,y){var c=false;rs.forEach(function(r){for(var i=0,j=r.length-1;i<r.length;j=i++){var a=r[i],b=r[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}});return c}
@@ -947,7 +956,7 @@ function clamp(v){
 function apply(){
   clamp(vb);
   svg.setAttribute("viewBox",vb.x.toFixed(2)+" "+vb.y.toFixed(2)+" "+vb.w.toFixed(2)+" "+vb.h.toFixed(2));
-  var s=size(),k=vb.w/s.w;svg.classList.toggle("far",k>1.5);svg.classList.toggle("mid",k>.75);
+  var s=size(),k=vb.w/s.w;[["halo",11],["case",5],["main",2.8],["flow",1],["last",1.8]].forEach(function(r){svg.style.setProperty("--rw-"+r[0],(r[1]*k).toFixed(3))});svg.classList.toggle("far",k>1.5);svg.classList.toggle("mid",k>.75);
   var ls=svg.querySelectorAll(".lb");for(var i=0;i<ls.length;i++){var g=ls[i];g.setAttribute("transform","translate("+g.dataset.x+" "+g.dataset.y+") rotate("+g.dataset.r+") scale("+k.toFixed(4)+")")}
 }
 function boxView(x0,y0,x1,y1,pad){
