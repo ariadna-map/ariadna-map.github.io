@@ -84,7 +84,7 @@ sheet:function(o,rects,date){
   var sb='<svg width="'+(px+44)+'" height="26" viewBox="0 0 '+(px+44)+' 26"><rect x="1" y="9" width="'+px/2+'" height="5" fill="#111"/><rect x="'+(1+px/2)+'" y="9" width="'+px/2+'" height="5" fill="#fff" stroke="#111" stroke-width=".8"/><rect x="1" y="9" width="'+px+'" height="5" fill="none" stroke="#111" stroke-width=".8"/>'
    +'<text x="1" y="24" font-size="9.5" fill="#111">0</text><text x="'+(px+4)+'" y="15" font-size="10.5" font-weight="700" fill="#111">'+len+' м</text></svg>';
   var na='<svg width="30" height="30" viewBox="-15 -15 30 30"><path d="M0-13 6 6 0 2-6 6Z" fill="#111"/><text y="14" text-anchor="middle" font-size="8" font-weight="700" fill="#111">Пн</text></svg>';
-  document.getElementById('prf').innerHTML=sb+na+'<span>Сітка: '+(o.kind==='all'?'лінії через '+st+' м':'тонкі лінії через '+st+' м, товсті через '+maj+' м')+'</span><span class="sp"></span><span>Друкуйте A4 альбомно, масштаб 100%. Карта: drdordr.github.io/ariadna</span>';
+  document.getElementById('prf').innerHTML=sb+na+'<span>Сітка: '+(o.kind==='all'?'лінії через '+st+' м':'тонкі лінії через '+st+' м, товсті через '+maj+' м')+'</span><span class="sp"></span><span>Друкуйте A4 альбомно, масштаб 100%. Карта: ariadna-map.github.io</span>';
   return JSON.stringify({ppm:+ppm.toFixed(3),scale:Math.round(1000/(ppm*0.26458)),vb:[vb.x,vb.y,vb.w].map(function(v){return +v.toFixed(1)}),st:st,len:len});
 }};1`;
 
