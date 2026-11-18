@@ -1,7 +1,7 @@
 /* ---------- стан ---------- */
 var Q=new URLSearchParams(location.search);
-var st={dept:null,b:-1,start:"e1",noSteps:false},prevStart="e1";
-try{var sv=JSON.parse(localStorage.getItem("ariadna")||"{}");if(STARTS[sv.start]&&!STARTS[sv.start].here)st.start=sv.start;st.noSteps=!!sv.noSteps}catch(_){}
+var st={dept:null,b:-1,start:"e1",noSteps:false,car:false,carIn:null},prevStart="e1",lastCar=null,lastCarK=null;
+try{var sv=JSON.parse(localStorage.getItem("ariadna")||"{}");if(STARTS[sv.start]&&!STARTS[sv.start].here)st.start=sv.start;st.noSteps=!!sv.noSteps;st.car=!!sv.car}catch(_){}
 if(STARTS[Q.get("from")])st.start=Q.get("from");
 prevStart=st.start;
 STARTS.geo={geo:1,name:"Моя геопозиція",cap:"Звідки",short:"Від мене",street:"",tr:"",at:null,stop:null,hint:"Синя точка — це ви. Лінія оновлюється, коли ви рухаєтеся."};
@@ -12,7 +12,7 @@ function dTitle(d){return d.q||d.x?(d.full||d.t):"Відділення № "+d.i
 function dShort(d){return d.q||d.x?(d.short||d.t):"Відділення "+d.id}
 function inK(k){return D.filter(function(x){return k&&x.k===k&&!x.x})}
 function dName(x){return x.q?x.t.toLowerCase():"№ "+x.id}
-function save(){try{var s=STARTS[st.start];localStorage.setItem("ariadna",JSON.stringify({start:(!s||s.here||s.geo)?prevStart:st.start,noSteps:st.noSteps}))}catch(_){}}
+function save(){try{var s=STARTS[st.start];localStorage.setItem("ariadna",JSON.stringify({start:(!s||s.here||s.geo)?prevStart:st.start,noSteps:st.noSteps,car:st.car}))}catch(_){}}
 function syncUrl(){try{var p=new URLSearchParams(location.search);if(st.dept)p.set("to",st.dept);else if(st.b>=0&&B[st.b].k)p.set("to","k"+B[st.b].k);else p.delete("to");var s=p.toString();history.replaceState(history.state,"",location.pathname+(s?"?"+s:""))}catch(_){}}
 
 /* ---------- геопозиція: синя точка, маршрут від вас, оновлення в русі ---------- */
@@ -63,6 +63,7 @@ function geoFail(e){GEO.auto=false;if(FOLLOW){FOLLOW=false;awake(false)}GEO.err=
 /* ---------- значки ---------- */
 function ico(p,w){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
 var BUS=ico('<rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M8 21v-4M16 21v-4M8.5 14h.01M15.5 14h.01"/>');
+var CARI=ico('<path d="M4 16.5v-3.2l1.7-4.3A2 2 0 0 1 7.6 7.6h8.8a2 2 0 0 1 1.9 1.4l1.7 4.3v3.2zM6.6 16.5v2.2M17.4 16.5v2.2M4.6 12.6h14.8"/><circle cx="8" cy="14.6" r=".6" fill="currentColor"/><circle cx="16" cy="14.6" r=".6" fill="currentColor"/>');
 var DOT=ico('<circle cx="12" cy="12" r="4" fill="currentColor"/><circle cx="12" cy="12" r="8.5"/>',2.2);
 var NAV=ico('<path d="m3 11 18-8-8 18-2-8z"/>',2.2);
 var STOPI=ico('<rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="currentColor"/>');
@@ -111,7 +112,7 @@ function pop(name,quiet){
   if(cur){POP[cur].classList.remove("on");if(cur==="to"){sIn.blur();setTimeout(function(){if(cur!=="to"){POP.to.classList.remove("top");sIn.value="";filter()}},260)}}
   cur=name;document.body.classList.toggle("popping",!!name);
   bTo.setAttribute("aria-expanded",name==="to");bFrom.setAttribute("aria-expanded",name==="from");res.setAttribute("aria-expanded",name==="det");
-  if(!name){mastArm();return}
+  if(!name){mastArm();if(dockOpen)foldSoon(1500);return}
   legend(false);if(name==="from")drawFrom();
   POP[name].classList.add("on");POP[name].querySelector(".pk-body").scrollTop=0;
   if(!quiet)try{if(!(history.state&&history.state.ar))history.pushState({ar:1},"")}catch(_){}
@@ -139,7 +140,7 @@ D.forEach(function(d){
   b.onclick=function(){choose(d.id)};
 });
 function flT(f){return f+(typeof f==="string"?" поверхи":" поверх")}
-function choose(id){var d=dById(id);st.dept=id;dockOpen=false;st.b=d.k===null?-1:bIndex(d.k);pop(null);render(true);syncUrl()}
+function choose(id){var d=dById(id);st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);render(true);syncUrl()}
 
 /* пошук: номер, назва, корпус, скульптура */
 function norm(s){return String(s).toLowerCase().replace(/[’'`ʼ"«»№#.,()—–-]/g," ").replace(/\s+/g," ").trim()}
@@ -194,12 +195,17 @@ function tapAt(x,y){
   if(ds.stop!==undefined&&STARTS[ds.stop]){if(st.start===ds.stop)clearStart();else setStart(ds.stop);return}
   if(ds.poi!==undefined){var p=POIS[+ds.poi];say(p.n,p.d);return}
   if(ds.ent!==undefined&&ENT[ds.ent]){entCard(ds.ent);return}
-  if(ds.b!==undefined){if(+ds.b===st.b)clearDest();else pickBuilding(+ds.b);return}
+  if(ds.b!==undefined){bCard(+ds.b);return}
 }
+/* корпус на карті: віконце з кнопками — весь корпус або конкретне відділення в ньому */
+function bCard(i){var b=B[i];
+  if(!b.k&&!b.n){say("Допоміжна будівля","відділень тут немає");return}
+  var list=b.k?D.filter(function(x){return x.k===b.k&&["lift","prm","prw"].indexOf(x.id)<0}):[],acts=[{t:b.k?"Корпус "+b.k:"Сюди",go:function(){pickBuilding(i)}}].concat(list.map(function(d){return {t:d.q||d.x?(d.short||d.t):"№ "+d.id,go:function(){choose(d.id)}}}));
+  say(b.k?"Корпус "+b.k:b.n,b.k?(b.n||b.nt||(list.length?"":"відділень тут немає")):(b.nt||""),acts,"Прокласти маршрут:")}
 function pickBuilding(i){
   var b=B[i];
   if(!b.k&&!b.n){say("Допоміжна будівля","відділень тут немає");return}
-  st.b=i;st.dept=null;dockOpen=false;render(true);syncUrl();
+  st.b=i;st.dept=null;dockOpen=false;st.carIn=null;render(true);syncUrl();
 }
 function setStart(k){st.start=k;dockOpen=false;if(k==="geo")geoStart();else if(!STARTS[k].here)prevStart=k;save();render(st.b>=0);if(st.b<0&&k!=="geo")say(STARTS[k].here?STARTS[k].name:"Зупинка «"+STARTS[k].name+"»","початок маршруту обрано")}
 function clearDest(){if(st.b<0&&!st.dept)return;if(FOLLOW){FOLLOW=false;awake(false)}st.dept=null;st.b=-1;if(cur==="det")pop(null);render(false);syncUrl();say("Пункт призначення знято","оберіть «Куди» або торкніться будівлі")}
@@ -208,26 +214,50 @@ function clearStart(){st.start=null;render(false);say("Початок маршр
 /* ---------- нижні кнопки, смужка з відповіддю, маршрут ---------- */
 var dock=document.getElementById("dock"),resRow=document.getElementById("resRow"),bMini=document.getElementById("bMini"),lastBox=null,lastRoutes=null,curTitle="",dockOpen=false,animT=0;
 /* на телефоні, коли маршрут прокладено, «Куди» і «Звідки» згортаються в одну кнопку ліворуч, а банер маршруту стає з нею в один рядок */
-function wantMin(){return innerWidth<900&&!resRow.hidden&&!!st.start&&(!!st.dept||st.b>=0)&&!dockOpen}
+function wantMin(){return innerWidth<900&&!resRow.hidden&&(!!st.start||st.car)&&(!!st.dept||st.b>=0)&&!dockOpen}
 function syncDock(){var m=wantMin();if(m===dock.classList.contains("min"))return;
   dock.classList.add("anim");dock.classList.toggle("min",m);clearTimeout(animT);animT=setTimeout(function(){dock.classList.remove("anim")},1700)}
 /* де буде верх панелі, коли вона закінчить згортатися чи розгортатися */
 function dockTop(){var r=dock.getBoundingClientRect(),rh=resRow.hidden?0:res.offsetHeight,h=dock.classList.contains("min")?rh:(rh?rh+8:0)+(bTo.offsetHeight||58);return r.bottom-h}
 function dockH(){var t=dockTop();document.documentElement.style.setProperty("--dockh",(dock.getBoundingClientRect().bottom-t)+"px");var c=document.getElementById("ctl");
   c.style.bottom=innerWidth>=900?"16px":(innerHeight-t+10)+"px"}
-bMini.onclick=function(){dockOpen=true;syncDock();dockH()};
+var foldT=0;
+function foldDock(){clearTimeout(foldT);if(!dockOpen)return;dockOpen=false;syncDock();dockH()}
+function foldSoon(ms){clearTimeout(foldT);foldT=setTimeout(function(){if(!cur)foldDock()},ms)}
+bMini.onclick=function(){dockOpen=true;syncDock();dockH();foldSoon(5000)};
+document.addEventListener("pointerdown",function(e){if(!dockOpen||cur||(e.target.closest&&e.target.closest("#dock")))return;foldDock()},true);
 addEventListener("resize",function(){syncDock();dockH()});
+var CARN={e1:{t:"В’їзд з вул. Олени Теліги",s:"дорогою вглиб гаю, біля зупинки «Лікарня ім. Павлова»",sh:"з Теліги",h:"Заїжджайте з вул. Олени Теліги дорогою, що відходить від вулиці вглиб гаю, біля зупинки «Лікарня ім. Павлова»."},
+  e3:{t:"В’їзд з вул. Кирилівської",s:"Врубелівським узвозом, біля зупинки «вул. Кирилівська»",sh:"з Кирилівської",h:"Заїжджайте з вул. Кирилівської Врубелівським узвозом до в’їзду на територію."}};
+function carHint(k){return (k==="geo"?"Маршрут від вас дорогами лікарні.":CARN[k].h)+" Пунктир — машиною, суцільна нитка — пішки. Окремих місць для паркування поки немає: ставте машину так, щоб не перекрити проїзд швидкій. На шлагбаум біля адміністрації не розраховуйте — маршрут його оминає."}
 function drawFrom(){
+  if(st.car){drawFromCar();return}
   var keys=startKeys(),h='<div class="pk-h">Звідки ви йдете?</div><div class="from">';STARTS.geo.street=geoText();
   keys.forEach(function(k){var S=STARTS[k],R=lastRoutes?lastRoutes[k]:null;
     h+='<button type="button" data-e="'+k+'" class="'+(S.here?"here":S.geo?"geo":"")+'" aria-pressed="'+(k===st.start)+'"><span class="bus">'+(S.here||S.geo?DOT:BUS)+'</span><span class="ft"><b>'+esc(S.here||S.geo?S.name:"Зупинка «"+S.name+"»")+'</b><small>'+esc(S.street+(S.tr?" · "+S.tr:""))+'</small></span>'+(st.b>=0?'<span class="m">'+(R?mins(R.len)+" хв":"—")+'</span>':'')+'</button>'});
-  h+='</div><label class="sw"><input type="checkbox" id="ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>';
+  h+='</div>'+switches();
   h+='<p class="pk-note">Можна також торкнутися зупинки на карті.</p>';
   var bd=document.getElementById("fromBody");bd.innerHTML=h;
   bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);if(x.dataset.e!==st.start)setStart(x.dataset.e);else if(lastBox)fitBox.apply(null,lastBox)}});
+  bindSwitches();
+}
+function switches(){return '<label class="sw"><input type="checkbox" id="car"'+(st.car?" checked":"")+'><span class="k"></span><span>На авто</span></label><label class="sw"><input type="checkbox" id="ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>'}
+function bindSwitches(){
   document.getElementById("ns").onchange=function(e){st.noSteps=e.target.checked;save();render(true)};
+  document.getElementById("car").onchange=function(e){st.car=e.target.checked;st.carIn=null;if(st.car&&st.start==="geo"&&!(GEO.pos&&!geoFar()))st.start=STARTS[prevStart]?prevStart:"e1";save();render(true)}}
+/* «Звідки» на авто: два в’їзди на територію і «Від мене» */
+function drawFromCar(){
+  var h='<div class="pk-h">Звідки заїжджаєте?</div><div class="from">',ks=Object.keys(CAR_IN);if(navigator.geolocation)ks.unshift("geo");
+  ks.forEach(function(k){var geo=k==="geo",R=geo?null:(lastCar?lastCar[k]:null),on=k===lastCarK;
+    h+='<button type="button" data-c="'+k+'" class="'+(geo?"geo":"")+'" aria-pressed="'+on+'"><span class="bus">'+(geo?DOT:CARI)+'</span><span class="ft"><b>'+esc(geo?"Від мене":CARN[k].t)+'</b><small>'+esc(geo?"якщо ви вже на території":CARN[k].s)+'</small></span>'+(st.b>=0&&!geo?'<span class="m">'+(R?R.min+" хв":"—")+'</span>':'')+'</button>'});
+  h+='</div>'+switches()+'<p class="pk-note">Найшвидший в’їзд обирається сам; натисніть інший, якщо їдете з того боку.</p>';
+  var bd=document.getElementById("fromBody");bd.innerHTML=h;
+  bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);var k=x.dataset.c;dockOpen=false;if(k==="geo"){setStart("geo");return}st.carIn=k;if(st.start==="geo")st.start=STARTS[prevStart]?prevStart:"e1";save();render(true)}});
+  bindSwitches();
 }
 function setFrom(){
+  if(st.car){bFrom.classList.remove("empty");document.getElementById("fromC").textContent="На авто";document.getElementById("fromV").textContent=lastCarK==="geo"?"Від мене":lastCarK?CARN[lastCarK].sh:"В’їзд";
+    var ci=document.getElementById("fromI");ci.className="ic sm "+(lastCarK==="geo"?"me":"bus");ci.innerHTML=lastCarK==="geo"?DOT:CARI;return}
   var S=st.start?STARTS[st.start]:null;bFrom.classList.toggle("empty",!S);
   document.getElementById("fromC").textContent=S?S.cap:"";document.getElementById("fromV").textContent=S?S.short:"Звідки?";
   var i=document.getElementById("fromI");i.className="ic sm "+(S?(S.geo||S.here?"me":"bus"):"");i.innerHTML=S?(S.geo||S.here?DOT:BUS):PIN;
@@ -270,11 +300,21 @@ function render(zoom){
   var keys=startKeys(),routes={};
   keys.forEach(function(k){routes[k]=STARTS[k].at?findRoute(STARTS[k].at,door,st.noSteps):null});lastRoutes=routes;
   if(st.start&&st.start!=="geo"&&!routes[st.start]&&st.noSteps){var best=null;keys.forEach(function(k){if(routes[k]&&(!best||routes[k].len<routes[best].len))best=k});if(best)st.start=best}
-  var s=st.start?STARTS[st.start]:null,r=s?routes[st.start]:null;
+  var s=st.start?STARTS[st.start]:null,r=s?routes[st.start]:null,cr=null;
+  lastCar=null;lastCarK=null;
+  if(st.car&&!b.priv){
+    lastCar={};Object.keys(CAR_IN).forEach(function(k){lastCar[k]=carRoute(CAR_IN[k],door,st.noSteps)});
+    if(st.start==="geo"&&GEO.pos&&!geoFar()){cr=carRoute(GEO.pos,door,st.noSteps);if(cr)lastCarK="geo"}
+    if(!cr){var bk=null;Object.keys(lastCar).forEach(function(k){var q=lastCar[k];if(q&&(!bk||q.min<lastCar[bk].min||(q.min===lastCar[bk].min&&q.len<lastCar[bk].len)))bk=k});
+      lastCarK=st.carIn&&lastCar[st.carIn]?st.carIn:bk;cr=lastCarK?lastCar[lastCarK]:null}
+    r=null}
+  if(st.car){var tv=d?dShort(d):(b.k?"Корпус "+b.k:b.n);document.getElementById("resF").innerHTML='Авто '+esc(lastCarK==="geo"?"від вас":lastCarK?CARN[lastCarK].sh:"")+'<i>→</i>'+esc(tv)}
   lastDoor=door;
   var GL=FOLLOW?'<button type="button" class="gbtn thread on" id="go">'+STOPI+'Стоп</button>':'<button type="button" class="gbtn thread" id="go">'+NAV+'Вести</button>';
   var FL=d&&d.fl?flT(d.fl)+(viaLift?", ліфтом":"")+" · ":"";
   if(b.priv)setRes("Закрита територія","вхід лише за дозволом");
+  else if(cr)setRes("≈ "+cr.min+" хв · "+Math.round(cr.len/10)*10+" м",FL+"авто "+Math.round(cr.dlen/10)*10+" м, пішки "+Math.max(5,Math.round(cr.wlen/5)*5)+" м",GL);
+  else if(st.car)setRes("Машиною не під’їхати","вимкніть «На авто» у «Звідки»",GL);
   else if(r)setRes("≈ "+mins(r.len)+" хв · "+Math.round(r.len/10)*10+" м",FL+(s.geo?"від вас":"від зупинки"),GL);
   else if(!s)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
   else if(s.geo)setRes(GEO.pos&&geoFar()?"Ви за ≈ "+fmtKm(geoFar()):GEO.err?"Геопозиція недоступна":"Визначаю, де ви…",GEO.pos&&geoFar()?"шлях прокладе Google Карти":GEO.err?"оберіть інше «Звідки»":"дозвольте доступ до геопозиції",GL);
@@ -284,7 +324,8 @@ function render(zoom){
     if(d.lift)wy.push(viaLift?"Маршрут веде до дверей ліфта — вони в дворі між крилами корпусу.":"Є ліфт: окремі двері з двору, на карті підписані «Ліфт». Щоб маршрут вів до них, увімкніть «Маршрут без сходів» у віконці «Звідки».");
     if(wy.length)html+='<p class="note way">'+wy.join(" ")+'</p>'}
   if(d&&d.tel)html+=tels(d.tel);
-  if(r)html+='<p class="hint">'+esc(s.hint)+'</p>';
+  if(cr)html+='<p class="hint">'+esc(carHint(lastCarK))+'</p>';
+  else if(r)html+='<p class="hint">'+esc(s.hint)+'</p>';
   var others=same.filter(function(x){return !d||x.id!==d.id});
   if(d&&others.length)html+='<p class="note">У цьому ж корпусі: '+others.map(dName).join(", ")+'.</p>';
   if(b.priv)html+='<p class="note">Закрита територія: вхід лише за дозволом, маршрут не прокладається.</p>';
@@ -300,7 +341,15 @@ function render(zoom){
     pill='<g transform="translate('+qx.toFixed(1)+' '+qy.toFixed(1)+')"><rect class="dn-w" x="'+(-qw/2)+'" y="-10" width="'+qw+'" height="20" rx="10"/><g class="dnum"><rect class="dn-b" x="'+(-qw/2)+'" y="-10" width="'+qw+'" height="20" rx="10" data-pin="1"/><text y=".6">'+esc(nm)+'</text></g></g>'}
   svg.querySelectorAll(".door").forEach(function(p){p.classList.toggle("np",!!pill&&p.dataset.en===eid)});
   var PINH=lbl("pin",door[0],door[1],0,(pill?'<circle class="core" r="3.4"/>':'<circle class="wave" r="7"/><circle class="core" r="7"/>')+'<circle class="hit" r="16" data-pin="1"/>'+pill);
-  if(r){
+  if(cr){
+    var f1=function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)},dl=cr.drive.map(f1).join(" "),wl2=cr.walk.map(f1).join(" "),we=cr.walk[cr.walk.length-1];
+    rg.innerHTML='<polyline class="route halo" points="'+dl+'"/><polyline class="route case" points="'+dl+'"/><polyline class="route drive" points="'+dl+'"/>'+
+      '<polyline class="route halo" points="'+wl2+'"/><polyline class="route case" points="'+wl2+'"/><polyline class="route main draw" points="'+wl2+'"/><polyline class="route flow" points="'+wl2+'"/><polyline class="route last" points="'+f1(we)+" "+door[0]+","+door[1]+'"/>';
+    var m2=rg.querySelector(".main"),L2=cr.wlen+20;m2.style.strokeDasharray=L2;m2.style.setProperty("--len",L2);
+    pin.innerHTML=PINH+lbl("park",cr.park[0],cr.park[1],0,'<circle class="pk" r="8"/><path class="pk-c" d="M-4.4 2.4V.6l1-2.6a1.2 1.2 0 0 1 1.1-.8h4.6a1.2 1.2 0 0 1 1.1.8l1 2.6v1.8zM-4.4.4h8.8M-3 2.4v1.2M3 2.4v1.2"/><title>Тут лишіть авто — далі пішки</title>');
+    var all=cr.drive.concat(cr.walk,[door]);
+    lastBox=[Math.min.apply(null,all.map(function(p){return p[0]})),Math.min.apply(null,all.map(function(p){return p[1]})),Math.max.apply(null,all.map(function(p){return p[0]})),Math.max.apply(null,all.map(function(p){return p[1]})),28];
+  } else if(r){
     var line=r.path.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join(" "),end=r.path[r.path.length-1];
     rg.innerHTML='<polyline class="route halo" points="'+line+'"/><polyline class="route case" points="'+line+'"/><polyline class="route main draw" points="'+line+'"/><polyline class="route flow" points="'+line+'"/><polyline class="route last" points="'+end[0]+","+end[1]+" "+door[0]+","+door[1]+'"/>';
     var m=rg.querySelector(".main"),L=r.len+20;m.style.strokeDasharray=L;m.style.setProperty("--len",L);
