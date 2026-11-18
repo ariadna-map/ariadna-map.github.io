@@ -474,6 +474,125 @@ body.popping .mast{opacity:0;transform:translateY(-6px)}
 rep('return {t:14,b:Math.max(14,s.h-(dr.top-s.t)+10),l:14,r:70};','var hb=document.getElementById("mast").getBoundingClientRect();\n  return {t:Math.max(14,hb.bottom-s.t+10),b:Math.max(14,s.h-(dr.top-s.t)+10),l:14,r:70};')
 rep('<span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="15" cy="15" r="11" fill="var(--thread)"/><path d="M7 11c5 1 11 6 13 13M6 17c5 0 10 3 12 8M11 5c4 3 8 9 9 16M18 4c2 4 3 8 2 13" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".85"/><path d="M25 22c3 2 4 5 2 7" fill="none" stroke="var(--thread)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span><b>Ariadna</b><small>','<span class="logo" aria-hidden="true"><img src="brand/ariadna-favicon.svg" alt="" width="42" height="42"></span><span><b><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="wm" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="104" height="17"></picture></b><small>')
 rep('.logo{width:42px;height:42px;flex:none;border-radius:14px;display:grid;place-items:center;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line)}','.logo{width:42px;height:42px;flex:none;border-radius:11px;display:grid;place-items:center;overflow:hidden}.logo img{width:42px;height:42px;display:block}.brand .wm{display:block;width:auto;height:15px;margin:2px 0 5px}')
+# ================= v14 (18.11.2026): список Андрія від 18.11 =================
+# --- дані: відділення 12 і корпусу 21 більше немає; стенда зі схемою немає — на тому місці шлагбаум ---
+rep('{id:"10",k:"8",ent:"k8"},{id:"12",k:"2"},','{id:"10",k:"8",ent:"k8"},')
+# корпус 21: без номера й назви — лишається звичайною будівлею без відділень (якщо її знесли — прибрати й контур)
+rep('{k:"21",lv:1,r:"r-graph",lab:[225,-314],n:"Аварійна станція (не працює)",','{lv:1,r:"r-graph",')
+rep('{n:"Стенд зі схемою лікарні",d:"тут можна звіритися з картою",x:86.7,y:16.9,ic:"in"}','{n:"Шлагбаум",d:"на дорозі біля адміністрації",x:86.7,y:16.9,ic:"br"}')
+BARRIER=('<path class="f" d="M-4.9-3.4h1.7v6.7h-1.7zM-5.7 3.2h3.3v1.4h-3.3z"/>'
+         '<path d="M-3.2-2.95h8.5v1.95h-8.5z" style="fill:#fff;stroke:#c63a2f;stroke-width:.55;stroke-linejoin:miter"/>'
+         '<path d="M-1.2-2.95h1.75v1.95h-1.75zM2.3-2.95h1.75v1.95H2.3z" style="fill:#c63a2f;stroke:none"/>')
+rep(""" in:'<path d="M-3 -3h6v4.4h-6zM0 1.4v2.4"/>',""",""" br:'"""+BARRIER+"""',""")
+rep('''<li><svg viewBox="0 0 30 16"><rect x="8" y="1" width="14" height="14" rx="4" fill="#2f6db5" stroke="#fff"/></svg>зупинка транспорту</li>''',
+    '''<li><svg viewBox="0 0 30 16"><rect x="8" y="1" width="14" height="14" rx="4" fill="#2f6db5" stroke="#fff"/></svg>зупинка транспорту</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><path d="M-4.9-3.4h1.7v6.7h-1.7zM-5.7 3.2h3.3v1.4h-3.3z" fill="#222b31"/><path d="M-3.2-2.95h8.5v1.95h-8.5z" fill="#fff" stroke="#c63a2f" stroke-width=".55"/><path d="M-1.2-2.95h1.75v1.95h-1.75zM2.3-2.95h1.75v1.95H2.3z" fill="#c63a2f"/></svg>шлагбаум</li>''')
+# старт «біля стенда» (адреса ?from=st) більше не потрібен
+cut('},\n st:{at:[93,10]','\n};','}')
+# --- тексти: без «повторного дотику» і без довгої довідки про джерела; © OpenStreetMap лишається (цього вимагає ліцензія даних) ---
+rep(' Торкніться будівлі чи зупинки, щоб обрати; повторний дотик знімає вибір.</p>',' Торкніться будівлі, входу чи зупинки, щоб обрати.</p>')
+rep('<br>Можна також торкнутися будівлі на карті. Повторний дотик до обраної знімає вибір.</p>','<br>Можна також торкнутися будівлі чи входу на карті.</p>')
+rep(' Двері відділень, поверхи, сходи й галерею уточнено на місці 16.11.2026. Контури, доріжки, зупинки, маршрути транспорту — © учасники <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, звірено із супутниковим знімком 15.11.2026. Час у дорозі приблизний.',
+    ' Дані карти — © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>.')
+# --- шапка: назва лікарні крупно, ARIADNA дрібно; за кілька секунд згортається до знака «А» ---
+rep('<div class="mast glass" id="mast"><img class="bi" src="brand/ariadna-favicon.svg" alt="" width="34" height="34"><span class="bt"><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="bw" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="92" height="15"></picture><span class="bs">КНП «ПСИХІАТРІЯ» · Кирилівська, 103</span></span></div>',
+    '<div class="mast glass" id="mast"><button type="button" class="bi" id="mastA" aria-label="Показати назву лікарні" aria-expanded="true"><img src="brand/ariadna-favicon.svg" alt="" width="34" height="34"></button>'
+    '<span class="bt"><span class="bh">КНП «ПСИХІАТРІЯ»</span><span class="bs">Кирилівська, 103 · <picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="bw" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="49" height="8"></picture></span></span></div>\n'
+    '<a class="osm on" id="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>')
+# --- нижня панель: банер маршруту з рядком «звідки → куди»; на телефоні «Куди» і «Звідки» згортаються в одну кнопку ліворуч ---
+ROUTE_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="18.5" r="2.3"/><path d="M8 18.5h7a3.2 3.2 0 0 0 0-6.4H9a3.2 3.2 0 0 1 0-6.4h4.5"/><path d="M18.5 10.4s-2.7-2.3-2.7-4.6a2.7 2.7 0 0 1 5.4 0c0 2.3-2.7 4.6-2.7 4.6z" fill="currentColor" stroke-width="1.4"/></svg>'
+rep('''<div class="dock" id="dock">
+  <div class="res glass" id="res" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-live="polite" hidden><div class="tx"><b id="resB"></b><span class="s" id="resS"></span></div><span id="resGo"></span></div>
+  <div class="dk-row">''','''<div class="dock" id="dock">
+  <div class="res-row" id="resRow" hidden><button type="button" class="dk mini glass" id="bMini" aria-label="Змінити, куди і звідки">'''+ROUTE_IC+'''</button><div class="res glass" id="res" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-live="polite"><div class="tx"><span class="ft" id="resF"></span><b id="resB"></b><span class="s" id="resS"></span></div><span id="resGo"></span></div></div>
+  <div class="dk-row" id="dkRow">''')
+# камера рахує відступ знизу за тим, якою панель стане після згортання, а не якою вона є посеред анімації
+rep('var s=size(),dr=document.getElementById("dock").getBoundingClientRect();','var s=size(),dr={top:dockTop()};')
+# --- жести: подвійний дотик збільшує карту; одиночний дотик чекає 0,26 с, чи не буде другого ---
+rep('if(moved<8&&e.type==="pointerup"&&!many){tapAt(e.clientX,e.clientY);return}','if(moved<8&&e.type==="pointerup"&&!many){tapOrDouble(e.clientX,e.clientY);return}')
+rep('/* жести: тягнути, щипок, інерція. Подвійне торкання нічого не збільшує. */','/* жести: тягнути, щипок, інерція, подвійне торкання — наблизити */')
+# --- CSS ---
+rep('.badge.on .pulse{animation:pulse','.badge.on.pl .pulse{animation:pulse')
+rep('</style>','''/* ---------- v14 ---------- */
+:root{--on-thread:#fff}
+@media (prefers-color-scheme:dark){:root{--on-thread:#222b31}}
+/* віконця прозоріші (кнопки всередині — як були) */
+.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(255,255,255,.4);--glass-glow:rgba(255,255,255,.42)}
+@media (prefers-color-scheme:dark){.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(44,52,59,.42);--glass-glow:rgba(255,255,255,.05)}}
+/* шапка */
+.mast{pointer-events:auto;gap:0;transition:opacity .2s,transform .2s,padding .6s cubic-bezier(.32,.72,0,1)}
+.mast .bi{display:block;padding:0;border:0;background:none;border-radius:9px;cursor:pointer;flex:none}
+.mast .bi img{display:block;width:34px;height:34px;border-radius:9px}
+.mast .bt{gap:3px;max-width:260px;margin-left:10px;overflow:hidden;transition:max-width .6s cubic-bezier(.32,.72,0,1),margin .6s cubic-bezier(.32,.72,0,1),opacity .35s}
+.mast .bh{font-size:15.5px;font-weight:700;letter-spacing:.005em;line-height:1.15;white-space:nowrap}
+.mast .bs{display:flex;align-items:center;gap:4px}
+.mast .bw{height:8px;width:auto;display:block}
+.mast.mini{padding-right:6px}
+.mast.mini .bt{max-width:0;margin-left:0;opacity:0}
+.osm{position:absolute;z-index:14;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));font-size:10.5px;line-height:1;padding:5px 8px;border-radius:9px;color:var(--muted);background:var(--glass-tint);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);text-decoration:none;opacity:0;pointer-events:none;transition:opacity .5s}
+.osm.on{opacity:1;pointer-events:auto}
+body.popping .osm{opacity:0;pointer-events:none}
+/* віконце про вхід: на нього можна натискати, карта під ним не реагує */
+.toast.on{pointer-events:auto;cursor:pointer}
+.toast .ta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px}
+.toast .ta small{font-size:12.5px;color:var(--muted);margin-right:2px}
+.toast .ta .gbtn{min-height:38px;padding:0 13px;font-size:14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+#map .door text{pointer-events:auto}
+/* номер обраного відділення пульсує біля дверей */
+.dnum{transform-box:fill-box;transform-origin:center;animation:dnum 1.7s ease-in-out infinite}
+.dnum .dn-b{fill:var(--thread);stroke:#fff;stroke-width:1.6}
+#map .dnum text{font-size:12.5px;font-weight:700;text-anchor:middle;dominant-baseline:central;fill:var(--on-thread);stroke:none}
+.dn-w{fill:none;stroke:var(--thread);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:dnw 1.7s ease-out infinite}
+@keyframes dnum{0%,100%{transform:scale(1)}50%{transform:scale(1.17)}}
+@keyframes dnw{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.9);opacity:0}}
+#map .door.np text{display:none}
+/* нижня панель */
+.res-row{display:flex;align-items:stretch;position:relative;z-index:1}
+.res-row[hidden]{display:none}
+.res-row .res{flex:1;min-width:0}
+.dk.mini{flex:none;width:0;min-height:0;padding:0;margin-right:0;justify-content:center;overflow:hidden;opacity:0;transform:scale(.5);pointer-events:none;color:var(--accent)}
+.dk.mini svg{width:25px;height:25px;flex:none}
+.res .ft{display:none;font-size:12px;color:var(--muted);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res .ft i{font-style:normal;font-weight:700;color:var(--thread);margin:0 3px}
+/* довгі переходи — лише поки панель згортається чи розгортається (клас anim), щоб натискання кнопок лишалось швидким */
+.dk-row{position:relative;z-index:0}
+.dk-row .dk{transform-origin:0 100%}
+.dock.anim .dk-row{transition:margin .95s cubic-bezier(.45,0,.2,1),visibility 0s}
+.dock.anim .dk-row .dk{transition:transform .95s cubic-bezier(.45,0,.2,1),opacity .55s .4s}
+.dock.anim .dk.mini{transition:width .95s cubic-bezier(.45,0,.2,1),margin .95s cubic-bezier(.45,0,.2,1),opacity .45s,transform .95s cubic-bezier(.45,0,.2,1)}
+#go.on{background:var(--btn-sheen),var(--btn-glass);color:var(--ink);box-shadow:0 0 0 .5px var(--line)}
+@media (max-width:899px){
+  .dock.min .dk.mini{width:60px;margin-right:8px;opacity:1;transform:none;pointer-events:auto}
+  .dock.anim.min .dk.mini{transition-delay:.35s,.35s,.5s,.35s}
+  .dock.min .res .ft{display:block}
+  /* ряд кнопок лишається внизу, а банер з’їжджає на його місце; кнопки стискаються в лівий нижній кут, звідки виростає одна кнопка */
+  .dock.min .dk-row{margin-top:-66px;pointer-events:none;visibility:hidden}
+  .dock.anim.min .dk-row{transition:margin .95s cubic-bezier(.45,0,.2,1) .15s,visibility 0s 1.2s}
+  .dock.min #bTo{transform:scale(.3);opacity:0}
+  .dock.min #bFrom{transform:translateX(-135%) scale(.3);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){.dnum,.dn-w{animation:none}.dn-w{display:none}}
+</style>''')
+# --- скрини Андрія 18.11.2026 ---
+# прохід західніше від Кирилівської церкви не існує: від брами під сходами — дорогою на північний схід повз корпус 10,
+# далі на південний схід до дороги зі східного боку церкви (стрілки на скрині)
+rep('\nf 141,-192 154,-168 157,-164\n','\n')
+rep('\nf 139,-156 141,-192\n','\n')
+rep('\nf 192,-235 184,-242 172,-232\n','\nf 198.8,-232 192,-235 184,-242 172,-232\n')
+rep(' 197,-215 202,-262\n',' 197,-215 198.8,-232 202,-262\n')
+rep('hint:"Від зупинки підніміться сходами до Кирилівської церкви, обійдіть її й пройдіть через браму на територію лікарні. На цьому шляху є сходи."',
+    'hint:"Від зупинки пройдіть сходами до дороги, обійдіть нею корпус 10 з північного боку й вийдіть на дорогу зі східного боку Кирилівської церкви; нею — на південь до лікарні. Повз церкву із західного боку проходу немає. На цьому шляху є сходи."')
+# східний двір корпусу 1: асфальт — смуга вздовж північного краю й уся східна частина двору (червоне на скрині); решта — газон
+PAVE_E='-54.7,24 -54.7,27.7 -52.7,28.8 -43,27 -34.4,29.6 -32.7,32.6 -28.7,31 -22.7,32.8 -19,36.3 -6.2,69.1 0.2,92.1 -0.8,95.3 1.3,97.7 1,101.2 1.8,103.7 3.2,104.5 6.8,102.9 10.3,102.8 16.6,100.8 17.7,99.5 17.6,97.9 15.9,94.9 15,89.4 1.9,45.7 0.6,44 0.2,41.9 -13.5,30.2 -36.1,21.3 -43.9,20.1 -48.6,21 -50.2,22.6'
+rep(',\n "-22.7,31 -18,32 -7,43 -6,60.5 -15.7,60.4",\n "-7,43 -2,42 1.6,44.1 5.2,56.1 6.8,61.4 8.1,65.8 18.3,100.1 5,104.1 -5,70 -6,65"];',
+    '];\n/* асфальт східного двору корпусу 1 (скрин 18.11.2026); малюється поверх схилу */\nvar PAVE_E=["'+PAVE_E+'"];')
+rep('var rd="",rde="",fw="",fwe="",stp="",stb="";\nWAYS','PAVE_E.forEach(function(p){h+=\'<polygon class="pave" points="\'+p+\'"/>\'});\nvar rd="",rde="",fw="",fwe="",stp="",stb="";\nWAYS')
+# сховище — знак цивільного захисту: синій трикутник на помаранчевому
+SHELTER='<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#f28c00;stroke:none"/><path d="M0-3.4 3.4 2.6H-3.4z" style="fill:#1d4fc4;stroke:none"/>'
+rep('{n:"Шлагбаум",d:"на дорозі біля адміністрації",x:86.7,y:16.9,ic:"br"}',
+    '{n:"Шлагбаум",d:"на дорозі біля адміністрації",x:86.7,y:16.9,ic:"br"},\n {n:"Сховище",d:"укриття у східному дворі корпусу 1",x:-8.6,y:89.8,ic:"sh",show:1}')
+rep(" br:'"," sh:'"+SHELTER+"',\n br:'")
+rep('шлагбаум</li>','шлагбаум</li>\n    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" fill="#f28c00"/><path d="M0-3.4 3.4 2.6H-3.4z" fill="#1d4fc4"/></svg>сховище, укриття</li>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
