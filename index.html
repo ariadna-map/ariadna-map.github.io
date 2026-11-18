@@ -409,6 +409,18 @@ body.popping .osm{opacity:0;pointer-events:none}
 .lb.park .pk{fill:#fff;stroke:var(--thread);stroke-width:1.8}
 .lb.park .pk-c{fill:none;stroke:#222b31;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
 .from .car-h{font-size:12.5px;color:var(--muted);margin:2px 4px 8px}
+/* ---------- v16 ---------- */
+/* на авто: відрізок машиною — як дорога (смуга з розміткою), пішки — золота нитка */
+.route.drive-b{stroke:#222b31;stroke-width:calc(var(--rw-main,2.8) * 2.6);opacity:.78}
+.route.drive{stroke:#fff;stroke-width:calc(var(--rw-main,2.8) * .55);stroke-dasharray:4 3.2;opacity:.95}
+@media (prefers-color-scheme:dark){.route.drive-b{stroke:#f3efe6;opacity:.85}.route.drive{stroke:#222b31}}
+.lb.carin .ci{fill:#222b31;stroke:#fff;stroke-width:1.6}
+.lb.carin .cc{fill:none;stroke:#fff;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
+@media (prefers-color-scheme:dark){.lb.carin .ci{fill:#f3efe6;stroke:#222b31}.lb.carin .cc{stroke:#222b31}}
+#detBody .sw{padding-top:10px}
+/* шапка з логотипом не налазить на віконце-підказку: поки воно відкрите, шапка й © OpenStreetMap ховаються */
+body.toasting .mast,body.toasting .osm{opacity:0;transform:translateY(-6px);pointer-events:none}
+#map .lb.park .pk-t{font-size:11.5px;font-weight:800;text-anchor:middle;dominant-baseline:central;fill:#222b31;stroke:none}
 </style>
 </head>
 <body>
@@ -634,7 +646,7 @@ var B=[
  {k:"8",lv:2,key:1,r:"r-terra",lab:[231,-222],door:[220.5,-225.3],p:["214.2,-250.3 224,-248.9 220.5,-225.3 216.4,-197.9 236.9,-194.8 245.4,-251.9 215.1,-256.5"]},
  {k:"9",lv:1,r:"r-grey",lab:[170,82],door:[163,93],p:["154,88.8 177,65.5 186.4,74.8 163.4,98"]},
  {k:"10",r:"r-sage",lv:1,lab:[176,-226],door:[180.1,-219.7],n:"Патологічна анатомія",kw:"морг патанатомія",p:["171.9,-213.2 168.9,-215.9 172.3,-219.7 167.6,-224.8 173.9,-231.6 175.2,-230.7 180.5,-236.4 184.8,-232.4 179.3,-226.6 183.2,-223 180.1,-219.7 176.6,-215.9 175.5,-217"]},
- {k:"11",lv:1,key:1,r:"r-grey",lab:[80,92],door:[65.4,80.8],p:["101.7,36.8 94.6,34 98,26.3 100.8,22.5 104.8,20.1 109.8,19.2 115,20 119.5,22.8 122.9,27 124.8,31.8 124.5,37.3 95.2,115.5 85.4,115.7 61.4,121.9 58.9,112 52.7,113.6 33.6,40.3 46.3,37 48.3,44.7 50.7,42.8 55.4,41.5 59.4,42 63.3,43.7 66.4,47.3 68.2,51.8 67.9,57.1 65.3,61.5 61.1,64.6 56.2,65.5 53.6,65 55.4,72 57.7,76.4 61,79.1 65.4,80.8 70.4,80.5 74.4,79.1 77.8,75.8 81.9,66.8 88.6,49.5 92.2,50.9 95.7,52.2 96.9,49.1"],
+ {k:"11",lv:1,key:1,r:"r-grey",lab:[80,92],door:[80,71.3],p:["101.7,36.8 94.6,34 98,26.3 100.8,22.5 104.8,20.1 109.8,19.2 115,20 119.5,22.8 122.9,27 124.8,31.8 124.5,37.3 95.2,115.5 85.4,115.7 61.4,121.9 58.9,112 52.7,113.6 33.6,40.3 46.3,37 48.3,44.7 50.7,42.8 55.4,41.5 59.4,42 63.3,43.7 66.4,47.3 68.2,51.8 67.9,57.1 65.3,61.5 61.1,64.6 56.2,65.5 53.6,65 55.4,72 57.7,76.4 61,79.1 65.4,80.8 70.4,80.5 74.4,79.1 77.8,75.8 81.9,66.8 88.6,49.5 92.2,50.9 95.7,52.2 96.9,49.1"],
    hi:["56.8,104 53.6,91.5 83.4,83.8 85.4,78.6 97.2,83.2 92.7,94.7 87.3,96.1","85.4,78.6 92,61.8 103.8,66.4 97.2,83.2","108.7,53.7 103.8,66.4 92,61.8 95.7,52.2 96.9,49.1"],hl:[7,6,4],
    ring:"48.3,44.7 50.7,42.8 55.4,41.5 59.4,42 63.3,43.7 66.4,47.3 68.2,51.8 67.9,57.1 65.3,61.5 61.1,64.6 56.2,65.5 53.6,65 51.9,64.7 48.1,62.4 45.6,59.1 44.3,54.9 44.6,50 47,45.8"},
  {k:"12",lv:1,key:1,r:"r-grey",lab:[120,-24],door:[100.6,-34.1],p:["125.7,-33.1 131.6,-36.8 138.2,-26.6 132.8,-14.6 129,-16.2 127.9,-13.8 125,-7.4 129.3,-5.5 126.9,-1.9 124.1,0.7 120.6,1.7 114.6,1.7 108.6,-1 105.3,-6.1 103.7,-10 105.2,-16.3 112.7,-12.9 117.4,-23.3 111.1,-33.3 100.6,-34.1 86.5,-35.1 87.3,-47 102.3,-46 102.8,-52.7 106.2,-52.5 105.7,-45.7 118.2,-44.8"],
@@ -673,6 +685,10 @@ var ENT={
  k2:{k:"2",p:[69.3,-38],t:"6 · 9",a:"r",n:"Вхід до відділень 6 і 9",d:"двері зі східного торця корпусу 2",w:"Двері — зі східного торця корпусу; від дороги до них ведуть сходинки."},
  k8:{k:"8",p:[220.5,-225.3],t:"8 · 10",a:"l",n:"Вхід до відділень 8 і 10",d:"єдиний вхід у корпус 8",w:"Це єдині двері корпусу 8: через них і до 8-го, і до 10-го відділення."},
  k5:{k:"5",p:[73.8,-114.1],t:"1 · 2",a:"l",n:"Вхід до відділень 1 і 2",d:"один вхід для обох відділень",w:"Через ці двері — і до 1-го, і до 2-го відділення."},
+ pl:{k:"11",p:[80,71.3],t:"Поліклініка · 5 · 22",a:"l",n:"Вхід до поліклініки й відділень 5 і 22",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його східного боку."},
+ vkz:{k:"11",p:[58.5,76.5],t:"Конференц-зала · Музей",a:"r",n:"Вхід до великої конференц-зали й музею",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його західного боку."},
+ st11:{k:"11",p:[86.3,57],t:"",a:"l",n:"Вхід до корпусу 11",d:"зі сходинками, з боку пішохідної доріжки"},
+ cafe:{k:"11",p:[112.4,70.7],t:"Кафе",a:"r",n:"Кафе",d:"вхід зі східного боку корпусу 11",w:"Вхід — зі східного боку корпусу 11."},
  mkz:{k:"12",p:[127,-12],t:"Мала конференц-зала",a:"r",n:"Мала конференц-зала",d:"вхід зі східного боку корпусу 12",w:"Вхід — зі східного боку корпусу."}
 };
 B.forEach(function(b){if(!b.k||b.k==="1"||!b.door)return;
@@ -721,10 +737,16 @@ v 135,21 138,24 147,22 163,5
 v 61,-117 76,-92 80,-79 80,-57
 f 72,8 90,-19
 v 101,11 103,-13 101,-18 90,-19
-v 93,10 84,54 65,72
+v 93,10 84,54 73.3,64.2 65,72
+f 27,37.9 31.6,37.9
+s 31.6,37.9 35.6,36.3 40,35 45,34.2 50.4,34.6 55.7,36.3 60.4,38.6
+f 41.2,18.4 40.6,29.5 40,35
+f 60.4,38.6 81.9,54 85.3,56.4
+f 73.3,64.2 79.4,70.6
+f 65,72 59.2,75.9
 v 124,75 137,90 148,119 147,147 141,152 99,161
 v 136,16 135,21 133,32 124,75 110,89 99,117 37,138
-v -138,197 -115,172 -107,165 -58,142 41,114 44,108 26,34 25,28 26,4
+v -138,197 -115,172 -107,165 -58,142 41,114 44,108 27,37.9 26,34 25,28 26,4
 f 60,7 28,-12 -3,-16 -8,-47 -6,-57 -1,-56
 v 100,-124 107,-107 106,-93 100,-64 99,-56
 v 205,155 198,143 225,65 226,54 167,-32
@@ -756,7 +778,7 @@ f 5,104 8,116
 f -6,65 -5,70
 f -5,70 5,104
 f 25,28 30,25
-s 30,25 52,12
+s 30,25 41.2,18.4 52,12
 f 52,12 60,7
 f 444,3 425,13 410,22 388,32 301,49 255,50 242,46
 f 229,36 171,-36
@@ -792,8 +814,10 @@ f 110,-270 108,-267 84,-236 79,-235`;
 var STARTS={
  e1:{at:[-322,-99],stop:[-344,-96],name:"Лікарня ім. Павлова",cap:"Від зупинки",short:"Павлова",street:"вул. Олени Теліги",tr:"тролейбуси 27, 30, 31 · автобус 50",
      hint:"Від зупинки йдіть асфальтовою дорогою, що відходить від вулиці вглиб гаю. Цією ж дорогою заїжджають автомобілі."},
- e2:{at:[100.5,-321],stop:[100.5,-324.3],name:"Музей «Кирилівська церква»",cap:"Від зупинки",short:"Музей",street:"вул. Олени Теліги",tr:"тролейбуси 27, 30, 31 · автобус 50",
-     hint:"Зупинка — на північному боці вул. Олени Теліги. Перейдіть вулицю підземним переходом, далі сходами до дороги, обійдіть нею корпус 10 з північного боку й вийдіть на дорогу зі східного боку Кирилівської церкви; нею — на південь до лікарні. Повз церкву із західного боку проходу немає. На цьому шляху є сходи."},
+ e2:{at:[100.5,-321],stop:[100.5,-324.3],name:"Музей «Кирилівська церква»",cap:"Від зупинки",short:"Музей · через дорогу",street:"вул. Олени Теліги, протилежний від церкви бік",tr:"тролейбуси 27, 30, 31 · автобус 50",
+     hint:"Ця зупинка — на протилежному від церкви боці вул. Олени Теліги. Перейдіть вулицю підземним переходом, далі сходами до дороги, обійдіть нею корпус 10 з північного боку й вийдіть на дорогу зі східного боку Кирилівської церкви; нею — на південь до лікарні. Повз церкву із західного боку проходу немає. На цьому шляху є сходи."},
+ e4:{at:[110,-270],stop:[101,-260],name:"Музей «Кирилівська церква»",ln:"Музей",cap:"Від зупинки",short:"Музей · бік церкви",street:"вул. Олени Теліги, бік церкви",tr:"тролейбуси 27, 30, 31 · автобус 50",
+     hint:"Ця зупинка — на боці церкви. Від неї пройдіть сходами до дороги, обійдіть нею корпус 10 з північного боку й вийдіть на дорогу зі східного боку Кирилівської церкви; нею — на південь до лікарні. Повз церкву із західного боку проходу немає. На цьому шляху є сходи."},
  e3:{at:[444,9],stop:[455,24],name:"вул. Кирилівська",cap:"Від зупинки",short:"Кирилівська",street:"ріг Подільського узвозу",tr:"тролейбуси 6, 18, 28, 33 · поруч трамваї 11, 12, 16, 19",
      hint:"Від зупинки зверніть на Врубелівський узвіз. Пішки коротше стежкою зі сходами; без сходів — узвозом до в’їзду."}
 };
@@ -817,7 +841,7 @@ var SLOPES=[{a:-15.4,p:"-151.2,41.6 -32.2,8.8 -30.7,12.5 -47,24 -86,35 -151,53.7
  {a:73.3,p:"-44.5,29.5 -31.5,72.8 -27.1,87.6 -24.9,95 -21.1,93.9 -23.3,86.5 -27.7,71.7 -40.7,28.4"}];
 /* сходинки всередині наскрізного проходу (малюються поверх корпусу) */
 var STEPS_IN=["-101,81 -97,79.8"];
-var BENCH=[[-140.6,83.5],[-121.3,79.5]];
+var BENCH=[[-140.6,83.5],[-121.3,79.5],[38,28.8]];
 var GAZEBO=[[-56.2,64.2],[-44.4,110.4]];
 var SCULPT=[
  {n:"Дон Кіхот",d:"кована скульптура; поруч — Санчо Панса та віслюк",x:142,y:-31,ic:"st"},
@@ -834,9 +858,9 @@ var LAND=[
  {n:"Сад відновлення",d:"терапевтичний сад (Nordic Therapy Garden)",x:-182,y:42,ic:"gd",show:1},
  {n:"Наріжна вежа XVIII ст.",d:"залишок мурів Кирилівського монастиря",x:207.7,y:-51.5,ic:"tw"},
  {n:"Шлагбаум",d:"на дорозі біля адміністрації",x:86.7,y:16.9,ic:"br"},
- {n:"Сховище",d:"укриття у східному дворі корпусу 1",x:-8.6,y:89.8,ic:"sh",show:1},
+ {n:"Сховище",d:"укриття у східному дворі корпусу 1",x:-8.6,y:89.8,ic:"sh",show:1,kw:"укриття бомбосховище тривога"},
  {n:"Дзвіниця",d:"біля Кирилівської церкви",x:177.7,y:-93.4,ic:"bl"},
- {n:"Банкомат Укргазбанку",d:"ліворуч від входу до малої конференц-зали, корпус 12",x:129.5,y:-7.5,ic:"atm",show:1}
+ {n:"Банкомат Укргазбанку",d:"ліворуч від входу до малої конференц-зали, корпус 12",x:129.5,y:-7.5,ic:"atm",show:1,sh:"Банкомат",kw:"гроші готівка картка укргазбанк"}
 ];
 /* підпірні стіни й уступи (OSM barrier=retaining_wall): нижчий бік — праворуч від напрямку лінії */
 var WALLS=["44,119 4,131","15.8,33.5 13.8,27.6 -30.7,12.5 -32.2,8.8 -151.2,41.6","-152.4,151.5 -148.5,148.3 -161,102.7 -162.2,76.6 -166,48.3","172.5,193.8 184.4,168.2 221.7,57.2","437.9,18 400.4,49.1 385.7,52.6","272.9,-226.4 267.4,-234.7 265.3,-291.5 256,-314.6 256.7,-329.9 238.1,-375.4","238.1,-375.4 231.6,-373 196.1,-334.6","-169.6,-335.7 -210.1,-295.4"];
@@ -846,7 +870,7 @@ var GATES=[[-13,-167],[141.3,-192.4],[176.9,-120.4],[253.6,101]];
 var EM="(044) 293-85-39";
 var D=[
  {id:"pr",q:1,short:"Приймальне",kw:"приймальня приймальний покій госпіталізація",t:"Приймальне відділення",sub:"цілодобово",ic:"cross",k:"1",door:[27.5,73.2],ents:["prm","prw"],way:"Вхід — із галереї під навісом уздовж корпусу. Двері чоловічого й жіночого блоків підписані на карті.",note:"Працює цілодобово",tel:[EM]},
- {id:"pol",q:1,short:"Поліклініка",kw:"реєстратура консультація",t:"Поліклініка",sub:"Пн–Пт 09:00–16:12",ic:"steth",full:"Міська консультативно-діагностична поліклініка",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 293-64-64","(098) 454-18-39"]},
+ {id:"pol",q:1,ent:"pl",short:"Поліклініка",kw:"реєстратура консультація",t:"Поліклініка",sub:"Пн–Пт 09:00–16:12",ic:"steth",full:"Міська консультативно-діагностична поліклініка",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 293-64-64","(098) 454-18-39"]},
  {id:"amb",q:1,short:"Амбулаторія № 1",t:"Амбулаторія № 1",sub:"Правобережна",ic:"door",full:"Правобережна психіатрична амбулаторія № 1",k:"1",fl:1,ent:"pnd",kw:"ПНД диспансер реєстратура амбулаторія",note:"реєстратура: Пн–Пт 09:00–16:12, Сб і Нд — вихідні",tel:["(044) 503-87-80","(095) 687-25-90"]},
  {id:"adm",q:1,short:"Адміністрація",kw:"директор дирекція головний лікар канцелярія",t:"Адміністрація",sub:"корпус 12",ic:"build",k:"12",wide:0},
  {id:"kab",q:1,short:"Кабінет прийому",t:"Кабінет амбулаторного прийому",sub:"корпус 5",ic:"chair",k:"5"},
@@ -854,7 +878,7 @@ var D=[
  {id:"2",k:"5",ent:"k5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
  {id:"3",k:"1",fl:2,ent:"s",d:"Активної терапії гострих психозів",tel:["(044) 503-87-03","(044) 293-85-43"]},
  {id:"4",k:"1",fl:1,ent:"v4",d:"Лікувально-діагностичне",tel:["(044) 503-87-04","(044) 503-87-05"]},
- {id:"5",k:"11",d:"Лікувально-діагностичне",tel:["(044) 293-64-65"]},
+ {id:"5",k:"11",ent:"pl",d:"Лікувально-діагностичне",tel:["(044) 293-64-65"]},
  {id:"6",k:"2",ent:"k2",note:"переїхало з корпусу 7: старі корпуси закривають на капітальний ремонт",d:"Лікувально-діагностичне",tel:["(044) 293-64-52","(044) 293-64-53"]},
  {id:"7",k:"1",fl:2,ent:"n",lift:1},{id:"8",k:"8",ent:"k8"},
  {id:"9",k:"2",ent:"k2",note:"переїхало в корпус 2: старі корпуси закривають на капітальний ремонт"},
@@ -865,7 +889,7 @@ var D=[
  {id:"16",k:"1",fl:3,ent:"s",lift:1,d:"Для хворих із супутньою соматичною патологією",tel:["(044) 503-87-16"]},
  {id:"18",k:"1",fl:3,ent:"w19",d:"Геронтологічне",tel:["(044) 293-64-62"]},
  {id:"19",k:"1",fl:"1–2",d:"Для хворих на епілепсію",tel:["(044) 293-85-36","(044) 293-64-63"],ent:"w19"},
- {id:"20",k:"1",fl:3,ent:"w19"},{id:"22",k:"11"},{id:"23",k:"1",fl:2,ent:"s"},{id:"24",k:"1",fl:3,ent:"s"},
+ {id:"20",k:"1",fl:3,ent:"w19"},{id:"22",k:"11",ent:"pl"},{id:"23",k:"1",fl:2,ent:"s"},{id:"24",k:"1",fl:3,ent:"s"},
  /* x — не відділення з номером: шукаються текстом, у плитках і номерах їх немає */
  {id:"prm",x:1,t:"Приймальне — чоловічий блок",short:"Приймальне (чол.)",k:"1",ent:"prm",kw:"чоловіки",note:"працює цілодобово",tel:[EM]},
  {id:"prw",x:1,t:"Приймальне — жіночий блок",short:"Приймальне (жін.)",k:"1",ent:"prw",kw:"жінки",note:"працює цілодобово",tel:[EM]},
@@ -873,6 +897,9 @@ var D=[
  
  {id:"ekopfo",x:1,t:"ЕКОПФО",short:"ЕКОПФО",full:"ЕКОПФО — експертна команда з оцінювання повсякденного функціонування особи",k:"1",fl:1,ent:"n",kw:"експертна команда оцінювання повсякденного функціонування особи мсек інвалідність",note:"вхід той самий, що до відділень 7 і 15"},
  {id:"lift",x:1,t:"Ліфт корпусу 1",short:"Ліфт",k:"1",ent:"lift",note:"до відділень 7, 15 і 16"},
+ {id:"vkz",x:1,t:"Велика конференц-зала",short:"Велика конф.-зала",k:"11",ent:"vkz",kw:"конференція зал актова",note:"вхід з внутрішнього двору корпусу 11"},
+ {id:"muz",x:1,t:"Музей",short:"Музей",k:"11",ent:"vkz",kw:"музей історії лікарні",note:"вхід з внутрішнього двору корпусу 11"},
+ {id:"cafe",x:1,t:"Кафе",k:"11",ent:"cafe",kw:"їжа кава буфет",note:"вхід зі східного боку корпусу 11"},
  {id:"mkz",x:1,t:"Мала конференц-зала",short:"Мала конф.-зала",k:"12",ent:"mkz",kw:"конференція зал",note:"вхід зі східного боку корпусу"}
 ];
 
@@ -1063,7 +1090,7 @@ Object.keys(ENT).sort(function(p,q){return (/^b\d/.test(p)?0:1)-(/^b\d/.test(q)?
     (e.t?'<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="'+an+'">'+esc(e.t)+'</text>':'')+'<circle class="hit" cx="'+(cx/2).toFixed(1)+'" cy="'+(cy/2).toFixed(1)+'" r="13" data-ent="'+id+'"/>','data-en="'+id+'"')});
 B.forEach(function(b,i){if(!b.k||!b.lab)return;h+=lbl("badge"+(b.key?" key":" sec"),b.lab[0],b.lab[1],0,'<circle class="pulse" r="13"/><circle r="'+(b.key?12:10)+'"/><text>'+b.k+'</text>','data-bb="'+i+'"')});
 Object.keys(STARTS).forEach(function(e){var s=STARTS[e];
-  h+=lbl("stop"+(s.here?" here":""),s.stop[0],s.stop[1],0,'<rect x="-9" y="-9" width="18" height="18" rx="5"/>'+(s.here?'<circle r="3.4" fill="#fff"/>':'<path d="M-4.5-5h9v7h-9zM-4.5 2h9v1.5h-9zM-3 4h1.6v1.5H-3zM1.4 4H3v1.5H1.4z" opacity=".95"/>')+'<text x="13" y="4">'+esc(s.name)+'</text><circle class="hit" r="17" data-stop="'+e+'"/>','data-e="'+e+'"'+(s.here?' data-here="1"':''))});
+  h+=lbl("stop"+(s.here?" here":""),s.stop[0],s.stop[1],0,'<rect x="-9" y="-9" width="18" height="18" rx="5"/>'+(s.here?'<circle r="3.4" fill="#fff"/>':'<path d="M-4.5-5h9v7h-9zM-4.5 2h9v1.5h-9zM-3 4h1.6v1.5H-3zM1.4 4H3v1.5H1.4z" opacity=".95"/>')+'<text x="13" y="4">'+esc(s.ln||s.name)+'</text><circle class="hit" r="17" data-stop="'+e+'"/>','data-e="'+e+'"'+(s.here?' data-here="1"':''))});
 h+='<g id="me"></g><g id="pin"></g>';
 svg.innerHTML=h;
 var POIS=SCULPT.concat(LAND);
@@ -1234,12 +1261,14 @@ function mins(m){return Math.max(1,Math.ceil(m/70))}
 /* ---------- підказка ---------- */
 /* віконце вгорі. Дотик до нього не проходить на карту під ним: закриває віконце або виконує кнопку в ньому */
 var toastT=0,toast=document.getElementById("toast"),TA=null;
-function hideToast(){toast.classList.remove("on");TA=null}
+function hideToast(){toast.classList.remove("on");document.body.classList.remove("toasting");TA=null}
 function say(t,s,acts,cap){TA=acts&&acts.length?acts:null;
   toast.innerHTML='<b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+(TA?'<div class="ta">'+(cap?'<small>'+esc(cap)+'</small>':'')+TA.map(function(a,i){return a.href?'<a class="gbtn" data-a="'+i+'" href="'+a.href.replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+esc(a.t)+'</a>':'<button type="button" class="gbtn" data-a="'+i+'">'+esc(a.t)+'</button>'}).join("")+'</div>':'');
-  toast.classList.add("on");clearTimeout(toastT);toastT=setTimeout(hideToast,TA?8000:2800)}
+  toast.classList.add("on");document.body.classList.add("toasting");clearTimeout(toastT);toastT=setTimeout(hideToast,TA?8000:2800)}
 toast.addEventListener("click",function(e){var b=e.target.closest("[data-a]"),a=b&&TA?TA[+b.dataset.a]:null;clearTimeout(toastT);if(a&&a.href){setTimeout(hideToast,300);return}hideToast();if(a&&a.go)a.go()});
 
+["pTo","pFrom"].forEach(function(id){document.getElementById(id).addEventListener("click",function(e){
+  if(e.target.closest("button,a,input,textarea,select,label,[role=button],[data-d]"))return;pop(null)})});
 /* ---------- шапка: назву лікарні видно кілька секунд, потім вона згортається до знака «А»; дотик до «А» розгортає ---------- */
 var mast=document.getElementById("mast"),osm=document.getElementById("osm"),mastA=document.getElementById("mastA"),mastT=0,mastArmed=false;
 function mastFold(v){mast.classList.toggle("mini",v);osm.classList.toggle("on",!v);mastA.setAttribute("aria-expanded",!v)}
@@ -1301,7 +1330,8 @@ D.forEach(function(d){
 B.forEach(function(b,i){if(!b.k&&!b.n)return;var inside=inK(b.k).map(dName);
   IDX.push({t:b.k?"Корпус "+b.k:b.n,s:b.k?(b.n||(inside.length?"тут: "+inside.join(", "):"")):"",bk:b.k||null,
     h:norm([b.k?"корпус "+b.k+" будівля":"",b.n||"",b.kw||""].join(" ")),go:function(){pop(null);pickBuilding(i)}})});
-POIS.forEach(function(p){IDX.push({t:p.n,s:p.d,poi:1,h:norm(p.n+" "+p.d),go:function(){pop(null);fitBox(p.x-70,p.y-70,p.x+70,p.y+70,0);say(p.n,p.d)}})});
+POIS.forEach(function(p,i){D.push({id:"poi"+i,x:1,poi:1,t:p.n,short:p.sh||p.n,k:null,door:p.door||[p.x,p.y],note:p.d});
+  IDX.push({t:p.n,s:p.d,poi:1,h:norm(p.n+" "+p.d+" "+(p.kw||"")),go:function(){choose("poi"+i)}})});
 IDX.forEach(function(e){e.ht=e.h.split(" ")});
 function tokOk(e,t){if(/^\d+$/.test(t))return e.ht.indexOf(t)>=0;if(e.h.indexOf(t)>=0)return true;var c=t.length>=8?3:t.length>=6?2:t.length>=5?1:0;return c>0&&e.h.indexOf(t.slice(0,t.length-c))>=0}
 var hits=[];
@@ -1343,7 +1373,7 @@ function tapAt(x,y){
   if(ds.pin!==undefined){clearDest();return}
   if(ds.me!==undefined){if(st.start==="geo")clearStart();else setStart("geo");return}
   if(ds.stop!==undefined&&STARTS[ds.stop]){if(st.start===ds.stop)clearStart();else setStart(ds.stop);return}
-  if(ds.poi!==undefined){var p=POIS[+ds.poi];say(p.n,p.d);return}
+  if(ds.poi!==undefined){var pi=+ds.poi,p=POIS[pi];say(p.n,p.d,[{t:"Сюди",go:function(){choose("poi"+pi)}}],"Прокласти маршрут:");return}
   if(ds.ent!==undefined&&ENT[ds.ent]){entCard(ds.ent);return}
   if(ds.b!==undefined){bCard(+ds.b);return}
 }
@@ -1391,10 +1421,10 @@ function drawFrom(){
   bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);if(x.dataset.e!==st.start)setStart(x.dataset.e);else if(lastBox)fitBox.apply(null,lastBox)}});
   bindSwitches();
 }
-function switches(){return '<label class="sw"><input type="checkbox" id="car"'+(st.car?" checked":"")+'><span class="k"></span><span>На авто</span></label><label class="sw"><input type="checkbox" id="ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>'}
-function bindSwitches(){
-  document.getElementById("ns").onchange=function(e){st.noSteps=e.target.checked;save();render(true)};
-  document.getElementById("car").onchange=function(e){st.car=e.target.checked;st.carIn=null;if(st.car&&st.start==="geo"&&!(GEO.pos&&!geoFar()))st.start=STARTS[prevStart]?prevStart:"e1";save();render(true)}}
+function switches(px){px=px||"";return '<label class="sw"><input type="checkbox" id="'+px+'car"'+(st.car?" checked":"")+'><span class="k"></span><span>На авто</span></label><label class="sw"><input type="checkbox" id="'+px+'ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>'}
+function bindSwitches(px){px=px||"";
+  document.getElementById(px+"ns").onchange=function(e){st.noSteps=e.target.checked;save();render(true)};
+  document.getElementById(px+"car").onchange=function(e){st.car=e.target.checked;st.carIn=null;if(st.car&&st.start==="geo"&&!(GEO.pos&&!geoFar()))st.start=STARTS[prevStart]?prevStart:"e1";save();render(true)}}
 /* «Звідки» на авто: два в’їзди на територію і «Від мене» */
 function drawFromCar(){
   var h='<div class="pk-h">Звідки заїжджаєте?</div><div class="from">',ks=Object.keys(CAR_IN);if(navigator.geolocation)ks.unshift("geo");
@@ -1427,7 +1457,7 @@ function render(zoom){
   if(!d&&st.b<0){bTo.classList.add("empty");toC.textContent="";toV.textContent="Куди вам?";resRow.hidden=true;lastDoor=null;if(FOLLOW){FOLLOW=false;awake(false)}det.innerHTML="";lastBox=null;lastRoutes=null;curTitle="";done();apply();return}
   bTo.classList.remove("empty");
   var html="";
-  if(st.b<0){ /* відділення № 9 */
+  if(st.b<0&&!(d&&d.door)){ /* відділення № 9 */
     curTitle="Відділення № 9";toC.textContent="Куди · без корпусу";toV.textContent="Відділення 9";lastRoutes=null;
     setRes("Корпус не вказано","уточніть телефоном");
     html='<div class="head"><div class="kb none">?</div><div class="tx"><div class="t">Відділення № 9</div><div class="d">Корпус на сайті лікарні не вказаний — лише «Врубелівський узвіз».</div></div></div>';
@@ -1436,7 +1466,7 @@ function render(zoom){
     det.innerHTML=html;lastBox=[150,-20,470,230,10];done();if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();return;
   }
   var en=d&&d.ent?ENT[d.ent]:null,viaLift=!!(d&&d.lift&&st.noSteps);
-  var b=B[st.b],door=viaLift?ENT.lift.p:en?en.p:(d&&d.door)||b.door||b.lab,same=inK(b.k);
+  var b=st.b>=0?B[st.b]:{k:null,door:d.door,lab:d.door},door=viaLift?ENT.lift.p:en?en.p:(d&&d.door)||b.door||b.lab,same=inK(b.k);
   var title=d?dTitle(d):(b.k?"Корпус "+b.k:(b.n||"Будівля")),sub="";
   if(d){sub=(d.d||d.note||"");if(d.d&&d.note)sub=d.d+" · "+d.note}
   else if(b.n)sub=b.n;
@@ -1481,10 +1511,10 @@ function render(zoom){
   if(b.priv)html+='<p class="note">Закрита територія: вхід лише за дозволом, маршрут не прокладається.</p>';
   html+='<p class="note">Заблукали? Приймальне відділення цілодобово: <a href="tel:+380442938539">'+EM+'</a></p>';
   html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+'Як доїхати — Google Карти</a><button type="button" class="gbtn" id="shr">'+SHARE+'Поділитися маршрутом</button></div>';
-  det.innerHTML=html;document.getElementById("shr").onclick=share;
+  det.innerHTML=html+switches("d");document.getElementById("shr").onclick=share;bindSwitches("d");
   /* якщо відомо, яку частину корпусу займає відділення, обводимо тільки її, а не весь корпус */
   var AR=d?areaOf(d.id):null;
-  glow.innerHTML=AR?"":'<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
+  glow.innerHTML=AR||!b.p?"":'<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
   if(AR)darea.innerHTML='<polygon class="dar-g" points="'+AR.p+'"/><polygon class="dar" points="'+AR.p+'"/>';
   var nm=d&&!d.q&&!d.x?d.id:null,eid=viaLift?"lift":(d&&d.ent)||null,pill="";
   if(nm){var ea=eid&&ENT[eid]?entDir(ENT[eid]):90,ra=ea*Math.PI/180,qx=-Math.cos(ra)*PINC,qy=-Math.sin(ra)*PINC,qw=Math.max(20,8+7.3*nm.length);
@@ -1493,10 +1523,12 @@ function render(zoom){
   var PINH=lbl("pin",door[0],door[1],0,(pill?'<circle class="core" r="3.4"/>':'<circle class="wave" r="7"/><circle class="core" r="7"/>')+'<circle class="hit" r="16" data-pin="1"/>'+pill);
   if(cr){
     var f1=function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)},dl=cr.drive.map(f1).join(" "),wl2=cr.walk.map(f1).join(" "),we=cr.walk[cr.walk.length-1];
-    rg.innerHTML='<polyline class="route halo" points="'+dl+'"/><polyline class="route case" points="'+dl+'"/><polyline class="route drive" points="'+dl+'"/>'+
+    rg.innerHTML='<polyline class="route drive-b" points="'+dl+'"/><polyline class="route drive" points="'+dl+'"/>'+
       '<polyline class="route halo" points="'+wl2+'"/><polyline class="route case" points="'+wl2+'"/><polyline class="route main draw" points="'+wl2+'"/><polyline class="route flow" points="'+wl2+'"/><polyline class="route last" points="'+f1(we)+" "+door[0]+","+door[1]+'"/>';
     var m2=rg.querySelector(".main"),L2=cr.wlen+20;m2.style.strokeDasharray=L2;m2.style.setProperty("--len",L2);
-    pin.innerHTML=PINH+lbl("park",cr.park[0],cr.park[1],0,'<circle class="pk" r="8"/><path class="pk-c" d="M-4.4 2.4V.6l1-2.6a1.2 1.2 0 0 1 1.1-.8h4.6a1.2 1.2 0 0 1 1.1.8l1 2.6v1.8zM-4.4.4h8.8M-3 2.4v1.2M3 2.4v1.2"/><title>Тут лишіть авто — далі пішки</title>');
+    var c0=cr.drive[0];
+    pin.innerHTML=PINH+(cr.dlen>15?lbl("carin",c0[0],c0[1],0,'<circle class="ci" r="8.5"/><path class="cc" d="M-4.4 2.4V.6l1-2.6a1.2 1.2 0 0 1 1.1-.8h4.6a1.2 1.2 0 0 1 1.1.8l1 2.6v1.8zM-4.4.4h8.8M-3 2.4v1.2M3 2.4v1.2"/><title>Звідси машиною</title>'):"")+
+      lbl("park",cr.park[0],cr.park[1],0,'<circle class="pk" r="8.5"/><text class="pk-t" y=".5">P</text><title>Тут лишіть авто — далі пішки</title>');
     var all=cr.drive.concat(cr.walk,[door]);
     lastBox=[Math.min.apply(null,all.map(function(p){return p[0]})),Math.min.apply(null,all.map(function(p){return p[1]})),Math.max.apply(null,all.map(function(p){return p[0]})),Math.max.apply(null,all.map(function(p){return p[1]})),28];
   } else if(r){

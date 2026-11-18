@@ -84,12 +84,14 @@ function mins(m){return Math.max(1,Math.ceil(m/70))}
 /* ---------- підказка ---------- */
 /* віконце вгорі. Дотик до нього не проходить на карту під ним: закриває віконце або виконує кнопку в ньому */
 var toastT=0,toast=document.getElementById("toast"),TA=null;
-function hideToast(){toast.classList.remove("on");TA=null}
+function hideToast(){toast.classList.remove("on");document.body.classList.remove("toasting");TA=null}
 function say(t,s,acts,cap){TA=acts&&acts.length?acts:null;
   toast.innerHTML='<b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+(TA?'<div class="ta">'+(cap?'<small>'+esc(cap)+'</small>':'')+TA.map(function(a,i){return a.href?'<a class="gbtn" data-a="'+i+'" href="'+a.href.replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+esc(a.t)+'</a>':'<button type="button" class="gbtn" data-a="'+i+'">'+esc(a.t)+'</button>'}).join("")+'</div>':'');
-  toast.classList.add("on");clearTimeout(toastT);toastT=setTimeout(hideToast,TA?8000:2800)}
+  toast.classList.add("on");document.body.classList.add("toasting");clearTimeout(toastT);toastT=setTimeout(hideToast,TA?8000:2800)}
 toast.addEventListener("click",function(e){var b=e.target.closest("[data-a]"),a=b&&TA?TA[+b.dataset.a]:null;clearTimeout(toastT);if(a&&a.href){setTimeout(hideToast,300);return}hideToast();if(a&&a.go)a.go()});
 
+["pTo","pFrom"].forEach(function(id){document.getElementById(id).addEventListener("click",function(e){
+  if(e.target.closest("button,a,input,textarea,select,label,[role=button],[data-d]"))return;pop(null)})});
 /* ---------- шапка: назву лікарні видно кілька секунд, потім вона згортається до знака «А»; дотик до «А» розгортає ---------- */
 var mast=document.getElementById("mast"),osm=document.getElementById("osm"),mastA=document.getElementById("mastA"),mastT=0,mastArmed=false;
 function mastFold(v){mast.classList.toggle("mini",v);osm.classList.toggle("on",!v);mastA.setAttribute("aria-expanded",!v)}
@@ -151,7 +153,8 @@ D.forEach(function(d){
 B.forEach(function(b,i){if(!b.k&&!b.n)return;var inside=inK(b.k).map(dName);
   IDX.push({t:b.k?"Корпус "+b.k:b.n,s:b.k?(b.n||(inside.length?"тут: "+inside.join(", "):"")):"",bk:b.k||null,
     h:norm([b.k?"корпус "+b.k+" будівля":"",b.n||"",b.kw||""].join(" ")),go:function(){pop(null);pickBuilding(i)}})});
-POIS.forEach(function(p){IDX.push({t:p.n,s:p.d,poi:1,h:norm(p.n+" "+p.d),go:function(){pop(null);fitBox(p.x-70,p.y-70,p.x+70,p.y+70,0);say(p.n,p.d)}})});
+POIS.forEach(function(p,i){D.push({id:"poi"+i,x:1,poi:1,t:p.n,short:p.sh||p.n,k:null,door:p.door||[p.x,p.y],note:p.d});
+  IDX.push({t:p.n,s:p.d,poi:1,h:norm(p.n+" "+p.d+" "+(p.kw||"")),go:function(){choose("poi"+i)}})});
 IDX.forEach(function(e){e.ht=e.h.split(" ")});
 function tokOk(e,t){if(/^\d+$/.test(t))return e.ht.indexOf(t)>=0;if(e.h.indexOf(t)>=0)return true;var c=t.length>=8?3:t.length>=6?2:t.length>=5?1:0;return c>0&&e.h.indexOf(t.slice(0,t.length-c))>=0}
 var hits=[];
@@ -193,7 +196,7 @@ function tapAt(x,y){
   if(ds.pin!==undefined){clearDest();return}
   if(ds.me!==undefined){if(st.start==="geo")clearStart();else setStart("geo");return}
   if(ds.stop!==undefined&&STARTS[ds.stop]){if(st.start===ds.stop)clearStart();else setStart(ds.stop);return}
-  if(ds.poi!==undefined){var p=POIS[+ds.poi];say(p.n,p.d);return}
+  if(ds.poi!==undefined){var pi=+ds.poi,p=POIS[pi];say(p.n,p.d,[{t:"Сюди",go:function(){choose("poi"+pi)}}],"Прокласти маршрут:");return}
   if(ds.ent!==undefined&&ENT[ds.ent]){entCard(ds.ent);return}
   if(ds.b!==undefined){bCard(+ds.b);return}
 }
@@ -241,10 +244,10 @@ function drawFrom(){
   bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);if(x.dataset.e!==st.start)setStart(x.dataset.e);else if(lastBox)fitBox.apply(null,lastBox)}});
   bindSwitches();
 }
-function switches(){return '<label class="sw"><input type="checkbox" id="car"'+(st.car?" checked":"")+'><span class="k"></span><span>На авто</span></label><label class="sw"><input type="checkbox" id="ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>'}
-function bindSwitches(){
-  document.getElementById("ns").onchange=function(e){st.noSteps=e.target.checked;save();render(true)};
-  document.getElementById("car").onchange=function(e){st.car=e.target.checked;st.carIn=null;if(st.car&&st.start==="geo"&&!(GEO.pos&&!geoFar()))st.start=STARTS[prevStart]?prevStart:"e1";save();render(true)}}
+function switches(px){px=px||"";return '<label class="sw"><input type="checkbox" id="'+px+'car"'+(st.car?" checked":"")+'><span class="k"></span><span>На авто</span></label><label class="sw"><input type="checkbox" id="'+px+'ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>'}
+function bindSwitches(px){px=px||"";
+  document.getElementById(px+"ns").onchange=function(e){st.noSteps=e.target.checked;save();render(true)};
+  document.getElementById(px+"car").onchange=function(e){st.car=e.target.checked;st.carIn=null;if(st.car&&st.start==="geo"&&!(GEO.pos&&!geoFar()))st.start=STARTS[prevStart]?prevStart:"e1";save();render(true)}}
 /* «Звідки» на авто: два в’їзди на територію і «Від мене» */
 function drawFromCar(){
   var h='<div class="pk-h">Звідки заїжджаєте?</div><div class="from">',ks=Object.keys(CAR_IN);if(navigator.geolocation)ks.unshift("geo");
@@ -277,7 +280,7 @@ function render(zoom){
   if(!d&&st.b<0){bTo.classList.add("empty");toC.textContent="";toV.textContent="Куди вам?";resRow.hidden=true;lastDoor=null;if(FOLLOW){FOLLOW=false;awake(false)}det.innerHTML="";lastBox=null;lastRoutes=null;curTitle="";done();apply();return}
   bTo.classList.remove("empty");
   var html="";
-  if(st.b<0){ /* відділення № 9 */
+  if(st.b<0&&!(d&&d.door)){ /* відділення № 9 */
     curTitle="Відділення № 9";toC.textContent="Куди · без корпусу";toV.textContent="Відділення 9";lastRoutes=null;
     setRes("Корпус не вказано","уточніть телефоном");
     html='<div class="head"><div class="kb none">?</div><div class="tx"><div class="t">Відділення № 9</div><div class="d">Корпус на сайті лікарні не вказаний — лише «Врубелівський узвіз».</div></div></div>';
@@ -286,7 +289,7 @@ function render(zoom){
     det.innerHTML=html;lastBox=[150,-20,470,230,10];done();if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();return;
   }
   var en=d&&d.ent?ENT[d.ent]:null,viaLift=!!(d&&d.lift&&st.noSteps);
-  var b=B[st.b],door=viaLift?ENT.lift.p:en?en.p:(d&&d.door)||b.door||b.lab,same=inK(b.k);
+  var b=st.b>=0?B[st.b]:{k:null,door:d.door,lab:d.door},door=viaLift?ENT.lift.p:en?en.p:(d&&d.door)||b.door||b.lab,same=inK(b.k);
   var title=d?dTitle(d):(b.k?"Корпус "+b.k:(b.n||"Будівля")),sub="";
   if(d){sub=(d.d||d.note||"");if(d.d&&d.note)sub=d.d+" · "+d.note}
   else if(b.n)sub=b.n;
@@ -331,10 +334,10 @@ function render(zoom){
   if(b.priv)html+='<p class="note">Закрита територія: вхід лише за дозволом, маршрут не прокладається.</p>';
   html+='<p class="note">Заблукали? Приймальне відділення цілодобово: <a href="tel:+380442938539">'+EM+'</a></p>';
   html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+'Як доїхати — Google Карти</a><button type="button" class="gbtn" id="shr">'+SHARE+'Поділитися маршрутом</button></div>';
-  det.innerHTML=html;document.getElementById("shr").onclick=share;
+  det.innerHTML=html+switches("d");document.getElementById("shr").onclick=share;bindSwitches("d");
   /* якщо відомо, яку частину корпусу займає відділення, обводимо тільки її, а не весь корпус */
   var AR=d?areaOf(d.id):null;
-  glow.innerHTML=AR?"":'<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
+  glow.innerHTML=AR||!b.p?"":'<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
   if(AR)darea.innerHTML='<polygon class="dar-g" points="'+AR.p+'"/><polygon class="dar" points="'+AR.p+'"/>';
   var nm=d&&!d.q&&!d.x?d.id:null,eid=viaLift?"lift":(d&&d.ent)||null,pill="";
   if(nm){var ea=eid&&ENT[eid]?entDir(ENT[eid]):90,ra=ea*Math.PI/180,qx=-Math.cos(ra)*PINC,qy=-Math.sin(ra)*PINC,qw=Math.max(20,8+7.3*nm.length);
@@ -343,10 +346,12 @@ function render(zoom){
   var PINH=lbl("pin",door[0],door[1],0,(pill?'<circle class="core" r="3.4"/>':'<circle class="wave" r="7"/><circle class="core" r="7"/>')+'<circle class="hit" r="16" data-pin="1"/>'+pill);
   if(cr){
     var f1=function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)},dl=cr.drive.map(f1).join(" "),wl2=cr.walk.map(f1).join(" "),we=cr.walk[cr.walk.length-1];
-    rg.innerHTML='<polyline class="route halo" points="'+dl+'"/><polyline class="route case" points="'+dl+'"/><polyline class="route drive" points="'+dl+'"/>'+
+    rg.innerHTML='<polyline class="route drive-b" points="'+dl+'"/><polyline class="route drive" points="'+dl+'"/>'+
       '<polyline class="route halo" points="'+wl2+'"/><polyline class="route case" points="'+wl2+'"/><polyline class="route main draw" points="'+wl2+'"/><polyline class="route flow" points="'+wl2+'"/><polyline class="route last" points="'+f1(we)+" "+door[0]+","+door[1]+'"/>';
     var m2=rg.querySelector(".main"),L2=cr.wlen+20;m2.style.strokeDasharray=L2;m2.style.setProperty("--len",L2);
-    pin.innerHTML=PINH+lbl("park",cr.park[0],cr.park[1],0,'<circle class="pk" r="8"/><path class="pk-c" d="M-4.4 2.4V.6l1-2.6a1.2 1.2 0 0 1 1.1-.8h4.6a1.2 1.2 0 0 1 1.1.8l1 2.6v1.8zM-4.4.4h8.8M-3 2.4v1.2M3 2.4v1.2"/><title>Тут лишіть авто — далі пішки</title>');
+    var c0=cr.drive[0];
+    pin.innerHTML=PINH+(cr.dlen>15?lbl("carin",c0[0],c0[1],0,'<circle class="ci" r="8.5"/><path class="cc" d="M-4.4 2.4V.6l1-2.6a1.2 1.2 0 0 1 1.1-.8h4.6a1.2 1.2 0 0 1 1.1.8l1 2.6v1.8zM-4.4.4h8.8M-3 2.4v1.2M3 2.4v1.2"/><title>Звідси машиною</title>'):"")+
+      lbl("park",cr.park[0],cr.park[1],0,'<circle class="pk" r="8.5"/><text class="pk-t" y=".5">P</text><title>Тут лишіть авто — далі пішки</title>');
     var all=cr.drive.concat(cr.walk,[door]);
     lastBox=[Math.min.apply(null,all.map(function(p){return p[0]})),Math.min.apply(null,all.map(function(p){return p[1]})),Math.max.apply(null,all.map(function(p){return p[0]})),Math.max.apply(null,all.map(function(p){return p[1]})),28];
   } else if(r){
