@@ -52,7 +52,7 @@ function lead(){
   if(had){followCam(true);say("Ведемо від вас","карта рухатиметься разом з вами")}
   else say("Визначаю, де ви…","дозвольте доступ до геопозиції")}
 function stopLead(quiet){if(!FOLLOW)return;FOLLOW=false;awake(false);geoMode();render(false);if(!quiet)say("Ведення зупинено","нитка лишається на карті")}
-function arrived(){if(!lastDoor||!GEO.pos)return;var m=meAt(),rem=LOCK&&st.start==="geo"?LOCK.L-LOCK.s+LOCK.tail:Math.hypot(m[0]-lastDoor[0],m[1]-lastDoor[1]);if(rem<(LOCK?12:Math.max(12,Math.min(GEO.acc,25)))){stopLead(true);say("Ви на місці",curTitle)}}
+function arrived(){if(!lastDoor||!GEO.pos)return;var m=meAt(),rem=LOCK&&st.start==="geo"?LOCK.L-LOCK.s+LOCK.tail:Math.hypot(m[0]-lastDoor[0],m[1]-lastDoor[1]);if(rem<(LOCK?12:Math.max(12,Math.min(GEO.acc,25)))){stopLead(true);var dv=st.dept&&dById(st.dept);say("Ви на місці",curTitle+(dv&&dv.vis?" · "+visNow(dv.vis).t:""))}}
 function fmtKm(m){return m<1000?Math.round(m/50)*50+" м":(m/1000).toFixed(m<10000?1:0).replace(".",",")+" км"}
 function geoFar(){if(!GEO.pos)return 0;var d=Math.hypot(GEO.pos[0]-20,GEO.pos[1]+20);return d>650?d:0}
 /* точці можна вірити: ви на території чи поруч і точність не гірша за 100 м (якщо вже було точно — терпимо до 300 м, щоб нитка не стрибала) */
@@ -177,6 +177,20 @@ var ICONS={
  chair:'<path d="M7 21v-6h10v6M6 15V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6M9 7V4h6v3"/>',
  build:'<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6M3 21h18"/>'
 };
+/* ---------- відвідування (поки лише 16 відділення): розклад і що зараз, за київським часом ---------- */
+function kyivMin(){var d=new Date();
+  for(var z=["Europe/Kyiv","Europe/Kiev"],i=0;i<z.length;i++)try{var p=new Intl.DateTimeFormat("en-GB",{timeZone:z[i],hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(d),h=0,m=0;
+    p.forEach(function(x){if(x.type==="hour")h=+x.value;if(x.type==="minute")m=+x.value});return h%24*60+m}catch(_){}
+  return d.getHours()*60+d.getMinutes()}
+function hm(m){return Math.floor(m/60)+":"+("0"+m%60).slice(-2)}
+function visText(v){return "щоденно "+v.o.map(function(o){return hm(o[0])+"–"+hm(o[1])}).join(" і ")}
+function visNow(v){var m=kyivMin(),i,o;
+  for(i=0;i<v.o.length;i++){o=v.o[i];if(m>=o[0]&&m<o[1])return {ok:1,t:"Зараз можна — до "+hm(o[1])+(o[1]-m<=30?" (ще "+(o[1]-m)+" хв)":"")}}
+  if(v.q&&m>=v.q[0]&&m<v.q[1])return {t:"Зараз тиха година — приходьте з "+hm(v.q[1])};
+  for(i=0;i<v.o.length;i++)if(m<v.o[i][0])return {t:"Зараз зачинено — відкриється о "+hm(v.o[i][0])};
+  return {t:"На сьогодні вже все — завтра з "+hm(v.o[0][0])}}
+function visBlock(v){var n=visNow(v);
+  return '<div class="vis"><b>Передачі й відвідування</b><span class="vs '+(n.ok?"ok":"no")+'">'+esc(n.t)+'</span><p>Прийом передач та відвідування пацієнтів '+esc(visText(v))+'.'+(v.q?'<br>Тиха година '+hm(v.q[0])+'–'+hm(v.q[1])+'.':'')+'</p></div>'}
 function tels(list){return '<div class="tels">'+list.map(function(t){return '<a class="gbtn" href="tel:+38'+t.replace(/\D/g,"")+'">'+ico('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>')+t+'</a>'}).join("")+'</div>'}
 function mins(m){return Math.max(1,Math.ceil(m/70))}
 
@@ -463,6 +477,7 @@ function render(zoom){
   if(d&&(d.fl||d.way||en)){var wy=[];if(d.fl)wy.push("<b>"+flT(d.fl)+".</b>");if(d&&areaOf(d.id))wy.push("Частину корпусу, яку займає відділення, обведено на карті.");if(d.way)wy.push(esc(d.way));else if(en&&en.w)wy.push(esc(en.w));
     if(d.lift)wy.push(viaLift?"Маршрут веде до дверей ліфта — вони в дворі між крилами корпусу.":"Є ліфт: окремі двері з двору, на карті підписані «Ліфт». Щоб маршрут вів до них, увімкніть «Маршрут без сходів» у віконці «Звідки».");
     if(wy.length)html+='<p class="note way">'+wy.join(" ")+'</p>'}
+  if(d&&d.vis)html+=visBlock(d.vis);
   if(d&&d.tel)html+=tels(d.tel);
   if(cr)html+='<p class="hint">'+esc(carHint(lastCarK))+'</p>';
   else if(r)html+='<p class="hint">'+esc((fk?(far?"Ви далеко від лікарні, тому нитка йде від зупинки «"+stopNm(s)+"». ":"Поки ми не знаємо точно, де ви, нитка йде від зупинки «"+stopNm(s)+"». "):"")+s.hint)+'</p>';
@@ -508,8 +523,8 @@ function render(zoom){
 }
 /* рідним іде лише «Куди». Звідки — визначить їхній телефон: на території — від них, далеко — Google Карти до потрібної зупинки */
 function share(){shareTo(st.dept||(st.b>=0&&B[st.b].k?"k"+B[st.b].k:""),curTitle)}
-function shareTo(to,name){
-  var url=location.origin+location.pathname+(to?"?to="+encodeURIComponent(to):""),title="Ariadna — "+name,text=name+" — Кирилівська, 103. Відкрийте посилання: карта сама прокладе шлях від того місця, де ви будете.";
+function shareTo(to,name){var dv=to&&dById(to),vt=dv&&dv.vis?" Передачі й відвідування "+visText(dv.vis)+(dv.vis.q?", тиха година "+hm(dv.vis.q[0])+"–"+hm(dv.vis.q[1]):"")+".":"";
+  var url=location.origin+location.pathname+(to?"?to="+encodeURIComponent(to):""),title="Ariadna — "+name,text=name+" — Кирилівська, 103."+vt+" Відкрийте посилання: карта сама прокладе шлях від того місця, де ви будете.";
   if(navigator.share){navigator.share({title:title,text:text,url:url}).catch(function(){})}
   else if(navigator.clipboard){navigator.clipboard.writeText(text+" "+url).then(function(){say("Посилання скопійовано","вставте його в повідомлення рідним")},function(){say("Не вдалося скопіювати",url)})}
   else say("Надішліть рідним це посилання",url,null,"",15000)

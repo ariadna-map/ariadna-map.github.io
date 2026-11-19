@@ -737,6 +737,18 @@ rep('</style>','''/* ---------- v18 ---------- */
 @media (prefers-reduced-motion:reduce){.lp,.lp.on{transition:opacity .15s}}
 </style>''')
 rep('<br>Можна також торкнутися будівлі чи входу на карті.</p>','<br>Можна також торкнутися будівлі чи входу на карті.<br>Щоб надіслати рідним, як дійти, — утримайте номер чи пункт.</p>')
+# ---------- v18.3 (19.11.2026): відвідування 16 відділення (табличка біля відділення, надіслав Андрій) ----------
+# vis.o — коли можна прийти (хвилини від півночі, київський час), vis.q — тиха година
+rep('tel:["(044) 503-87-16"]}','tel:["(044) 503-87-16"],vis:{o:[[570,900],[1020,1080]],q:[900,1020]}}')
+rep('</style>','''/* відвідування: розклад і що зараз */
+.vis{margin:12px 0 0;padding:11px 13px;border-radius:16px;background:var(--btn-in);box-shadow:0 0 0 .5px var(--line)}
+.vis b{display:block;font-size:14px}
+.vis .vs{display:inline-flex;align-items:center;gap:6px;margin:6px 0 2px;font-size:13px;font-weight:600}
+.vis .vs::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.vis .vs.ok{color:#2f8f4e}.vis .vs.no{color:#b5462f}
+.vis p{margin:4px 0 0;font-size:13px;line-height:1.45;color:var(--muted)}
+@media (prefers-color-scheme:dark){.vis .vs.ok{color:#5fc77f}.vis .vs.no{color:#f08a6c}}
+</style>''')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
