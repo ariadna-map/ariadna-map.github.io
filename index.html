@@ -491,7 +491,8 @@ body.toasting .mast,body.toasting .osm{opacity:0;transform:translateY(-6px);poin
 .pitch-l{fill:none;stroke:#f4f7f0;stroke-width:.6;pointer-events:none}
 .zeb-b{fill:none;stroke:#4a535a;stroke-width:5.2;pointer-events:none}
 .zeb{fill:none;stroke:#fff;stroke-width:4.2;stroke-dasharray:.9 .9;pointer-events:none}
-@media (prefers-color-scheme:dark){html:not(.light) .trk{fill:#5b4036;stroke:#6e4c40}html:not(.light) .pitch{fill:#2f4b36;stroke:#7f9887}html:not(.light) .pitch-l{stroke:#7f9887}html:not(.light) .zeb-b{stroke:#141a1e}html:not(.light) .zeb{stroke:#cfd5d9}}html.dark .trk{fill:#5b4036;stroke:#6e4c40}html.dark .pitch{fill:#2f4b36;stroke:#7f9887}html.dark .pitch-l{stroke:#7f9887}html.dark .zeb-b{stroke:#141a1e}html.dark .zeb{stroke:#cfd5d9}
+.cnp{fill:#e4e1d8;stroke:#a9a596;stroke-width:.6;pointer-events:none}
+@media (prefers-color-scheme:dark){html:not(.light) .trk{fill:#5b4036;stroke:#6e4c40}html:not(.light) .pitch{fill:#2f4b36;stroke:#7f9887}html:not(.light) .pitch-l{stroke:#7f9887}html:not(.light) .zeb-b{stroke:#141a1e}html:not(.light) .zeb{stroke:#cfd5d9}html:not(.light) .cnp{fill:#3b454c;stroke:#59656d}}html.dark .trk{fill:#5b4036;stroke:#6e4c40}html.dark .pitch{fill:#2f4b36;stroke:#7f9887}html.dark .pitch-l{stroke:#7f9887}html.dark .zeb-b{stroke:#141a1e}html.dark .zeb{stroke:#cfd5d9}html.dark .cnp{fill:#3b454c;stroke:#59656d}
 </style>
 </head>
 <body>
@@ -952,7 +953,7 @@ var LAND=[
  {n:"Аптека",d:"корпус 11, цокольний поверх; вхід — як до поліклініки та відділень 5 і 22",x:88,y:66,door:[80,71.3],fl:"цокольний",ic:"ph",show:1,kw:"ліки медикаменти фармація препарати"},
  {n:"Нова Пошта № 146",d:"вул. Кирилівська, через дорогу від стадіону «Спартак»; перейти — переходом біля вул. Олени Теліги",x:420.2,y:-273.9,ic:"np",show:1,sh:"Нова Пошта",kw:"пошта посилка відправлення отримати нп",near:{t:"Нова Пошта № 146",sub:"вул. Кирилівська",ic:"box"}},
  {n:"Супермаркет «Фора»",d:"вул. Кирилівська, через дорогу від стадіону «Спартак»; перейти — переходом біля вул. Олени Теліги",x:519.2,y:-132.8,ic:"shop",show:1,sh:"Фора",kw:"магазин супермаркет продукти їжа вода фора",near:{t:"Супермаркет «Фора»",sub:"через Кирилівську",ic:"cart"}},
- {n:"АЗС «БРСМ-Нафта»",d:"заправка з невеликим магазином (не супермаркет); вул. Олени Теліги, біля Кирилівської церкви",x:156,y:-269,ic:"fuel",show:1,sh:"АЗС",kw:"магазин заправка азс бензин кава перекус брсм нафта",near:{t:"Магазин на АЗС",sub:"«БРСМ-Нафта» · не супермаркет",ic:"fuel"}},
+ {n:"АЗС «БРСМ-Нафта»",d:"заправка; у будівлі поруч із навісом — невеликий магазин (не супермаркет); вул. Олени Теліги, на північ від корпусу 5",x:53.9,y:-168,door:[71.5,-179],ic:"fuel",show:1,sh:"АЗС",kw:"магазин заправка азс бензин кава перекус брсм нафта",near:{t:"Магазин на АЗС",sub:"«БРСМ-Нафта» · не супермаркет",ic:"fuel"}},
  {n:"Футбольне поле",d:"на північ від корпусу 7",x:233,y:-100,door:[218.6,-87.8],ic:"ball",kw:"футбол спорт стадіон майданчик м’яч"}
 ];
 /* підпірні стіни й уступи (OSM barrier=retaining_wall): нижчий бік — праворуч від напрямку лінії */
@@ -1117,6 +1118,8 @@ var STAD={o:"442.2,-119.5 446.9,-108.8 448.6,-97.2 447.3,-85.6 443.0,-74.7 436.0
 var PITCH={p:"208.9,-102.6 226.5,-114.1 246.0,-84.5 228.4,-73.0",l:"218.6,-87.8 236.2,-99.3",c:[227.4,-93.5]};
 h+='<polygon class="trk" points="'+STAD.o+'"/><polygon class="pitch" points="'+STAD.i+'"/><polygon class="pitch-l" points="'+STAD.p+'"/><polyline class="pitch-l" points="'+STAD.l+'"/><circle class="pitch-l" cx="'+STAD.c[0]+'" cy="'+STAD.c[1]+'" r="9.15"/>';
 h+='<polygon class="pitch" points="'+PITCH.p+'"/><polyline class="pitch-l" points="'+PITCH.l+'"/><circle class="pitch-l" cx="'+PITCH.c[0]+'" cy="'+PITCH.c[1]+'" r="3"/>';
+/* навіс АЗС «БРСМ-Нафта» (скрин Андрія, 19.11.2026); магазин — сусідня будівля з CTX (78,-170 65,-188 79,-199 92,-181) */
+h+='<polygon class="cnp" points="34.6,-168 57.6,-179 58.7,-163.8 42.4,-158.2"/>';
 /* тіні: сонце з північного заходу, тінь падає на південний схід; довжина — від висоти */
 var SUN=[.55,.66];
 function shadowOf(poly,hgt){var out="",n=4;for(var k=1;k<=n;k++){var d=hgt*.62*k/n;out+='<path class="shd" transform="translate('+(SUN[0]*d).toFixed(2)+' '+(SUN[1]*d).toFixed(2)+')" d="'+poly+'"/>'}return out}
