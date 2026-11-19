@@ -516,6 +516,7 @@ body.toasting .mast,body.toasting .osm{opacity:0;transform:translateY(-6px);poin
     <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><path d="M-4.9-3.4h1.7v6.7h-1.7zM-5.7 3.2h3.3v1.4h-3.3z" fill="#222b31"/><path d="M-3.2-2.95h8.5v1.95h-8.5z" fill="#fff" stroke="#c63a2f" stroke-width=".55"/><path d="M-1.2-2.95h1.75v1.95h-1.75zM2.3-2.95h1.75v1.95H2.3z" fill="#c63a2f"/></svg>шлагбаум</li>
     <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" fill="#f28c00"/><path d="M0-3.4 3.4 2.6H-3.4z" fill="#1d4fc4"/></svg>укриття</li>
     <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4" y="-5" width="8" height="10" rx="1.3" fill="#2e7d4f"/><rect x="-2.7" y="-3.7" width="5.4" height="3.3" rx=".5" fill="#fff"/><path d="M-2.4 1.5h4.8M-1.2 3.2h2.4" stroke="#fff" stroke-width=".9" stroke-linecap="round"/></svg>банкомат</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" fill="#1f8a4c"/><path d="M-1-3.4h2v2.4h2.4v2H1v2.4h-2V1h-2.4v-2H-1z" fill="#fff"/></svg>аптека</li>
     <li><svg viewBox="0 0 30 16"><path d="M3 8h24" stroke="var(--road-edge)" stroke-width="5" stroke-dasharray="2.5 2"/><path d="M3 8h24" stroke="var(--road)" stroke-width="3"/></svg>підземний перехід</li>
     <li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--road-edge)" stroke-width="8"/><path d="M2 8h26" stroke="var(--road)" stroke-width="6"/><path d="M15 2v12" stroke="var(--gate)" stroke-width="1.8"/><circle cx="15" cy="2" r="1.7" fill="var(--gate)"/><circle cx="15" cy="14" r="1.7" fill="var(--gate)"/></svg>брама, ворота</li>
     <li><svg viewBox="-15 -8 30 16"><path d="M0 0-6.2-3.6A7.2 7.2 0 1 0-6.2 3.6Z" transform="translate(9 0)" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.3"/><path transform="translate(-3.4 0)" d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3" fill="none" stroke="var(--key-t)" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>вхід (двері) до корпусу чи відділення</li>
@@ -751,7 +752,7 @@ var ENT={
  k2:{k:"2",p:[69.3,-38],t:"6 · 9",a:"r",n:"Вхід до відділень 6 і 9",d:"двері зі східного торця корпусу 2",w:"Двері — зі східного торця корпусу; від дороги до них ведуть сходинки."},
  k8:{k:"8",p:[220.5,-225.3],t:"8 · 10",a:"l",n:"Вхід до відділень 8 і 10",d:"єдиний вхід у корпус 8",w:"Це єдині двері корпусу 8: через них і до 8-го, і до 10-го відділення."},
  k5:{k:"5",p:[73.8,-114.1],t:"1 · 2",a:"l",n:"Вхід до відділень 1 і 2",d:"один вхід для обох відділень",w:"Через ці двері — і до 1-го, і до 2-го відділення."},
- pl:{k:"11",p:[80,71.3],t:"Поліклініка · 5 · 22",a:"l",n:"Вхід до поліклініки й відділень 5 і 22",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його східного боку."},
+ pl:{k:"11",p:[80,71.3],t:"Поліклініка · 5 · 22",a:"l",n:"Вхід до поліклініки, відділень 5 і 22 та аптеки",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його східного боку."},
  vkz:{k:"11",p:[58.5,76.5],t:"Конференц-зала · Музей",a:"r",n:"Вхід до великої конференц-зали й музею",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його західного боку."},
  st11:{k:"11",p:[86.3,57],t:"Укриття",a:"l",n:"Вхід до укриття",d:"корпус 11, зі сходинками, з боку пішохідної доріжки",w:"Вхід до укриття — зі сходинками, з боку пішохідної доріжки."},
  cafe:{k:"11",p:[112.4,70.7],t:"Кафе",a:"r",n:"Кафе",d:"вхід зі східного боку корпусу 11",w:"Вхід — зі східного боку корпусу 11."},
@@ -927,7 +928,8 @@ var LAND=[
  {n:"Шлагбаум",d:"на дорозі біля адміністрації",x:86.7,y:16.9,ic:"br"},
  {n:"Укриття",d:"у східному дворі корпусу 1",x:-8.6,y:89.8,ic:"sh",show:1,kw:"сховище бомбосховище тривога"},
  {n:"Дзвіниця",d:"біля Кирилівської церкви",x:177.7,y:-93.4,ic:"bl"},
- {n:"Банкомат Укргазбанку",d:"ліворуч від входу до малої конференц-зали, корпус 12",x:129.5,y:-7.5,ic:"atm",show:1,sh:"Банкомат",kw:"гроші готівка картка укргазбанк"}
+ {n:"Банкомат Укргазбанку",d:"ліворуч від входу до малої конференц-зали, корпус 12",x:129.5,y:-7.5,ic:"atm",show:1,sh:"Банкомат",kw:"гроші готівка картка укргазбанк"},
+ {n:"Аптека",d:"корпус 11, цокольний поверх; вхід — як до поліклініки та відділень 5 і 22",x:88,y:66,door:[80,71.3],fl:"цокольний",ic:"ph",show:1,kw:"ліки медикаменти фармація препарати"}
 ];
 /* підпірні стіни й уступи (OSM barrier=retaining_wall): нижчий бік — праворуч від напрямку лінії */
 var WALLS=["44,119 4,131","15.8,33.5 13.8,27.6 -30.7,12.5 -32.2,8.8 -151.2,41.6","-152.4,151.5 -148.5,148.3 -161,102.7 -162.2,76.6 -166,48.3","172.5,193.8 184.4,168.2 221.7,57.2","437.9,18 400.4,49.1 385.7,52.6","272.9,-226.4 267.4,-234.7 265.3,-291.5 256,-314.6 256.7,-329.9 238.1,-375.4","238.1,-375.4 231.6,-373 196.1,-334.6","-169.6,-335.7 -210.1,-295.4"];
@@ -1067,6 +1069,7 @@ var IC={
  tw:'<path d="M-2.2 3.6v-6.2h4.4v6.2zM-2.2-2.6l2.2-2 2.2 2"/>',
  bl:'<path class="f" d="M0-4.8c-.5 0-.8.3-.8.7v.3C-2.5-3.3-3.1-1.7-3.1.4v1.7l-1.1 1.1v.7h8.4v-.7L3.1 2.1V.4c0-2.1-.6-3.7-2.3-4.2v-.3c0-.4-.3-.7-.8-.7zM-1.2 4.1a1.2 1.2 0 0 0 2.4 0z"/>',
  atm:'<rect x="-4" y="-5" width="8" height="10" rx="1.3" style="fill:#2e7d4f;stroke:none"/><rect x="-2.7" y="-3.7" width="5.4" height="3.3" rx=".5" style="fill:#fff;stroke:none"/><path d="M-2.4 1.5h4.8M-1.2 3.2h2.4" style="fill:none;stroke:#fff;stroke-width:.9;stroke-linecap:round"/>',
+ ph:'<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#1f8a4c;stroke:none"/><path d="M-1-3.4h2v2.4h2.4v2H1v2.4h-2V1h-2.4v-2H-1z" style="fill:#fff;stroke:none"/>',
  sh:'<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#f28c00;stroke:none"/><path d="M0-3.4 3.4 2.6H-3.4z" style="fill:#1d4fc4;stroke:none"/>',
  br:'<path class="f" d="M-4.9-3.4h1.7v6.7h-1.7zM-5.7 3.2h3.3v1.4h-3.3z"/><path d="M-3.2-2.95h8.5v1.95h-8.5z" style="fill:#fff;stroke:#c63a2f;stroke-width:.55;stroke-linejoin:miter"/><path d="M-1.2-2.95h1.75v1.95h-1.75zM2.3-2.95h1.75v1.95H2.3z" style="fill:#c63a2f;stroke:none"/>',
  gd:'<path d="M0 4V-.5M0 -.5c-2.6 0-3.6-1.6-3.2-3.2C-2.6-5.4-1-5.6 0-4.6c1-1 2.6-.8 3.2 1C3.6-2 2.6-.5 0-.5z"/>'
@@ -1516,7 +1519,7 @@ D.forEach(function(d){
   else{b.className="num";b.textContent=d.id;b.setAttribute("aria-label","Відділення номер "+d.id);nums.appendChild(b)}
   b.onclick=function(){choose(d.id)};
 });
-function flT(f){return f+(typeof f==="string"?" поверхи":" поверх")}
+function flT(f){return f+(typeof f==="string"&&/^\d/.test(f)?" поверхи":" поверх")}   /* 3 поверх · 1–2 поверхи · цокольний поверх */
 function choose(id){var d=dById(id);LOCK=null;st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);geoAsk();render(true);syncUrl()}
 
 /* пошук: номер, назва, корпус, скульптура */
@@ -1528,7 +1531,7 @@ D.forEach(function(d){
 B.forEach(function(b,i){if(!b.k&&!b.n)return;var inside=inK(b.k).map(dName);
   IDX.push({t:b.k?"Корпус "+b.k:b.n,s:b.k?(b.n||(inside.length?"тут: "+inside.join(", "):"")):"",bk:b.k||null,
     h:norm([b.k?"корпус "+b.k+" будівля":"",b.n||"",b.kw||""].join(" ")),to:b.k?"k"+b.k:null,go:function(){pop(null);pickBuilding(i)}})});
-POIS.forEach(function(p,i){D.push({id:"poi"+i,x:1,poi:1,t:p.n,short:p.sh||p.n,k:null,door:p.door||[p.x,p.y],note:p.d});
+POIS.forEach(function(p,i){D.push({id:"poi"+i,x:1,poi:1,t:p.n,short:p.sh||p.n,k:null,door:p.door||[p.x,p.y],fl:p.fl,note:p.d});
   IDX.push({t:p.n,s:p.d,poi:1,h:norm(p.n+" "+p.d+" "+(p.kw||"")),to:"poi"+i,go:function(){choose("poi"+i)}})});
 IDX.forEach(function(e){e.ht=e.h.split(" ")});
 function tokOk(e,t){if(/^\d+$/.test(t))return e.ht.indexOf(t)>=0;if(e.h.indexOf(t)>=0)return true;var c=t.length>=8?3:t.length>=6?2:t.length>=5?1:0;return c>0&&e.h.indexOf(t.slice(0,t.length-c))>=0}

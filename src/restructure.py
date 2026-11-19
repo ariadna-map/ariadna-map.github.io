@@ -781,6 +781,12 @@ def theme_css(css):
             c=css[q];d+=(c=='{')-(c=='}');q+=1
         inner=css[k:q-1];out.append(key+prefix(inner,'html:not(.light)')+'}'+prefix(inner,'html.dark'));i=q;n+=1
     return ''.join(out),n
+# ---------- v18.5 (19.11.2026): аптека — цокольний поверх корпусу 11, вхід той самий, що до 22 відділення (і поліклініки, і 5) ----------
+PH='<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#1f8a4c;stroke:none"/><path d="M-1-3.4h2v2.4h2.4v2H1v2.4h-2V1h-2.4v-2H-1z" style="fill:#fff;stroke:none"/>'
+rep(" sh:'"," ph:'"+PH+"',\n sh:'")
+rep('kw:"гроші готівка картка укргазбанк"}','kw:"гроші готівка картка укргазбанк"},\n {n:"Аптека",d:"корпус 11, цокольний поверх; вхід — як до поліклініки та відділень 5 і 22",x:88,y:66,door:[80,71.3],fl:"цокольний",ic:"ph",show:1,kw:"ліки медикаменти фармація препарати"}')
+rep('n:"Вхід до поліклініки й відділень 5 і 22"','n:"Вхід до поліклініки, відділень 5 і 22 та аптеки"')
+rep('stroke="#fff" stroke-width=".9" stroke-linecap="round"/></svg>банкомат</li>','stroke="#fff" stroke-width=".9" stroke-linecap="round"/></svg>банкомат</li>\n    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" fill="#1f8a4c"/><path d="M-1-3.4h2v2.4h2.4v2H1v2.4h-2V1h-2.4v-2H-1z" fill="#fff"/></svg>аптека</li>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()

@@ -271,7 +271,7 @@ D.forEach(function(d){
   else{b.className="num";b.textContent=d.id;b.setAttribute("aria-label","Відділення номер "+d.id);nums.appendChild(b)}
   b.onclick=function(){choose(d.id)};
 });
-function flT(f){return f+(typeof f==="string"?" поверхи":" поверх")}
+function flT(f){return f+(typeof f==="string"&&/^\d/.test(f)?" поверхи":" поверх")}   /* 3 поверх · 1–2 поверхи · цокольний поверх */
 function choose(id){var d=dById(id);LOCK=null;st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);geoAsk();render(true);syncUrl()}
 
 /* пошук: номер, назва, корпус, скульптура */
@@ -283,7 +283,7 @@ D.forEach(function(d){
 B.forEach(function(b,i){if(!b.k&&!b.n)return;var inside=inK(b.k).map(dName);
   IDX.push({t:b.k?"Корпус "+b.k:b.n,s:b.k?(b.n||(inside.length?"тут: "+inside.join(", "):"")):"",bk:b.k||null,
     h:norm([b.k?"корпус "+b.k+" будівля":"",b.n||"",b.kw||""].join(" ")),to:b.k?"k"+b.k:null,go:function(){pop(null);pickBuilding(i)}})});
-POIS.forEach(function(p,i){D.push({id:"poi"+i,x:1,poi:1,t:p.n,short:p.sh||p.n,k:null,door:p.door||[p.x,p.y],note:p.d});
+POIS.forEach(function(p,i){D.push({id:"poi"+i,x:1,poi:1,t:p.n,short:p.sh||p.n,k:null,door:p.door||[p.x,p.y],fl:p.fl,note:p.d});
   IDX.push({t:p.n,s:p.d,poi:1,h:norm(p.n+" "+p.d+" "+(p.kw||"")),to:"poi"+i,go:function(){choose("poi"+i)}})});
 IDX.forEach(function(e){e.ht=e.h.split(" ")});
 function tokOk(e,t){if(/^\d+$/.test(t))return e.ht.indexOf(t)>=0;if(e.h.indexOf(t)>=0)return true;var c=t.length>=8?3:t.length>=6?2:t.length>=5?1:0;return c>0&&e.h.indexOf(t.slice(0,t.length-c))>=0}
