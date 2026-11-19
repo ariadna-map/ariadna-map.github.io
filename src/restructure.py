@@ -749,11 +749,44 @@ rep('</style>','''/* відвідування: розклад і що зараз
 .vis p{margin:4px 0 0;font-size:13px;line-height:1.45;color:var(--muted)}
 @media (prefers-color-scheme:dark){.vis .vs.ok{color:#5fc77f}.vis .vs.no{color:#f08a6c}}
 </style>''')
+# ---------- v18.4 (19.11.2026): перемикач теми — у стовпчику кнопок над «i» ----------
+# Без вибору — як у телефоні; вибір пам’ятаємо. Темні правила (@media prefers-color-scheme:dark) наприкінці
+# дублюються функцією theme_css: html:not(.light) … у @media і html.dark … без нього.
+rep('<div class="ctl" id="ctl">\n','<div class="ctl" id="ctl">\n  <button type="button" class="gbtn" id="thm" aria-label="Темна тема" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg></button>\n')
+rep('<meta name="theme-color" content="#e8eae4"','<script>try{var t=localStorage.getItem("ariadna-theme");if(t==="dark"||t==="light")document.documentElement.classList.add(t)}catch(e){}</script>\n<meta name="theme-color" content="#e8eae4"')
+rep('</style>','''/* перемикач теми: місяць — увімкнути темну, сонце — світлу */
+#thm .sun{display:none}
+@media (prefers-color-scheme:dark){#thm .moon{display:none}#thm .sun{display:block}}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
+</style>''')
+def theme_css(css):
+    def prefix(rules,P):
+        res=[];i=0
+        while i<len(rules):
+            b=rules.find('{',i)
+            if b<0:res.append(rules[i:]);break
+            sel=rules[i:b];d=1;q=b+1
+            while d:
+                c=rules[q];d+=(c=='{')-(c=='}');q+=1
+            lead=sel[:len(sel)-len(sel.lstrip())]
+            ns=[(P+x[5:]) if x.startswith(':root') else P+' '+x for x in (y.strip() for y in sel.split(','))]
+            res.append(lead+','.join(ns)+rules[b:q]);i=q
+        return ''.join(res)
+    key='@media (prefers-color-scheme:dark){';out=[];i=0;n=0
+    while True:
+        j=css.find(key,i)
+        if j<0:out.append(css[i:]);break
+        out.append(css[i:j]);k=j+len(key);d=1;q=k
+        while d:
+            c=css[q];d+=(c=='{')-(c=='}');q+=1
+        inner=css[k:q-1];out.append(key+prefix(inner,'html:not(.light)')+'}'+prefix(inner,'html.dark'));i=q;n+=1
+    return ''.join(out),n
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==7,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))

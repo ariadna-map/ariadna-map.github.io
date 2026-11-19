@@ -219,6 +219,22 @@ function legend(v){lg.classList.toggle("on",v);ib.setAttribute("aria-expanded",v
 ib.onclick=function(e){e.stopPropagation();pop(null);legend(!lg.classList.contains("on"))};
 lg.onclick=function(e){if(!e.target.closest("a"))legend(false)};
 
+/* ---------- тема: світла / темна (19.11.2026). Без вибору — як у телефоні; вибір пам’ятаємо.
+   Якщо обрана тема збігається з телефоном — вибір скидаємо, і карта знову йде за налаштуваннями телефона ---------- */
+var MQD=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null,thB=document.getElementById("thm");
+function isDark(){var c=document.documentElement.classList;return c.contains("dark")||(!c.contains("light")&&!!(MQD&&MQD.matches))}
+function themeSync(){var d=isDark(),c=document.documentElement.classList,man=c.contains("dark")||c.contains("light");
+  /* логотип-картинки й колір рядка браузера теж слухають вибір, а не лише телефон */
+  document.querySelectorAll('source[media*="prefers-color-scheme"],source[data-m]').forEach(function(x){if(!x.dataset.m)x.dataset.m=x.media;x.media=man?(d?"all":"not all"):x.dataset.m});
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function(x){if(!x.dataset.m)x.dataset.m=x.getAttribute("media")||"";x.setAttribute("media",man?(/dark/.test(x.dataset.m)===d?"all":"not all"):x.dataset.m)});
+  if(thB){thB.setAttribute("aria-label",d?"Світла тема":"Темна тема");thB.setAttribute("aria-pressed",d?"true":"false")}}
+function themeFlip(){var c=document.documentElement.classList,want=isDark()?"light":"dark",sys=MQD&&MQD.matches?"dark":"light";
+  var go=function(){c.remove("dark","light");if(want!==sys)c.add(want);try{if(want!==sys)localStorage.setItem("ariadna-theme",want);else localStorage.removeItem("ariadna-theme")}catch(_){}themeSync()};
+  if(document.startViewTransition&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))document.startViewTransition(go);else go()}
+if(thB)thB.onclick=function(e){e.stopPropagation();themeFlip()};
+if(MQD){if(MQD.addEventListener)MQD.addEventListener("change",themeSync);else if(MQD.addListener)MQD.addListener(themeSync)}
+themeSync();
+
 /* ---------- віконця: «Куди», «Звідки», «Докладніше». Зникають після вибору або дотику будь-де поза ними ---------- */
 var bTo=document.getElementById("bTo"),bFrom=document.getElementById("bFrom"),res=document.getElementById("res");
 var POP={to:document.getElementById("pTo"),from:document.getElementById("pFrom"),det:document.getElementById("pDet")},cur=null;
