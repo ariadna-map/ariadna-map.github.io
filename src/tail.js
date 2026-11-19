@@ -1,7 +1,8 @@
 /* ---------- стан ---------- */
 var Q=new URLSearchParams(location.search);
 /* «Звідки» не запам’ятовується (19.11.2026): щоразу — від того місця, де ви є. Поки місце невідоме, ви далеко чи точність погана,
-   нитка йде від найзручнішої зупинки. Немає геопозиції — зупинка обирається сама (st.auto), доки ви не оберете іншу.
+   нитку не малюємо: зупинку сама сторінка не обирає (20.11.2026, Андрій) — «Вести» відкриває «Звідки». Далеко від лікарні (> 650 м) —
+   нитка від найзручнішої зупинки й кнопка «Як дістатися» (Google Карти).
    Пам’ятаємо лише «Маршрут без сходів»: це потреба людини, а не місце. */
 var st={dept:null,b:-1,start:navigator.geolocation?"geo":null,auto:!navigator.geolocation,noSteps:false,car:false,carIn:null},lastCar=null,lastCarK=null;
 try{var sv=JSON.parse(localStorage.getItem("ariadna")||"{}");st.noSteps=!!sv.noSteps}catch(_){}
@@ -45,14 +46,19 @@ function followCam(first){if(!FOLLOW||!GEO.pos)return;var p=meAt();
   var R=first?60:Math.max(45,Math.min(160,vb.w*.32));fitBox(p[0]-R,p[1]-R,p[0]+R,p[1]+R,0,first?700:450)}
 function lead(){
   if(FOLLOW){stopLead();return}
-  if(!navigator.geolocation){say("Браузер не визначає, де ви","йдіть за ниткою від обраної зупинки");return}
+  if(!navigator.geolocation){if(st.start&&STARTS[st.start])say("Браузер не визначає, де ви","йдіть за ниткою від зупинки «"+stopNm(STARTS[st.start])+"»");else askFrom("Браузер не визначає, де ви");return}
   if(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000){farCard();return}
+  st.prevStart=st.start&&st.start!=="geo"?st.start:null;
   FOLLOW=true;awake(true);st.start="geo";st.auto=false;st.carIn=null;GEO.err="";
   var had=geoNear();if(GEO.pos&&geoFar())GEO.pos=null;geoStart();geoMode();render(false);
   if(had){followCam(true);say("Ведемо від вас","карта рухатиметься разом з вами")}
   else say("Визначаю, де ви…","дозвольте доступ до геопозиції")}
+/* звідки йти — питаємо людину, а не обираємо зупинку самі */
+function askFrom(){pop("from")}   /* чому немає «Від мене» — видно в самому списку, у рядку «Моя геопозиція» */
 function stopLead(quiet){if(!FOLLOW)return;FOLLOW=false;awake(false);geoMode();render(false);if(!quiet)say("Ведення зупинено","нитка лишається на карті")}
 function arrived(){if(!lastDoor||!GEO.pos)return;var m=meAt(),rem=LOCK&&st.start==="geo"?LOCK.L-LOCK.s+LOCK.tail:Math.hypot(m[0]-lastDoor[0],m[1]-lastDoor[1]);if(rem<(LOCK?12:Math.max(12,Math.min(GEO.acc,25)))){stopLead(true);var dv=st.dept&&dById(st.dept);say("Ви на місці",curTitle+(dv&&dv.vis?" · "+visNow(dv.vis).t:""))}}
+/* довжина в банері: до кілометра — метри (з точністю до 10), далі — «1,2 км», щоб рядок влазив поруч із «×» і «Вести» */
+function fmtLen(m){return m<1000?Math.round(m/10)*10+" м":(m/1000).toFixed(1).replace(".",",")+" км"}
 function fmtKm(m){return m<1000?Math.round(m/50)*50+" м":(m/1000).toFixed(m<10000?1:0).replace(".",",")+" км"}
 function geoFar(){if(!GEO.pos)return 0;var d=Math.hypot(GEO.pos[0]-20,GEO.pos[1]+20);return d>650?d:0}
 /* точці можна вірити: ви на території чи поруч і точність не гірша за 100 м (якщо вже було точно — терпимо до 300 м, щоб нитка не стрибала) */
@@ -147,17 +153,18 @@ function geoOk(p){
   if(!first&&was===now)return;GEO.last=meAt().slice();
   var dest=st.b>=0||!!st.dept;
   if(st.start!=="geo"){if(first)say("Ви тут","точність ±"+GEO.acc+" м");return}
-  if(!now){if(dest)say("Поки не бачу, де ви точно","±"+GEO.acc+" м — нитка від зупинки, вийдіть з будівлі на відкрите місце");return}
+  if(!now){if(dest)say("Поки не бачу, де ви точно","±"+GEO.acc+" м — вийдіть з будівлі на відкрите місце або оберіть «Звідки»");return}
   if(dest)say(HERE?"Ви вже тут":"Маршрут від вас",HERE?"надішліть рідним, як сюди дійти, — кнопка «Надіслати»":"точність ±"+GEO.acc+" м");
   else{say("Ви тут","точність ±"+GEO.acc+" м");fitBox(m[0]-90,m[1]-90,m[0]+90,m[1]+90,0)}
 }
 function geoFail(e){
   if(e&&e.code!==1&&GEO.pos)return;   /* сигнал тимчасово зник (у будівлі, між корпусами) — лишаємо останню точку, стеження триває */
-  if(FOLLOW){FOLLOW=false;awake(false)}geoStop();
+  var byLead=FOLLOW;if(FOLLOW){FOLLOW=false;awake(false)}geoStop();
   GEO.err=e&&e.code===1?"доступ заборонено — дозвольте його в налаштуваннях браузера":"не вдалося визначити";
-  if(st.start==="geo"){st.start=null;st.auto=true}render(false);
-  var S=st.start?STARTS[st.start]:null;
-  say(e&&e.code===1?"Геопозиція вимкнена":"Не вдалося визначити, де ви",S?"маршрут від зупинки «"+stopNm(S)+"» — іншу можна обрати у «Звідки»":GEO.err)}
+  if(st.start==="geo"){st.start=st.prevStart||null;st.auto=!st.start}st.prevStart=null;render(false);
+  var S=st.start?STARTS[st.start]:null,dest=st.b>=0||!!st.dept,T=e&&e.code===1?"Геопозиція вимкнена":"Не вдалося визначити, де ви";
+  if(!S&&dest&&byLead){askFrom(T);return}
+  say(T,S?"маршрут від зупинки «"+stopNm(S)+"» — іншу можна обрати у «Звідки»":dest?"оберіть, звідки йдете, — кнопка «Звідки»":GEO.err)}
 
 /* ---------- значки ---------- */
 function ico(p,w){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
@@ -258,8 +265,8 @@ function pop(name,quiet){
 }
 bTo.onclick=function(){pop(cur==="to"?null:"to")};
 bFrom.onclick=function(){pop(cur==="from"?null:"from")};
-res.onclick=function(e){var g=e.target.closest("#go");if(g){if(g.dataset.k==="share")share();else if(g.dataset.k==="far")farCard();else lead();return}if(e.target.closest("a"))return;pop(cur==="det"?null:"det")};
-res.onkeydown=function(e){if((e.key==="Enter"||e.key===" ")&&!e.target.closest("a,#go")){e.preventDefault();pop(cur==="det"?null:"det")}};
+res.onclick=function(e){if(e.target.closest("#rx")){cancelAll();return}var g=e.target.closest("#go");if(g){if(g.dataset.k==="share")share();else if(g.dataset.k==="far")farCard();else lead();return}if(e.target.closest("a"))return;pop(cur==="det"?null:"det")};
+res.onkeydown=function(e){if((e.key==="Enter"||e.key===" ")&&!e.target.closest("a,#go,#rx")){e.preventDefault();pop(cur==="det"?null:"det")}};
 document.getElementById("scrim").onclick=function(){pop(null)};
 document.getElementById("pToX").onclick=function(){pop(null)};
 addEventListener("keydown",function(e){if(e.key==="Escape"){pop(null);legend(false)}});
@@ -391,8 +398,16 @@ function syncDock(){var m=wantMin();if(m===dock.classList.contains("min"))return
   dock.classList.add("anim");dock.classList.toggle("min",m);clearTimeout(animT);animT=setTimeout(function(){dock.classList.remove("anim")},1700)}
 /* де буде верх панелі, коли вона закінчить згортатися чи розгортатися */
 function dockTop(){var r=dock.getBoundingClientRect(),rh=resRow.hidden?0:res.offsetHeight,h=dock.classList.contains("min")?rh:(rh?rh+8:0)+(bTo.offsetHeight||58);return r.bottom-h}
-function dockH(){var t=dockTop();document.documentElement.style.setProperty("--dockh",(dock.getBoundingClientRect().bottom-t)+"px");var c=document.getElementById("ctl");
-  c.style.bottom=innerWidth>=900?"16px":(innerHeight-t+10)+"px"}
+/* правий стовпчик кнопок рухається разом із нижньою панеллю (20.11.2026): поки панель розгортається чи згортається,
+   щокадру міряємо, де зараз її верх (видимі кнопки й банер), і ставимо стовпчик на 10 пкс вище — без власної анімації */
+var ctlEl=document.getElementById("ctl"),ctlR=0;
+function dockNowTop(){var t=dock.getBoundingClientRect().bottom;[bMini,bTo,bFrom].forEach(function(el){if(!el||!el.offsetParent)return;var cs=getComputedStyle(el);if(cs.visibility==="hidden"||+cs.opacity<.35)return;var r=el.getBoundingClientRect();if(r.height>8)t=Math.min(t,r.top)});
+  /* банер з’являється плавно (rise) — стовпчик піднімається разом з ним, пропорційно до того, наскільки банер уже видно */
+  if(!resRow.hidden&&res.offsetParent){var w=Math.max(0,Math.min(1,+getComputedStyle(res).opacity)),rt=res.getBoundingClientRect().top;if(rt<t)t+=(rt-t)*w}
+  return t}
+function ctlPlace(){ctlEl.style.bottom=innerWidth>=900?"16px":Math.round(innerHeight-dockNowTop()+10)+"px"}
+function ctlFollow(ms){cancelAnimationFrame(ctlR);var end=performance.now()+ms;(function f(){ctlPlace();if(performance.now()<end)ctlR=requestAnimationFrame(f)})()}
+function dockH(){var t=dockTop();document.documentElement.style.setProperty("--dockh",(dock.getBoundingClientRect().bottom-t)+"px");ctlFollow(dock.classList.contains("anim")?1800:600)}
 var foldT=0;
 function foldDock(){clearTimeout(foldT);if(!dockOpen)return;dockOpen=false;syncDock();dockH()}
 function foldSoon(ms){clearTimeout(foldT);foldT=setTimeout(function(){if(!cur)foldDock()},ms)}
@@ -433,7 +448,14 @@ function setFrom(){
   document.getElementById("fromC").textContent=S?S.cap:"";document.getElementById("fromV").textContent=S?S.short:"Звідки?";
   var i=document.getElementById("fromI");i.className="ic sm "+(S?(S.geo||S.here?"me":"bus"):"");i.innerHTML=S?(S.geo||S.here?DOT:VEH(S)):PIN;
 }
-function setRes(main,sub,go,more){resRow.hidden=false;document.getElementById("resB").textContent=main;document.getElementById("resS").innerHTML='<span>'+esc(sub)+(more===false?"":" · докладніше")+'</span>'+UP;document.getElementById("resGo").innerHTML=go||""}
+var XB='<button type="button" class="gbtn rx" id="rx" aria-label="Скасувати маршрут">'+ico('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',2.3)+'</button>';
+function setRes(main,sub,go,more){resRow.hidden=false;document.getElementById("resB").textContent=main;document.getElementById("resS").innerHTML='<span>'+esc(sub)+(more===false?"":" · докладніше")+'</span>'+UP;document.getElementById("resGo").innerHTML=XB+(go||"")}
+/* «×»: скасувати маршрут і всі виділення (20.11.2026). «Від мене» лишається — це не виділення, а звичайний початок */
+function cancelAll(){if(st.b<0&&!st.dept)return;var was={dept:st.dept,b:st.b,start:st.start,auto:st.auto,carIn:st.carIn};
+  if(FOLLOW){FOLLOW=false;awake(false);geoMode()}LOCK=null;st.dept=null;st.b=-1;st.carIn=null;
+  if(st.start!=="geo"||GEO.err){st.start=navigator.geolocation&&!GEO.err?"geo":null;st.auto=false}
+  pop(null);render(false);syncUrl();
+  say("Маршрут скасовано","",[{t:"Повернути",go:function(){st.dept=was.dept;st.b=was.b;st.start=was.start;st.auto=was.auto;st.carIn=was.carIn;LOCK=null;render(true);syncUrl()}}],"",6000)}
 
 function render(zoom){
   document.querySelectorAll("#pTo [data-d]").forEach(function(c){c.setAttribute("aria-pressed",c.dataset.d===st.dept?"true":"false")});
@@ -470,10 +492,9 @@ function render(zoom){
   var keys=startKeys(),routes={},near=geoNear();lastDoor=door;
   var lkey=door[0].toFixed(1)+","+door[1].toFixed(1)+(st.noSteps?"n":"");
   keys.forEach(function(k){routes[k]=k==="geo"?(near?(st.start==="geo"&&!st.car?lockRoute(door,lkey):findRoute(STARTS.geo.at,door,st.noSteps)):null):STARTS[k].at?findRoute(STARTS[k].at,door,st.noSteps):null});lastRoutes=routes;STARTS.geo.stop=meAt();
-  if(st.auto){var ak=pickStop(routes);if(ak)st.start=ak}
   if(st.start&&st.start!=="geo"&&!routes[st.start]&&st.noSteps){var best=null;keys.forEach(function(k){if(routes[k]&&(!best||routes[k].len<routes[best].len))best=k});if(best)st.start=best}
   /* «від мене», але де ви — ще невідомо, ви далеко чи точка неточна: нитка від найзручнішої зупинки (fk) */
-  var wantGeo=st.start==="geo",far=wantGeo&&!!GEO.pos&&!!geoFar(),fk=wantGeo&&!near?pickStop(routes):null;SK=fk||st.start;
+  var wantGeo=st.start==="geo",far=wantGeo&&!!GEO.pos&&!!geoFar(),fk=far?pickStop(routes):null;SK=fk||st.start;
   var s=SK?STARTS[SK]:null,r=s?routes[SK]:null,cr=null;
   /* ви вже біля дверей або в цьому корпусі — маршрут не потрібен, потрібна кнопка «Надіслати» */
   var me0=GEO.f||GEO.pos;if(wantGeo&&near&&(Math.hypot(me0[0]-door[0],me0[1]-door[1])<25||(b.p&&inRings(me0,b.p.map(pts)))))HERE=true;
@@ -492,12 +513,14 @@ function render(zoom){
       SB='<button type="button" class="gbtn thread" id="go" data-k="share">'+SHARE+'Надіслати</button>',wait=GEO.watch!==null&&!GEO.pos?"визначаю, де ви":GEO.pos&&!far?"±"+GEO.acc+" м":"";
   if(b.priv)setRes("Закрита територія","вхід лише за дозволом");
   else if(HERE&&!FOLLOW)setRes(b.p&&Math.hypot(me0[0]-door[0],me0[1]-door[1])>=25&&b.k?"Ви в корпусі "+b.k:"Ви вже тут","надішліть рідним, як сюди дійти",SB);
-  else if(cr)setRes(far?"Ви за ≈ "+fmtKm(geoFar()):"≈ "+cr.min+" хв · "+Math.round(cr.len/10)*10+" м",far?"авто — від в’їзду "+CARN[lastCarK].sh:FL+"авто "+Math.round(cr.dlen/10)*10+" м, пішки "+Math.max(5,Math.round(cr.wlen/5)*5)+" м",far?FB:GL);
+  else if(cr)setRes(far?"Ви за ≈ "+fmtKm(geoFar()):"≈ "+cr.min+" хв · "+fmtLen(cr.len),far?"авто — від в’їзду "+CARN[lastCarK].sh:FL+"авто "+Math.round(cr.dlen/10)*10+" м, пішки "+Math.max(5,Math.round(cr.wlen/5)*5)+" м",far?FB:GL);
   else if(st.car)setRes("Машиною не під’їхати","вимкніть «На авто» у «Звідки»",GL);
   else if(r&&far)setRes("Ви за ≈ "+fmtKm(geoFar()),"нитка — від зупинки «"+stopNm(s)+"»",FB);
-  else if(r&&fk)setRes("≈ "+mins(r.len)+" хв · "+Math.round(r.len/10)*10+" м",(wait?wait+" · ":"")+"поки від зупинки «"+stopNm(s)+"»",GL);
-  else if(r)setRes("≈ "+mins(r.len)+" хв · "+Math.round(r.len/10)*10+" м",FL+(s.geo?"від вас"+(GEO.acc>40?" · ±"+GEO.acc+" м":""):"від зупинки"),GL);
+  else if(r&&fk)setRes("≈ "+mins(r.len)+" хв · "+fmtLen(r.len),(wait?wait+" · ":"")+"поки від зупинки «"+stopNm(s)+"»",GL);
+  else if(r)setRes("≈ "+mins(r.len)+" хв · "+fmtLen(r.len),FL+(s.geo?"від вас"+(GEO.acc>40?" · ±"+GEO.acc+" м":""):"від зупинки"),GL);
   else if(!s)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
+  else if(s.geo&&GEO.err&&!GEO.pos)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
+  else if(s.geo&&!near)setRes(GEO.pos?"Уточнюю, де ви":"Визначаю, де ви…",(GEO.pos?"±"+GEO.acc+" м · ":"")+"або оберіть «Звідки»",GL,false);
   else if(s.geo)setRes("Доріжки від вас немає","оберіть «Звідки»",GL);
   else if(st.noSteps)setRes("Без сходів не пройти","оберіть інше «Звідки»",GL);
   else setRes("Доріжки на карті немає","орієнтуйтеся за номером корпусу",GL);

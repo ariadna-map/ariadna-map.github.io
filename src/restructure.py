@@ -817,8 +817,8 @@ TRAMG=('<path fill-rule="evenodd" d="M-4.4-2.1c0-.9.6-1.5 1.5-1.5h5.8c.9 0 1.5.6
        '<path d="M-.4-5.3h.8v1.7h-.8zM-2.8-6.3h5.6v1h-5.6zM-3.7 3.7h1.7v1.3h-1.7zM2 3.7h1.7v1.3H2z"/>')
 rep('Object.keys(STARTS).forEach(function(e){var s=STARTS[e];',"var STOP_BUS='"+BUSG+"',STOP_TRAM='"+TRAMG+"';\nObject.keys(STARTS).forEach(function(e){var s=STARTS[e];")
 rep('\'<path d="M-4.5-5h9v7h-9zM-4.5 2h9v1.5h-9zM-3 4h1.6v1.5H-3zM1.4 4H3v1.5H1.4z" opacity=".95"/>\'','(s.vt==="tram"?STOP_TRAM:STOP_BUS)')
-# --- стадіон «Спартак» (бігова доріжка й поле, 172,7 × 89,7 м), футбольне поле на місці корпусу 6 (21 × 35 м), навіс АЗС
-#     АЗС (виправлено 19.11.2026 за скрином Андрія): навіс на в’їзді з вул. Олени Теліги, на північ від корпусу 5; магазин — будівля поруч (CTX)
+# --- стадіон «Спартак» (бігова доріжка й поле, 172,7 × 89,7 м), футбольне поле на місці корпусу 6 (21 × 35 м)
+#     АЗС (виправлено 19.11.2026 за скрином Андрія): на в’їзді з вул. Олени Теліги, на північ від корпусу 5; магазин — будівля поруч (CTX)
 STAD_JS='''var STAD={o:"442.2,-119.5 446.9,-108.8 448.6,-97.2 447.3,-85.6 443.0,-74.7 436.0,-65.3 426.9,-58.0 416.1,-53.3 404.6,-51.6 392.9,-52.9 382.0,-57.2 372.6,-64.2 365.3,-73.3 322.6,-144.5 317.9,-155.2 316.2,-166.8 317.5,-178.4 321.8,-189.3 328.8,-198.7 337.9,-206.0 348.7,-210.7 360.2,-212.4 371.9,-211.1 382.8,-206.8 392.2,-199.8 399.5,-190.7",
  i:"433.8,-114.5 437.5,-106.1 438.8,-97.0 437.8,-87.9 434.4,-79.4 429.0,-72.1 421.8,-66.4 413.4,-62.7 404.4,-61.4 395.3,-62.4 386.8,-65.8 379.4,-71.2 373.7,-78.4 331.0,-149.5 327.3,-157.9 326.0,-167.0 327.0,-176.1 330.4,-184.6 335.8,-191.9 343.0,-197.6 351.4,-201.3 360.4,-202.6 369.5,-201.6 378.0,-198.2 385.4,-192.8 391.1,-185.6",
  p:"384.1,-191.3 435.6,-105.6 380.7,-72.7 329.2,-158.4",l:"409.8,-148.5 355.0,-115.5",c:[382.4,-132.0]};
@@ -827,8 +827,7 @@ rep('h+=\'<polygon class="terr" points="\'+TERR+\'"/>\';',
     'h+=\'<polygon class="terr" points="\'+TERR+\'"/>\';\n/* стадіон «Спартак» і футбольне поле — зі скринів Google (19.11.2026) */\n'+STAD_JS+'\n'
     'h+=\'<polygon class="trk" points="\'+STAD.o+\'"/><polygon class="pitch" points="\'+STAD.i+\'"/><polygon class="pitch-l" points="\'+STAD.p+\'"/><polyline class="pitch-l" points="\'+STAD.l+\'"/><circle class="pitch-l" cx="\'+STAD.c[0]+\'" cy="\'+STAD.c[1]+\'" r="9.15"/>\';\n'
     'h+=\'<polygon class="pitch" points="\'+PITCH.p+\'"/><polyline class="pitch-l" points="\'+PITCH.l+\'"/><circle class="pitch-l" cx="\'+PITCH.c[0]+\'" cy="\'+PITCH.c[1]+\'" r="3"/>\';'
-    '\n/* навіс АЗС «БРСМ-Нафта» (скрин Андрія, 19.11.2026); магазин — сусідня будівля з CTX (78,-170 65,-188 79,-199 92,-181) */\n'
-    'h+=\'<polygon class="cnp" points="34.6,-168 57.6,-179 58.7,-163.8 42.4,-158.2"/>\';')
+    )
 rep('var STREETS=[','var STREETS=[["Стадіон «Спартак»",382.4,-132,0],')
 rep('["вул. Кирилівська",436,-190,56]','["вул. Кирилівська",455,-140,56]')
 # --- нові значки: Нова Пошта, супермаркет, АЗС, футбольне поле (загальні знаки, без логотипів)
@@ -842,7 +841,7 @@ rep(" ph:'"," np:'"+NP+"',\n shop:'"+SHOP+"',\n fuel:'"+FUEL+"',\n ball:'"+BALL+
 rep('kw:"ліки медикаменти фармація препарати"}\n];','kw:"ліки медикаменти фармація препарати"},\n'
     ' {n:"Нова Пошта № 146",d:"вул. Кирилівська, через дорогу від стадіону «Спартак»; перейти — переходом біля вул. Олени Теліги",x:420.2,y:-273.9,ic:"np",show:1,sh:"Нова Пошта",kw:"пошта посилка відправлення отримати нп",near:{t:"Нова Пошта № 146",sub:"вул. Кирилівська",ic:"box"}},\n'
     ' {n:"Супермаркет «Фора»",d:"вул. Кирилівська, через дорогу від стадіону «Спартак»; перейти — переходом біля вул. Олени Теліги",x:519.2,y:-132.8,ic:"shop",show:1,sh:"Фора",kw:"магазин супермаркет продукти їжа вода фора",near:{t:"Супермаркет «Фора»",sub:"через Кирилівську",ic:"cart"}},\n'
-    ' {n:"АЗС «БРСМ-Нафта»",d:"заправка; у будівлі поруч із навісом — невеликий магазин (не супермаркет); вул. Олени Теліги, на північ від корпусу 5",x:53.9,y:-168,door:[71.5,-179],ic:"fuel",show:1,sh:"АЗС",kw:"магазин заправка азс бензин кава перекус брсм нафта",near:{t:"Магазин на АЗС",sub:"«БРСМ-Нафта» · не супермаркет",ic:"fuel"}},\n'
+    ' {n:"АЗС «БРСМ-Нафта»",d:"заправка з магазином: продукти, кава, хот-доги й бургери (не супермаркет); вул. Олени Теліги, на північ від корпусу 5",x:53.9,y:-168,door:[71.5,-179],ic:"fuel",show:1,sh:"АЗС",kw:"магазин заправка азс бензин кава перекус продукти їжа хот-дог хотдог бургер брсм нафта",near:{t:"Магазин на АЗС",sub:"продукти, хот-доги, бургери",ic:"fuel"}},\n'
     ' {n:"Футбольне поле",d:"на північ від корпусу 7",x:233,y:-100,door:[218.6,-87.8],ic:"ball",kw:"футбол спорт стадіон майданчик м’яч"}\n];')
 # --- карту можна відвести на схід, до «Фори», і трохи північніше — до переходу
 rep('var BOUND={x0:-360,y0:-330,x1:380,y1:300}','var BOUND={x0:-360,y0:-345,x1:540,y1:300}')
@@ -855,7 +854,7 @@ rep('<li><svg viewBox="0 0 30 16"><rect x="8" y="1" width="14" height="14" rx="4
     '    <li><svg viewBox="-15 -8 30 16"><rect x="-7" y="-7" width="14" height="14" rx="4" fill="#2f6db5" stroke="#fff"/><g transform="scale(.72)" fill="#fff">'+TRAMG+'</g></svg>зупинка трамвая</li>')
 rep('</svg>аптека</li>','</svg>аптека</li>\n'
     '    <li><svg viewBox="-15 -8 30 16">'+DOTL+SHOP+'</svg>супермаркет</li>\n'
-    '    <li><svg viewBox="-15 -8 30 16">'+DOTL+FUEL+'</svg>АЗС (з невеликим магазином)</li>\n'
+    '    <li><svg viewBox="-15 -8 30 16">'+DOTL+FUEL+'</svg>АЗС з магазином</li>\n'
     '    <li><svg viewBox="-15 -8 30 16">'+DOTL+NP+'</svg>пошта</li>\n'
     '    <li><svg viewBox="0 0 30 16"><rect class="pitch" x="3" y="2" width="24" height="12" rx="1" style="stroke-width:.8"/><path class="pitch-l" d="M15 2v12" style="stroke-width:.8"/><circle class="pitch-l" cx="15" cy="8" r="2.6" style="stroke-width:.8"/></svg>футбольне поле</li>')
 rep('</svg>підземний перехід</li>','</svg>підземний перехід</li>\n'
@@ -866,8 +865,33 @@ rep('</style>','/* ---------- v19: стадіон, футбольне поле, 
     '.pitch-l{fill:none;stroke:#f4f7f0;stroke-width:.6;pointer-events:none}\n'
     '.zeb-b{fill:none;stroke:#4a535a;stroke-width:5.2;pointer-events:none}\n'
     '.zeb{fill:none;stroke:#fff;stroke-width:4.2;stroke-dasharray:.9 .9;pointer-events:none}\n'
-    '.cnp{fill:#e4e1d8;stroke:#a9a596;stroke-width:.6;pointer-events:none}\n'
-    '@media (prefers-color-scheme:dark){.trk{fill:#5b4036;stroke:#6e4c40}.pitch{fill:#2f4b36;stroke:#7f9887}.pitch-l{stroke:#7f9887}.zeb-b{stroke:#141a1e}.zeb{stroke:#cfd5d9}.cnp{fill:#3b454c;stroke:#59656d}}\n'
+    '@media (prefers-color-scheme:dark){.trk{fill:#5b4036;stroke:#6e4c40}.pitch{fill:#2f4b36;stroke:#7f9887}.pitch-l{stroke:#7f9887}.zeb-b{stroke:#141a1e}.zeb{stroke:#cfd5d9}}\n'
+    '</style>')
+# ================= v20 (20.11.2026): скасування маршруту, скляні віконця, правий стовпчик іде разом із панеллю =================
+rep('</style>','/* ---------- v20 ---------- */\n'
+    # правий стовпчик кнопок ставить tail.js щокадру (ctlFollow) — власної анімації «bottom» більше немає, інакше він відстає чи забігає
+    '.ctl{transition:opacity .2s}\n'
+    # «×» у банері маршруту — ліворуч від «Вести»; кругла, приглушена, щоб не сперечалася з головною кнопкою
+    '#resGo{display:flex;align-items:center;gap:5px;flex:none}\n'
+    '.res .rx{width:36px;height:36px;min-height:36px;padding:0;border-radius:50%;color:var(--muted);flex:none}\n'
+    '.res #go{padding:0 12px}\n'
+    '@media (max-width:899px){.dock.min .res b{font-size:17px}}\n'
+    '.res .rx svg{width:17px;height:17px}\n'
+    '.res .rx:active{transform:scale(.94)}\n'
+    # віконця («Куди», «Звідки», «Докладніше», легенда, підказки): фон на 20 % прозоріший (0,4 → 0,32), матовіші (сильніше розмиття)
+    # і підсвічені, як скло в iOS: світла смужка зверху, світлий обідок і м’яке сяйво довкола
+    '.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(255,255,255,.32);--glass-glow:rgba(255,255,255,.34);--glass-spec:rgba(255,255,255,.3);'
+    '--rim-hi:rgba(255,255,255,1);--rim-mid:rgba(255,255,255,.6);--rim-lo:rgba(255,255,255,.2);'
+    'background:linear-gradient(180deg,var(--glass-spec) 0%,rgba(255,255,255,0) 34%),radial-gradient(120% 60% at 10% 0%,var(--glass-glow),transparent 62%),var(--glass-tint);'
+    '-webkit-backdrop-filter:blur(40px) saturate(2) brightness(1.04);backdrop-filter:blur(40px) saturate(2) brightness(1.04);'
+    'box-shadow:var(--shadow),inset 0 1px 1px rgba(255,255,255,.8),inset 0 -1px 1px rgba(255,255,255,.22),0 0 0 .5px rgba(255,255,255,.4),0 0 32px -6px rgba(255,255,255,.45)}\n'
+    '@media (prefers-color-scheme:dark){.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(44,52,59,.34);--glass-glow:rgba(255,255,255,.04);--glass-spec:rgba(255,255,255,.08);'
+    '--rim-hi:rgba(255,255,255,.42);--rim-mid:rgba(255,255,255,.16);--rim-lo:rgba(255,255,255,.05);'
+    '-webkit-backdrop-filter:blur(40px) saturate(1.8) brightness(.94);backdrop-filter:blur(40px) saturate(1.8) brightness(.94);'
+    'box-shadow:var(--shadow),inset 0 1px 1px rgba(255,255,255,.22),inset 0 -1px 1px rgba(255,255,255,.06),0 0 0 .5px rgba(255,255,255,.12),0 0 34px -8px rgba(150,185,210,.22)}}\n'
+    # без розмиття (старі браузери) чи «Зменшити прозорість» у налаштуваннях — суцільний фон, як і раніше
+    '@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.pop.glass,.legend.glass,.toast.glass{background:color-mix(in srgb,var(--bg) 94%,transparent)}}\n'
+    '@media (prefers-reduced-transparency:reduce){.pop.glass,.legend.glass,.toast.glass{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}\n'
     '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
@@ -875,6 +899,6 @@ s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
-h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==8,nth;s=s[:h0]+css_+s[h1:]
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==9,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))
