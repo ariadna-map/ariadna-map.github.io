@@ -718,6 +718,25 @@ AFTER.append(('Ariadna — Карта КНП «ПСИХІАТРІЯ»','Ariadna 
 AFTER.append(('Ariadna — карта КНП «ПСИХІАТРІЯ» (Київ','Ariadna — карта-план психіатричної лікарні (Київ'))
 AFTER.append(('<span class="bh">КНП «ПСИХІАТРІЯ»</span>','<span class="bh">Карта-план<br>психіатричної лікарні</span>'))
 AFTER.append(('КНП «ПСИХІАТРІЯ» · Кирилівська, 103','Карта-план психіатричної лікарні · Кирилівська, 103'))
+# ---------- v18 (19.11.2026): утримання пункту в «Куди» — спливає «Поділитися» ----------
+rep('</style>','''/* ---------- v18 ---------- */
+/* утримання пункту в «Куди»: пункт повільно втискається, потім над ним спливає «Поділитися» */
+#pTo .pk-body button{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+#pTo .lp-hold{transform:scale(.94)!important;transition:transform .48s cubic-bezier(.3,.6,.2,1)!important}
+.lp{position:fixed;left:0;top:0;z-index:80;opacity:0;pointer-events:none;transform-origin:50% 100%;
+  transform:translate(-50%,calc(-100% - 12px)) scale(.55);transition:opacity .16s ease,transform .2s ease}
+.lp.on{opacity:1;pointer-events:auto;transform:translate(-50%,calc(-100% - 12px)) scale(1);transition:opacity .2s ease,transform .42s cubic-bezier(.2,1.5,.35,1)}
+.lp.below{transform-origin:50% 0;transform:translate(-50%,12px) scale(.55)}
+.lp.below.on{transform:translate(-50%,12px) scale(1)}
+.lp-b{display:flex;align-items:center;gap:8px;padding:11px 18px 11px 14px;border-radius:999px;font:inherit;font-weight:600;font-size:15px;white-space:nowrap;
+  background:var(--accent);color:var(--accent-ink);box-shadow:0 14px 34px -10px rgba(20,26,30,.55),0 0 0 .5px rgba(0,0,0,.08)}
+.lp-b small{font-weight:500;opacity:.72;font-size:13px}
+.lp::after{content:"";position:absolute;left:calc(50% + var(--ax,0px));bottom:-5px;width:12px;height:12px;margin-left:-6px;background:var(--accent);transform:rotate(45deg);border-radius:2px}
+.lp.below::after{bottom:auto;top:-5px}
+.lp-b svg{width:18px;height:18px;flex:none}
+@media (prefers-reduced-motion:reduce){.lp,.lp.on{transition:opacity .15s}}
+</style>''')
+rep('<br>Можна також торкнутися будівлі чи входу на карті.</p>','<br>Можна також торкнутися будівлі чи входу на карті.<br>Щоб надіслати рідним, як дійти, — утримайте номер чи пункт.</p>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
