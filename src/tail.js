@@ -40,7 +40,7 @@ function gmaps(){return st.car?gmapsTo(CAR_IN[pickGate()],"driving"):gmapsTo(STA
 function farCard(){var m=geoFar(),S=STARTS[pickStop(lastRoutes)||"e1"],g=pickGate();
   say((m?"Ви за ≈ "+fmtKm(m)+" від лікарні":"Як дістатися до лікарні"),"Google Карти доведуть до зупинки «"+stopNm(S)+"» (машиною — до в’їзду "+CARN[g].sh+"). Там поверніться на цю сторінку — далі поведе нитка.",
     [{t:"Транспортом",href:gmapsTo(S.stop,"transit"),go:function(){if(st.car){st.car=false;render(true)}}},{t:"Автомобілем",href:gmapsTo(CAR_IN[g],"driving"),go:function(){st.car=true;st.carIn=g;render(true)}}],"",15000)}
-function followCam(first){if(!FOLLOW||!GEO.pos)return;var p=GEO.pos;
+function followCam(first){if(!FOLLOW||!GEO.pos)return;var p=meAt();
   if(!first){var cx=(p[0]-vb.x)/vb.w,cy=(p[1]-vb.y)/vb.h;if(cx>.25&&cx<.75&&cy>.25&&cy<.7)return}   /* ви ще в середині екрана — карту не рухаємо */
   var R=first?60:Math.max(45,Math.min(160,vb.w*.32));fitBox(p[0]-R,p[1]-R,p[0]+R,p[1]+R,0,first?700:450)}
 function lead(){
@@ -52,14 +52,69 @@ function lead(){
   if(had){followCam(true);say("Ведемо від вас","карта рухатиметься разом з вами")}
   else say("Визначаю, де ви…","дозвольте доступ до геопозиції")}
 function stopLead(quiet){if(!FOLLOW)return;FOLLOW=false;awake(false);geoMode();render(false);if(!quiet)say("Ведення зупинено","нитка лишається на карті")}
-function arrived(){if(!lastDoor||!GEO.pos)return;if(Math.hypot(GEO.pos[0]-lastDoor[0],GEO.pos[1]-lastDoor[1])<Math.max(12,Math.min(GEO.acc,25))){stopLead(true);say("Ви на місці",curTitle)}}
+function arrived(){if(!lastDoor||!GEO.pos)return;var m=meAt(),rem=LOCK&&st.start==="geo"?LOCK.L-LOCK.s+LOCK.tail:Math.hypot(m[0]-lastDoor[0],m[1]-lastDoor[1]);if(rem<(LOCK?12:Math.max(12,Math.min(GEO.acc,25)))){stopLead(true);say("Ви на місці",curTitle)}}
 function fmtKm(m){return m<1000?Math.round(m/50)*50+" м":(m/1000).toFixed(m<10000?1:0).replace(".",",")+" км"}
 function geoFar(){if(!GEO.pos)return 0;var d=Math.hypot(GEO.pos[0]-20,GEO.pos[1]+20);return d>650?d:0}
 /* точці можна вірити: ви на території чи поруч і точність не гірша за 100 м (якщо вже було точно — терпимо до 300 м, щоб нитка не стрибала) */
 function geoNear(){return !!GEO.pos&&!geoFar()&&GEO.acc<=(GEO.good?300:100)}
+/* ---------- точка на нитці (19.11.2026) ----------
+   GPS у дворах між корпусами помиляється на 20–60 м і «стрибає». Тому:
+   1) згладжуємо точки (простий фільтр Калмана): різкий стрибок, швидший за біг, майже не зсуває точку;
+   2) коли маршрут від вас прокладено, він «замикається» (LOCK): синя точка рухається лише по нитці, нитка не перебудовується з кожною точкою;
+   3) з маршруту сходимо, лише якщо GPS довго (≥ 3 точки і ≥ 12 с) показує місце далі ніж 20–35 м від нитки — тоді нитка будується заново від вас. */
+var LOCK=null,REROUTES=0;
+function geoFilter(x,y,a,t){var v=st.car?12:3;
+  var j=GEO.f?Math.hypot(x-GEO.f[0],y-GEO.f[1]):0;
+  if(!GEO.f||t-GEO.ft>30000||j>300+2*a){GEO.f=[x,y];GEO.P=a*a;GEO.ft=t;return}   /* давно не було точок або ви «переїхали» (з дому до лікарні) — починаємо наново */
+  var dt=Math.max(.3,(t-GEO.ft)/1000),P=GEO.P+(v*dt)*(v*dt),R=a*a;
+  if(j>3*v*dt+2*a)R=Math.max(R,j*j);
+  var K=P/(P+R);GEO.f=[GEO.f[0]+K*(x-GEO.f[0]),GEO.f[1]+K*(y-GEO.f[1])];GEO.P=(1-K)*P;GEO.ft=t}
+/* старт — не просто найближча точка доріжки, а та, що в межах похибки дає найкоротший шлях до дверей (без петель з паралельної доріжки) */
+function geoRoute(from,door,noSteps,acc){
+  var base=findRoute(from,door,noSteps);if(!base)return null;
+  var g=graph(noSteps),e=base.path[base.path.length-1],t=g.idx[e[0].toFixed(1)+","+e[1].toFixed(1)],tail=Math.hypot(e[0]-door[0],e[1]-door[1]);
+  if(t===undefined)return {path:base.path,tail:tail};
+  var R=Math.max(15,Math.min(acc||20,35)),r=dijkstra(g,t),best=-1,bs=Infinity;
+  for(var q=0;q<g.nodes.length;q++){if(r.dist[q]===Infinity)continue;var d=Math.hypot(g.nodes[q][0]-from[0],g.nodes[q][1]-from[1]);if(d>R)continue;var sc=d*1.5+r.dist[q];if(sc<bs){bs=sc;best=q}}
+  if(best<0)return {path:base.path,tail:tail};
+  var path=[];for(var c=best;c>=0;c=r.prev[c])path.push(g.nodes[c]);
+  if(path.length<2)path.unshift(path[0]);
+  return {path:path,tail:tail}}
+function lockMake(path,key,tail){var c=[0];for(var i=1;i<path.length;i++)c.push(c[i-1]+Math.hypot(path[i][0]-path[i-1][0],path[i][1]-path[i-1][1]));
+  return {p:path,c:c,L:c[c.length-1],s:0,key:key,tail:tail,off:0,offT:0,back:0,tOn:Date.now(),drawn:false}}
+function lockAt(L,s){for(var i=1;i<L.p.length;i++)if(L.c[i]>=s){var t=(s-L.c[i-1])/((L.c[i]-L.c[i-1])||1);return [L.p[i-1][0]+t*(L.p[i][0]-L.p[i-1][0]),L.p[i-1][1]+t*(L.p[i][1]-L.p[i-1][1])]}return L.p[L.p.length-1].slice()}
+/* найближча точка нитки до q, але лише на відрізку нитки [s0, s1] — щоб точка не перескакувала вперед через двір */
+function lockProj(L,q,s0,s1){var best=null;
+  for(var i=1;i<L.p.length;i++){var c0=L.c[i-1],c1=L.c[i];if(c1<s0||c0>s1)continue;var a=L.p[i-1],b=L.p[i],dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy,
+    t=l2?((q[0]-a[0])*dx+(q[1]-a[1])*dy)/l2:0,lo=c1>c0?(s0-c0)/(c1-c0):0,hi=c1>c0?(s1-c0)/(c1-c0):1;t=Math.max(Math.max(0,lo),Math.min(Math.min(1,hi),t));
+    var x=a[0]+t*dx,y=a[1]+t*dy,d=Math.hypot(q[0]-x,q[1]-y);if(!best||d<best.d)best={d:d,s:c0+t*(c1-c0)}}
+  return best}
+function lockStep(){
+  if(!LOCK||!GEO.pos)return "none";
+  if(GEO.acc>60)return "hold";   /* точка надто груба — синя точка лишається, де була */
+  var now=Date.now(),dt=Math.max(1,(now-LOCK.tOn)/1000),vmax=st.car?15:3,T=Math.max(15,Math.min(GEO.acc,30))+5,
+      pr=lockProj(LOCK,GEO.pos,Math.max(0,LOCK.s-25),LOCK.s+20+vmax*dt);
+  if(pr&&pr.d<=T){LOCK.off=0;LOCK.tOn=now;
+    if(pr.s>LOCK.s){LOCK.s+=Math.min(pr.s-LOCK.s,vmax*dt+3)*.6;LOCK.back=0}   /* уперед — плавно і не швидше, ніж можна йти */
+    else if(LOCK.s-pr.s>15){if(++LOCK.back>=3){LOCK.s=pr.s;LOCK.back=0}}   /* назад — лише коли повторюється: людина розвернулася */
+    else LOCK.back=0;
+    return "on"}
+  if(!LOCK.off)LOCK.offT=now;LOCK.off++;
+  /* нитку будували з грубої точки, а тепер GPS набагато точніший і показує інше місце — перебудовуємо швидше */
+  if(LOCK.off>=2&&GEO.acc*2<=LOCK.acc)return "reroute";
+  return LOCK.off>=3&&now-LOCK.offT>=12000?"reroute":"hold"}
+/* маршрут від вас для малювання: решта замкненої нитки від синьої точки до дверей */
+function lockRoute(door,key){
+  if(!GEO.f)return null;
+  if(!LOCK||LOCK.key!==key){var gr=geoRoute(GEO.f,door,st.noSteps,GEO.acc);if(!gr){LOCK=null;return null}LOCK=lockMake(gr.path,key,gr.tail);LOCK.acc=GEO.acc;var pr=lockProj(LOCK,GEO.f,0,40);if(pr)LOCK.s=pr.s}
+  GEO.show=lockAt(LOCK,LOCK.s);
+  var out=[GEO.show];for(var i=1;i<LOCK.p.length;i++)if(LOCK.c[i]>LOCK.s)out.push(LOCK.p[i]);
+  return {path:out,len:LOCK.L-LOCK.s+LOCK.tail,locked:1}}
+function meAt(){return GEO.show||GEO.f||GEO.pos}
+
 function geoText(){return GEO.err||(GEO.pos?(geoFar()?"ви за ≈ "+fmtKm(geoFar())+" від лікарні":"точність ±"+GEO.acc+" м"):(GEO.watch!==null?"визначаю…":"торкніться, щоб визначити"))}
-function drawMe(){var g=document.getElementById("me");if(!GEO.pos||geoFar()){g.innerHTML="";return}
-  g.innerHTML='<circle class="acc" cx="'+GEO.pos[0].toFixed(1)+'" cy="'+GEO.pos[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",GEO.pos[0].toFixed(1),GEO.pos[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/><circle class="hit" r="16" data-me="1"/>');apply()}
+function drawMe(){var g=document.getElementById("me");if(!GEO.pos||geoFar()){g.innerHTML="";return}var m=meAt();
+  g.innerHTML='<circle class="acc" cx="'+m[0].toFixed(1)+'" cy="'+m[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",m[0].toFixed(1),m[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/><circle class="hit" r="16" data-me="1"/>');apply()}
 /* перші 30 с — точно (GPS), щоб перша точка була правильною; далі — економно, щоб телефон не грівся. Під час «Вести» — точно весь час */
 function geoStart(){
   if(!navigator.geolocation){GEO.err="цей браузер не підтримує геопозицію";return false}
@@ -73,26 +128,31 @@ function geoMode(){var hi=FOLLOW||GEO.boost;if(GEO.watch===null||GEO.hi===hi)ret
 /* питаємо геопозицію, коли людина обрала, куди їй, — тоді зрозуміло, навіщо */
 function geoAsk(){if(st.start==="geo"&&GEO.watch===null&&!GEO.err&&!(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000))geoStart()}
 function geoOk(p){
-  var x=(p.coords.longitude-LON0)*KX,y=(LAT0-p.coords.latitude)*KY,moved=!GEO.last||Math.hypot(x-GEO.last[0],y-GEO.last[1])>12,first=GEO.first,was=geoNear();
+  var x=(p.coords.longitude-LON0)*KX,y=(LAT0-p.coords.latitude)*KY,first=GEO.first,was=geoNear(),gap=Date.now()-GEO.t;
   GEO.pos=[x,y];GEO.acc=Math.round(p.coords.accuracy);GEO.t=Date.now();GEO.first=false;
+  if(first&&gap>60000)LOCK=null;   /* довго не було точок (сторінка була схована) — нитку будуємо заново */
+  geoFilter(x,y,GEO.acc,GEO.t);
   if(GEO.boost&&GEO.acc<=20){GEO.boost=false;clearTimeout(GEO.bt);geoMode()}   /* точка вже точна — GPS більше не тримаємо */
   /* далеко від лікарні: стеження вимикаємо (не гріємо телефон), нитку лишаємо від зупинки, Google Карти — на кнопці */
   if(geoFar()){var fl=FOLLOW;geoStop();GEO.last=null;if(fl){FOLLOW=false;awake(false)}drawMe();
     if(st.start==="geo")render(first&&(st.b>=0||!!st.dept));
     if(first||fl){if(st.b>=0||st.dept)farCard();else say("Ви за ≈ "+fmtKm(geoFar())+" від лікарні","оберіть, куди вам потрібно, — підкажемо, як дістатися")}
     return}
-  drawMe();var now=geoNear();if(now&&GEO.acc<=100)GEO.good=true;
-  if(st.start==="geo"&&(first||moved||was!==now)){GEO.last=[x,y];render(first&&st.b>=0&&!FOLLOW)}
-  if(FOLLOW){followCam(first);arrived();if(first){GEO.last=[x,y];say("Ведемо від вас","карта рухатиметься разом з вами")}return}
-  if(!first&&was===now)return;GEO.last=[x,y];
+  var now=geoNear();if(now&&GEO.acc<=100)GEO.good=true;
+  var ls=st.start==="geo"&&now?lockStep():"none";if(ls==="reroute"){LOCK=null;REROUTES++}
+  GEO.show=LOCK&&st.start==="geo"&&now?lockAt(LOCK,LOCK.s):GEO.f.slice();drawMe();
+  var m=meAt(),moved=!GEO.last||Math.hypot(m[0]-GEO.last[0],m[1]-GEO.last[1])>(LOCK?3:12);
+  if(st.start==="geo"&&(first||moved||was!==now||ls==="reroute")){render(first&&st.b>=0&&!FOLLOW);drawMe();GEO.last=meAt().slice()}
+  if(FOLLOW){followCam(first);arrived();if(first)say("Ведемо від вас","карта рухатиметься разом з вами");else if(ls==="reroute")say("Нитку перебудовано","ви пішли іншим шляхом — ведемо звідси");return}
+  if(!first&&was===now)return;GEO.last=meAt().slice();
   var dest=st.b>=0||!!st.dept;
   if(st.start!=="geo"){if(first)say("Ви тут","точність ±"+GEO.acc+" м");return}
   if(!now){if(dest)say("Поки не бачу, де ви точно","±"+GEO.acc+" м — нитка від зупинки, вийдіть з будівлі на відкрите місце");return}
   if(dest)say(HERE?"Ви вже тут":"Маршрут від вас",HERE?"надішліть рідним, як сюди дійти, — кнопка «Надіслати»":"точність ±"+GEO.acc+" м");
-  else{say("Ви тут","точність ±"+GEO.acc+" м");fitBox(x-90,y-90,x+90,y+90,0)}
+  else{say("Ви тут","точність ±"+GEO.acc+" м");fitBox(m[0]-90,m[1]-90,m[0]+90,m[1]+90,0)}
 }
 function geoFail(e){
-  if(e&&e.code===3&&GEO.pos)return;   /* нова точка затрималася — лишаємо попередню */
+  if(e&&e.code!==1&&GEO.pos)return;   /* сигнал тимчасово зник (у будівлі, між корпусами) — лишаємо останню точку, стеження триває */
   if(FOLLOW){FOLLOW=false;awake(false)}geoStop();
   GEO.err=e&&e.code===1?"доступ заборонено — дозвольте його в налаштуваннях браузера":"не вдалося визначити";
   if(st.start==="geo"){st.start=null;st.auto=true}render(false);
@@ -182,7 +242,7 @@ D.forEach(function(d){
   b.onclick=function(){choose(d.id)};
 });
 function flT(f){return f+(typeof f==="string"?" поверхи":" поверх")}
-function choose(id){var d=dById(id);st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);geoAsk();render(true);syncUrl()}
+function choose(id){var d=dById(id);LOCK=null;st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);geoAsk();render(true);syncUrl()}
 
 /* пошук: номер, назва, корпус, скульптура */
 function norm(s){return String(s).toLowerCase().replace(/[’'`ʼ"«»№#.,()—–-]/g," ").replace(/\s+/g," ").trim()}
@@ -248,9 +308,9 @@ function bCard(i){var b=B[i];
 function pickBuilding(i){
   var b=B[i];
   if(!b.k&&!b.n){say("Допоміжна будівля","відділень тут немає");return}
-  st.b=i;st.dept=null;dockOpen=false;st.carIn=null;geoAsk();render(true);syncUrl();
+  LOCK=null;st.b=i;st.dept=null;dockOpen=false;st.carIn=null;geoAsk();render(true);syncUrl();
 }
-function setStart(k){st.start=k;st.auto=false;dockOpen=false;if(k==="geo"){st.carIn=null;GEO.err="";if(!(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000))geoStart()}render(st.b>=0);if(st.b<0&&k!=="geo")say(STARTS[k].here?STARTS[k].name:"Зупинка «"+STARTS[k].name+"»","початок маршруту обрано")}
+function setStart(k){st.start=k;st.auto=false;LOCK=null;dockOpen=false;if(k==="geo"){st.carIn=null;GEO.err="";if(!(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000))geoStart()}render(st.b>=0);if(st.b<0&&k!=="geo")say(STARTS[k].here?STARTS[k].name:"Зупинка «"+STARTS[k].name+"»","початок маршруту обрано")}
 function clearDest(){if(st.b<0&&!st.dept)return;if(FOLLOW){FOLLOW=false;awake(false);geoMode()}st.dept=null;st.b=-1;if(cur==="det")pop(null);render(false);syncUrl();say("Пункт призначення знято","оберіть «Куди» або торкніться будівлі")}
 function clearStart(){st.start=null;st.auto=false;render(false);say("Початок маршруту знято","оберіть «Звідки» або торкніться зупинки")}
 
@@ -314,7 +374,7 @@ function render(zoom){
   svg.querySelectorAll(".door").forEach(function(p){p.classList.toggle("on",onE.indexOf(p.dataset.en)>=0)});
   var rg=document.getElementById("route"),pin=document.getElementById("pin"),glow=document.getElementById("glow"),darea=document.getElementById("darea");darea.innerHTML="";rg.innerHTML="";pin.innerHTML="";glow.innerHTML="";
   var d=dById(st.dept),det=document.getElementById("detBody"),toC=document.getElementById("toC"),toV=document.getElementById("toV");
-  STARTS.geo.at=GEO.pos;STARTS.geo.stop=GEO.pos;STARTS.geo.street=geoText();var SK=st.start;HERE=false;
+  STARTS.geo.at=GEO.f||GEO.pos;STARTS.geo.stop=meAt();STARTS.geo.street=geoText();var SK=st.start;HERE=false;
   function done(){svg.querySelectorAll(".stop").forEach(function(p){p.classList.toggle("on",p.dataset.e===SK)});setFrom();bFrom.classList.toggle("ask",!st.start&&(st.b>=0||!!d));syncDock();dockH();if(cur==="from")drawFrom()}
   if(!d&&st.b<0){bTo.classList.add("empty");toC.textContent="";toV.textContent="Куди вам?";resRow.hidden=true;lastDoor=null;if(st.auto)SK=st.start=null;if(FOLLOW){FOLLOW=false;awake(false);geoMode()}det.innerHTML="";lastBox=null;lastRoutes=null;curTitle="";done();apply();return}
   bTo.classList.remove("empty");
@@ -339,19 +399,20 @@ function render(zoom){
   toC.textContent="Куди"+(b.k?" · корпус "+b.k:"");toV.textContent=d?dShort(d):(b.k?"Корпус "+b.k:b.n);
   html+='<div class="head"><div class="kb">'+(b.k?'<span><small>корп.</small>'+b.k+'</span>':'•')+'</div><div class="tx"><div class="t">'+esc(title)+'</div><div class="d">'+esc(sub)+'</div></div></div>';
   var keys=startKeys(),routes={},near=geoNear();lastDoor=door;
-  keys.forEach(function(k){routes[k]=STARTS[k].at&&(k!=="geo"||near)?findRoute(STARTS[k].at,door,st.noSteps):null});lastRoutes=routes;
+  var lkey=door[0].toFixed(1)+","+door[1].toFixed(1)+(st.noSteps?"n":"");
+  keys.forEach(function(k){routes[k]=k==="geo"?(near?(st.start==="geo"&&!st.car?lockRoute(door,lkey):findRoute(STARTS.geo.at,door,st.noSteps)):null):STARTS[k].at?findRoute(STARTS[k].at,door,st.noSteps):null});lastRoutes=routes;STARTS.geo.stop=meAt();
   if(st.auto){var ak=pickStop(routes);if(ak)st.start=ak}
   if(st.start&&st.start!=="geo"&&!routes[st.start]&&st.noSteps){var best=null;keys.forEach(function(k){if(routes[k]&&(!best||routes[k].len<routes[best].len))best=k});if(best)st.start=best}
   /* «від мене», але де ви — ще невідомо, ви далеко чи точка неточна: нитка від найзручнішої зупинки (fk) */
   var wantGeo=st.start==="geo",far=wantGeo&&!!GEO.pos&&!!geoFar(),fk=wantGeo&&!near?pickStop(routes):null;SK=fk||st.start;
   var s=SK?STARTS[SK]:null,r=s?routes[SK]:null,cr=null;
   /* ви вже біля дверей або в цьому корпусі — маршрут не потрібен, потрібна кнопка «Надіслати» */
-  if(wantGeo&&near&&(Math.hypot(GEO.pos[0]-door[0],GEO.pos[1]-door[1])<25||(b.p&&inRings(GEO.pos,b.p.map(pts)))))HERE=true;
+  var me0=GEO.f||GEO.pos;if(wantGeo&&near&&(Math.hypot(me0[0]-door[0],me0[1]-door[1])<25||(b.p&&inRings(me0,b.p.map(pts)))))HERE=true;
   document.getElementById("resF").innerHTML=s?esc(s.geo?s.short:stopNm(s))+'<i>→</i>'+esc(toV.textContent):"";
   lastCar=null;lastCarK=null;
   if(st.car&&!b.priv){
     lastCar={};Object.keys(CAR_IN).forEach(function(k){lastCar[k]=carRoute(CAR_IN[k],door,st.noSteps)});
-    if(wantGeo&&near&&!st.carIn){cr=carRoute(GEO.pos,door,st.noSteps);if(cr)lastCarK="geo"}
+    if(wantGeo&&near&&!st.carIn){cr=carRoute(GEO.f||GEO.pos,door,st.noSteps);if(cr)lastCarK="geo"}
     if(!cr){var bk=null;Object.keys(lastCar).forEach(function(k){var q=lastCar[k];if(q&&(!bk||q.min<lastCar[bk].min||(q.min===lastCar[bk].min&&q.len<lastCar[bk].len)))bk=k});
       lastCarK=st.carIn&&lastCar[st.carIn]?st.carIn:(far?pickGate():bk);cr=lastCarK?lastCar[lastCarK]:null}
     r=null}
@@ -361,7 +422,7 @@ function render(zoom){
   var FB='<button type="button" class="gbtn thread" id="go" data-k="far">'+GMAP+'Як дістатися</button>',
       SB='<button type="button" class="gbtn thread" id="go" data-k="share">'+SHARE+'Надіслати</button>',wait=GEO.watch!==null&&!GEO.pos?"визначаю, де ви":GEO.pos&&!far?"±"+GEO.acc+" м":"";
   if(b.priv)setRes("Закрита територія","вхід лише за дозволом");
-  else if(HERE&&!FOLLOW)setRes(b.p&&Math.hypot(GEO.pos[0]-door[0],GEO.pos[1]-door[1])>=25&&b.k?"Ви в корпусі "+b.k:"Ви вже тут","надішліть рідним, як сюди дійти",SB);
+  else if(HERE&&!FOLLOW)setRes(b.p&&Math.hypot(me0[0]-door[0],me0[1]-door[1])>=25&&b.k?"Ви в корпусі "+b.k:"Ви вже тут","надішліть рідним, як сюди дійти",SB);
   else if(cr)setRes(far?"Ви за ≈ "+fmtKm(geoFar()):"≈ "+cr.min+" хв · "+Math.round(cr.len/10)*10+" м",far?"авто — від в’їзду "+CARN[lastCarK].sh:FL+"авто "+Math.round(cr.dlen/10)*10+" м, пішки "+Math.max(5,Math.round(cr.wlen/5)*5)+" м",far?FB:GL);
   else if(st.car)setRes("Машиною не під’їхати","вимкніть «На авто» у «Звідки»",GL);
   else if(r&&far)setRes("Ви за ≈ "+fmtKm(geoFar()),"нитка — від зупинки «"+stopNm(s)+"»",FB);
@@ -404,9 +465,9 @@ function render(zoom){
     lastBox=[Math.min.apply(null,all.map(function(p){return p[0]})),Math.min.apply(null,all.map(function(p){return p[1]})),Math.max.apply(null,all.map(function(p){return p[0]})),Math.max.apply(null,all.map(function(p){return p[1]})),28];
   } else if(r){
     var line=r.path.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join(" "),end=r.path[r.path.length-1];
-    rg.innerHTML='<polyline class="route halo" points="'+line+'"/><polyline class="route case" points="'+line+'"/><polyline class="route main draw" points="'+line+'"/><polyline class="route flow" points="'+line+'"/><polyline class="route last" points="'+end[0]+","+end[1]+" "+door[0]+","+door[1]+'"/>';
+    rg.innerHTML='<polyline class="route halo" points="'+line+'"/><polyline class="route case" points="'+line+'"/><polyline class="route main'+(r.locked&&LOCK&&LOCK.drawn?"":" draw")+'" points="'+line+'"/><polyline class="route flow" points="'+line+'"/><polyline class="route last" points="'+end[0]+","+end[1]+" "+door[0]+","+door[1]+'"/>';
     var m=rg.querySelector(".main"),L=r.len+20;m.style.strokeDasharray=L;m.style.setProperty("--len",L);
-    pin.innerHTML=PINH;
+    pin.innerHTML=PINH;if(r.locked&&LOCK)LOCK.drawn=true;
     var xs=r.path.map(function(p){return p[0]}).concat([door[0],s.stop[0]]),ys=r.path.map(function(p){return p[1]}).concat([door[1],s.stop[1]]);
     lastBox=[Math.min.apply(null,xs),Math.min.apply(null,ys),Math.max.apply(null,xs),Math.max.apply(null,ys),28];
   } else {
