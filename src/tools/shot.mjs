@@ -11,6 +11,8 @@ const send=(method,params={})=>new Promise(r=>{const i=++id;pend[i]=r;ws.send(JS
 await send('Page.enable');if(process.env.DARK)await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});await send('Runtime.enable');
 await send('Emulation.setDeviceMetricsOverride',{width:+W,height:+H,deviceScaleFactor:+mob?2:1,mobile:!!+mob});
 if(+mob)await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+if(process.env.GEO){const [la,lo,ac]=process.env.GEO.split(',').map(Number);await send('Browser.grantPermissions',{permissions:['geolocation']});await send('Emulation.setGeolocationOverride',{latitude:la,longitude:lo,accuracy:ac||10})}
+if(process.env.GEODENY)await send('Browser.setPermission',{permission:{name:'geolocation'},setting:'denied'});
 await send('Page.navigate',{url});await sleep(2500);
 const steps=stepsJson?JSON.parse(stepsJson):[];
 for(const s of steps){
