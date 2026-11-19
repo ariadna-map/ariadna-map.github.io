@@ -78,7 +78,7 @@ sheet:function(o,rects,date){
       list=list.charAt(0).toUpperCase()+list.slice(1)}
     ins+=list}
   var right=(o.floor?'<div class="fl">'+o.floor+' поверх</div><br>':'')+'аркуш '+o.n+' з '+o.N+'<br>'+date;
-  document.getElementById('prh').innerHTML='<div><div class="t">Аріадна · КНП «ПСИХІАТРІЯ» — '+o.title+'</div><div class="i">'+ins+'</div></div><div class="r">'+right+'</div>';
+  document.getElementById('prh').innerHTML='<div><div class="t">Аріадна · карта-план психіатричної лікарні — '+o.title+'</div><div class="i">'+ins+'</div></div><div class="r">'+right+'</div>';
   // масштабна лінійка
   var len=[5,10,20,25,50,100,200,250].find(function(l){return l*ppm>=60})||500,px=len*ppm;
   var sb='<svg width="'+(px+44)+'" height="26" viewBox="0 0 '+(px+44)+' 26"><rect x="1" y="9" width="'+px/2+'" height="5" fill="#111"/><rect x="'+(1+px/2)+'" y="9" width="'+px/2+'" height="5" fill="#fff" stroke="#111" stroke-width=".8"/><rect x="1" y="9" width="'+px+'" height="5" fill="none" stroke="#111" stroke-width=".8"/>'

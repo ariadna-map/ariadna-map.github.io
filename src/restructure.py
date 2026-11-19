@@ -1,5 +1,6 @@
 import re
 s=open('src_v31.html',encoding='utf8').read()
+AFTER=[]   # заміни, що застосовуються до вже зібраної сторінки (разом із tail.js)
 def rep(a,b,n=1):
     global s
     assert s.count(a)==n,(a[:90],s.count(a)); s=s.replace(a,b)
@@ -676,8 +677,53 @@ body.toasting .mast,body.toasting .osm{opacity:0;transform:translateY(-6px);poin
 </style>''')
 rep('x:129.5,y:-7.5,ic:"atm",show:1}','x:129.5,y:-7.5,ic:"atm",show:1,sh:"Банкомат",kw:"гроші готівка картка укргазбанк"}')
 rep('x:-8.6,y:89.8,ic:"sh",show:1}','x:-8.6,y:89.8,ic:"sh",show:1,kw:"укриття бомбосховище тривога"}')
+# ================= v17 (19.11.2026) =================
+# меню «Куди»: без «Кабінету амбулаторного прийому» (лишається в пошуку), з «Архівом»
+rep('{id:"kab",q:1,short:"Кабінет прийому",','{id:"kab",x:1,short:"Кабінет прийому",')
+rep('{id:"arh",x:1,t:"Архів",k:"1",ent:"arh",note:"двері в галереї під навісом"},','{id:"arh",q:1,short:"Архів",t:"Архів",sub:"корпус 1",ic:"door",k:"1",ent:"arh",note:"двері в галереї під навісом"},')
+# вхід до корпусу 12 — це вхід до адміністрації
+rep(' mkz:{k:"12",',' adm:{k:"12",p:[100.6,-34.1],t:"Адміністрація",a:"l",n:"Вхід до адміністрації",d:"корпус 12"},\n mkz:{k:"12",')
+rep('{id:"adm",q:1,','{id:"adm",q:1,ent:"adm",')
+# назву трансформаторної підстанції прибрано з міркувань безпеки (будівля лишається без підпису)
+rep('{k:"",r:"r-graph",n:"Трансформаторна підстанція",p:','{k:"",r:"r-graph",p:')
+# «Сховище» → «Укриття»; вхід зі сходинками в корпусі 11 — теж вхід до укриття
+rep('{n:"Сховище",d:"укриття у східному дворі корпусу 1",','{n:"Укриття",d:"у східному дворі корпусу 1",')
+rep('kw:"укриття бомбосховище тривога"}','kw:"сховище бомбосховище тривога"}')
+rep('сховище, укриття</li>','укриття</li>')
+rep(' st11:{k:"11",p:[86.3,57],t:"",a:"l",n:"Вхід до корпусу 11",d:"зі сходинками, з боку пішохідної доріжки"},',
+    ' st11:{k:"11",p:[86.3,57],t:"Укриття",a:"l",n:"Вхід до укриття",d:"корпус 11, зі сходинками, з боку пішохідної доріжки",w:"Вхід до укриття — зі сходинками, з боку пішохідної доріжки."},')
+rep('{id:"cafe",x:1,','{id:"ukr11",x:1,t:"Укриття в корпусі 11",short:"Укриття",k:"11",ent:"st11",kw:"сховище бомбосховище тривога",note:"вхід зі сходинками"},\n {id:"cafe",x:1,')
+# легенда: без речення про колір дахів; © OpenStreetMap лишається дрібним рядком (ліцензія даних вимагає, щоб його можна було знайти за кнопкою «i»)
+rep('<p class="note" style="margin-top:10px">Колір будівель — колір дахів із супутникового знімка: так їх видно згори. Торкніться будівлі, входу чи зупинки, щоб обрати.</p>',
+    '<p class="note" style="margin-top:10px">Торкніться будівлі, входу чи зупинки, щоб обрати.</p>')
+rep('Перелік корпусів і відділень — сайт лікарні (psychiatry-kyiv.itmed.org, 14.11.2026). Дані карти — © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>. У невідкладному стані — 103.</p>',
+    'Перелік корпусів і відділень — сайт лікарні (psychiatry-kyiv.itmed.org, 14.11.2026). У невідкладному стані — 103.</p>\n  <p class="osm-l"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></p>')
+rep('</style>','''/* ---------- v17 ---------- */
+.osm-l{margin:8px 0 0;font-size:10.5px;text-align:right}.osm-l a{color:var(--muted);text-decoration:none}
+/* шапка: «Карта-план психіатричної лікарні» довша за стару назву */
+.mast .bh{font-size:14px;line-height:1.18}
+.mast .bt{max-width:220px}
+/* віконця з'являються й ховаються плавніше */
+.scrim{transition:opacity .45s ease}
+.pop{transition:opacity .32s cubic-bezier(.4,0,1,1),transform .42s cubic-bezier(.4,0,.9,.6),visibility 0s .42s}
+.pop.on{transition:opacity .42s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.16,1,.3,1),visibility 0s}
+.legend{transition:opacity .3s cubic-bezier(.4,0,1,1),transform .4s cubic-bezier(.4,0,.9,.6),visibility 0s .4s}
+.legend.on{transition:opacity .4s cubic-bezier(.2,.8,.2,1),transform .58s cubic-bezier(.16,1,.3,1),visibility 0s}
+/* щоб телефон не грівся: «вічні» анімації зупиняються за кілька секунд */
+.route.flow{animation-iteration-count:8}
+.badge.on.pl .pulse,.pin .wave,.dnum,.dn-w{animation-iteration-count:6}
+</style>''')
+# офіційну назву лікарні прибрано скрізь — замість неї «карта-план психіатричної лікарні»
+AFTER.append(('Ariadna — Карта КНП «ПСИХІАТРІЯ»','Ariadna — карта-план психіатричної лікарні'))
+AFTER.append(('Ariadna — карта КНП «ПСИХІАТРІЯ» (Київ','Ariadna — карта-план психіатричної лікарні (Київ'))
+AFTER.append(('<span class="bh">КНП «ПСИХІАТРІЯ»</span>','<span class="bh">Карта-план<br>психіатричної лікарні</span>'))
+AFTER.append(('КНП «ПСИХІАТРІЯ» · Кирилівська, 103','Карта-план психіатричної лікарні · Кирилівська, 103'))
+AFTER.append((' (КНП «ПСИХІАТРІЯ»)',' (психіатрична лікарня, Кирилівська, 103)'))
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
+for a_,b_ in AFTER:
+    assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
+assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))

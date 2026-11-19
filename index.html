@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#e8eae4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#222b31" media="(prefers-color-scheme: dark)">
-<meta name="description" content="Ariadna — карта КНП «ПСИХІАТРІЯ» (Київ, вул. Кирилівська, 103): де корпус і відділення, як дійти від зупинки.">
-<title>Ariadna — Карта КНП «ПСИХІАТРІЯ»</title>
+<meta name="description" content="Ariadna — карта-план психіатричної лікарні (Київ, вул. Кирилівська, 103): де корпус і відділення, як дійти від зупинки.">
+<title>Ariadna — карта-план психіатричної лікарні</title>
 <link rel="icon" type="image/svg+xml" href="brand/ariadna-favicon.svg">
 <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
 <link rel="preload" href="fonts/FixelText-Regular.woff2" as="font" type="font/woff2" crossorigin>
@@ -421,11 +421,25 @@ body.popping .osm{opacity:0;pointer-events:none}
 /* шапка з логотипом не налазить на віконце-підказку: поки воно відкрите, шапка й © OpenStreetMap ховаються */
 body.toasting .mast,body.toasting .osm{opacity:0;transform:translateY(-6px);pointer-events:none}
 #map .lb.park .pk-t{font-size:11.5px;font-weight:800;text-anchor:middle;dominant-baseline:central;fill:#222b31;stroke:none}
+/* ---------- v17 ---------- */
+.osm-l{margin:8px 0 0;font-size:10.5px;text-align:right}.osm-l a{color:var(--muted);text-decoration:none}
+/* шапка: «Карта-план психіатричної лікарні» довша за стару назву */
+.mast .bh{font-size:14px;line-height:1.18}
+.mast .bt{max-width:220px}
+/* віконця з'являються й ховаються плавніше */
+.scrim{transition:opacity .45s ease}
+.pop{transition:opacity .32s cubic-bezier(.4,0,1,1),transform .42s cubic-bezier(.4,0,.9,.6),visibility 0s .42s}
+.pop.on{transition:opacity .42s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.16,1,.3,1),visibility 0s}
+.legend{transition:opacity .3s cubic-bezier(.4,0,1,1),transform .4s cubic-bezier(.4,0,.9,.6),visibility 0s .4s}
+.legend.on{transition:opacity .4s cubic-bezier(.2,.8,.2,1),transform .58s cubic-bezier(.16,1,.3,1),visibility 0s}
+/* щоб телефон не грівся: «вічні» анімації зупиняються за кілька секунд */
+.route.flow{animation-iteration-count:8}
+.badge.on.pl .pulse,.pin .wave,.dnum,.dn-w{animation-iteration-count:6}
 </style>
 </head>
 <body>
 <svg id="map" role="img" aria-label="Карта території лікарні: корпуси, доріжки, проходи, зупинки"></svg>
-<div class="mast glass" id="mast"><button type="button" class="bi" id="mastA" aria-label="Показати назву лікарні" aria-expanded="true"><img src="brand/ariadna-favicon.svg" alt="" width="34" height="34"></button><span class="bt"><span class="bh">КНП «ПСИХІАТРІЯ»</span><span class="bs">Кирилівська, 103 · <picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="bw" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="49" height="8"></picture></span></span></div>
+<div class="mast glass" id="mast"><button type="button" class="bi" id="mastA" aria-label="Показати назву лікарні" aria-expanded="true"><img src="brand/ariadna-favicon.svg" alt="" width="34" height="34"></button><span class="bt"><span class="bh">Карта-план<br>психіатричної лікарні</span><span class="bs">Кирилівська, 103 · <picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="bw" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="49" height="8"></picture></span></span></div>
 <a class="osm on" id="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>
 
 <div class="ctl" id="ctl">
@@ -449,15 +463,16 @@ body.toasting .mast,body.toasting .osm{opacity:0;transform:translateY(-6px);poin
     <li><svg viewBox="0 0 30 16"><circle cx="15" cy="8" r="6.5" fill="#fff" stroke="var(--b-edge)"/><path d="M15 4.6v.1M13.3 7.2h3.4M15 7.2v4.4" stroke="#5b4c3f" stroke-width="1.4" stroke-linecap="round"/></svg>скульптура, пам’ятний знак</li>
     <li><svg viewBox="0 0 30 16"><rect x="8" y="1" width="14" height="14" rx="4" fill="#2f6db5" stroke="#fff"/></svg>зупинка транспорту</li>
     <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><path d="M-4.9-3.4h1.7v6.7h-1.7zM-5.7 3.2h3.3v1.4h-3.3z" fill="#222b31"/><path d="M-3.2-2.95h8.5v1.95h-8.5z" fill="#fff" stroke="#c63a2f" stroke-width=".55"/><path d="M-1.2-2.95h1.75v1.95h-1.75zM2.3-2.95h1.75v1.95H2.3z" fill="#c63a2f"/></svg>шлагбаум</li>
-    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" fill="#f28c00"/><path d="M0-3.4 3.4 2.6H-3.4z" fill="#1d4fc4"/></svg>сховище, укриття</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" fill="#f28c00"/><path d="M0-3.4 3.4 2.6H-3.4z" fill="#1d4fc4"/></svg>укриття</li>
     <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4" y="-5" width="8" height="10" rx="1.3" fill="#2e7d4f"/><rect x="-2.7" y="-3.7" width="5.4" height="3.3" rx=".5" fill="#fff"/><path d="M-2.4 1.5h4.8M-1.2 3.2h2.4" stroke="#fff" stroke-width=".9" stroke-linecap="round"/></svg>банкомат</li>
     <li><svg viewBox="0 0 30 16"><path d="M3 8h24" stroke="var(--road-edge)" stroke-width="5" stroke-dasharray="2.5 2"/><path d="M3 8h24" stroke="var(--road)" stroke-width="3"/></svg>підземний перехід</li>
     <li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--road-edge)" stroke-width="8"/><path d="M2 8h26" stroke="var(--road)" stroke-width="6"/><path d="M15 2v12" stroke="var(--gate)" stroke-width="1.8"/><circle cx="15" cy="2" r="1.7" fill="var(--gate)"/><circle cx="15" cy="14" r="1.7" fill="var(--gate)"/></svg>брама, ворота</li>
     <li><svg viewBox="-15 -8 30 16"><path d="M0 0-6.2-3.6A7.2 7.2 0 1 0-6.2 3.6Z" transform="translate(9 0)" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.3"/><path transform="translate(-3.4 0)" d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3" fill="none" stroke="var(--key-t)" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>вхід (двері) до корпусу чи відділення</li>
     <li><svg viewBox="0 0 30 16"><path d="M2 6h26" stroke="var(--wall)" stroke-width="1.4"/><path d="M4 6v4.5M8 6v4.5M12 6v4.5M16 6v4.5M20 6v4.5M24 6v4.5" stroke="var(--wall)" stroke-width="1"/></svg>обрив, підпірна стіна</li>
   </ul>
-  <p class="note" style="margin-top:10px">Колір будівель — колір дахів із супутникового знімка: так їх видно згори. Торкніться будівлі, входу чи зупинки, щоб обрати.</p>
-  <p class="foot" style="margin-top:10px">Перелік корпусів і відділень — сайт лікарні (psychiatry-kyiv.itmed.org, 14.11.2026). Дані карти — © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>. У невідкладному стані — 103.</p>
+  <p class="note" style="margin-top:10px">Торкніться будівлі, входу чи зупинки, щоб обрати.</p>
+  <p class="foot" style="margin-top:10px">Перелік корпусів і відділень — сайт лікарні (psychiatry-kyiv.itmed.org, 14.11.2026). У невідкладному стані — 103.</p>
+  <p class="osm-l"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></p>
 </div>
 
 <div class="scrim" id="scrim"></div>
@@ -465,7 +480,7 @@ body.toasting .mast,body.toasting .osm{opacity:0;transform:translateY(-6px);poin
 <section class="pop glass" id="pTo" tabindex="-1" role="dialog" aria-label="Куди вам потрібно?">
   <button type="button" class="pclose" id="pToX" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <div class="pk-body">
-    <div class="brand"><span class="logo" aria-hidden="true"><img src="brand/ariadna-favicon.svg" alt="" width="42" height="42"></span><span><b><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="wm" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="104" height="17"></picture></b><small>КНП «ПСИХІАТРІЯ» · Кирилівська, 103</small></span></div>
+    <div class="brand"><span class="logo" aria-hidden="true"><img src="brand/ariadna-favicon.svg" alt="" width="42" height="42"></span><span><b><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="wm" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="104" height="17"></picture></b><small>Карта-план психіатричної лікарні · Кирилівська, 103</small></span></div>
     <label class="srch" id="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="q" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Номер, назва або корпус" aria-label="Пошук: номер відділення, назва або корпус"><button type="button" class="x" id="qx" aria-label="Очистити пошук"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></label>
     <div class="found" id="found" hidden></div>
     <div id="pkMain">
@@ -664,7 +679,7 @@ var B=[
  {k:"",r:"r-grey",p:["173.3,21.9 178.1,26.5 172.6,32.1 167.6,27.6"]},
  {k:"",r:"r-grey",p:["133.4,-148.4 129.8,-151.7 130.9,-152.8 122.4,-160.9 125.5,-164.1 134,-156 135.1,-157.3 138.7,-153.9"]},
  {k:"",r:"r-grey",p:["97.2,-130.3 103.2,-134.7 105.3,-131.7 99.4,-127.3"]},
- {k:"",r:"r-graph",n:"Трансформаторна підстанція",p:["126.7,-65.6 138.8,-64.9 138.4,-58.1 126.3,-58.8"]}
+ {k:"",r:"r-graph",p:["126.7,-65.6 138.8,-64.9 138.4,-58.1 126.3,-58.8"]}
 ];
 /* проходи крізь будівлі (у OSM — tunnel=building_passage): на місцевості це відкриті галереї під верхнім поверхом */
 var GAL=["-84.7,38.7 -80.9,50.6","-100.8,80.6 -88.4,76.8","-70.6,83.3 -69.2,87.4","5,104.1 8.5,116.5"];
@@ -687,8 +702,9 @@ var ENT={
  k5:{k:"5",p:[73.8,-114.1],t:"1 · 2",a:"l",n:"Вхід до відділень 1 і 2",d:"один вхід для обох відділень",w:"Через ці двері — і до 1-го, і до 2-го відділення."},
  pl:{k:"11",p:[80,71.3],t:"Поліклініка · 5 · 22",a:"l",n:"Вхід до поліклініки й відділень 5 і 22",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його східного боку."},
  vkz:{k:"11",p:[58.5,76.5],t:"Конференц-зала · Музей",a:"r",n:"Вхід до великої конференц-зали й музею",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його західного боку."},
- st11:{k:"11",p:[86.3,57],t:"",a:"l",n:"Вхід до корпусу 11",d:"зі сходинками, з боку пішохідної доріжки"},
+ st11:{k:"11",p:[86.3,57],t:"Укриття",a:"l",n:"Вхід до укриття",d:"корпус 11, зі сходинками, з боку пішохідної доріжки",w:"Вхід до укриття — зі сходинками, з боку пішохідної доріжки."},
  cafe:{k:"11",p:[112.4,70.7],t:"Кафе",a:"r",n:"Кафе",d:"вхід зі східного боку корпусу 11",w:"Вхід — зі східного боку корпусу 11."},
+ adm:{k:"12",p:[100.6,-34.1],t:"Адміністрація",a:"l",n:"Вхід до адміністрації",d:"корпус 12"},
  mkz:{k:"12",p:[127,-12],t:"Мала конференц-зала",a:"r",n:"Мала конференц-зала",d:"вхід зі східного боку корпусу 12",w:"Вхід — зі східного боку корпусу."}
 };
 B.forEach(function(b){if(!b.k||b.k==="1"||!b.door)return;
@@ -858,7 +874,7 @@ var LAND=[
  {n:"Сад відновлення",d:"терапевтичний сад (Nordic Therapy Garden)",x:-182,y:42,ic:"gd",show:1},
  {n:"Наріжна вежа XVIII ст.",d:"залишок мурів Кирилівського монастиря",x:207.7,y:-51.5,ic:"tw"},
  {n:"Шлагбаум",d:"на дорозі біля адміністрації",x:86.7,y:16.9,ic:"br"},
- {n:"Сховище",d:"укриття у східному дворі корпусу 1",x:-8.6,y:89.8,ic:"sh",show:1,kw:"укриття бомбосховище тривога"},
+ {n:"Укриття",d:"у східному дворі корпусу 1",x:-8.6,y:89.8,ic:"sh",show:1,kw:"сховище бомбосховище тривога"},
  {n:"Дзвіниця",d:"біля Кирилівської церкви",x:177.7,y:-93.4,ic:"bl"},
  {n:"Банкомат Укргазбанку",d:"ліворуч від входу до малої конференц-зали, корпус 12",x:129.5,y:-7.5,ic:"atm",show:1,sh:"Банкомат",kw:"гроші готівка картка укргазбанк"}
 ];
@@ -872,8 +888,8 @@ var D=[
  {id:"pr",q:1,short:"Приймальне",kw:"приймальня приймальний покій госпіталізація",t:"Приймальне відділення",sub:"цілодобово",ic:"cross",k:"1",door:[27.5,73.2],ents:["prm","prw"],way:"Вхід — із галереї під навісом уздовж корпусу. Двері чоловічого й жіночого блоків підписані на карті.",note:"Працює цілодобово",tel:[EM]},
  {id:"pol",q:1,ent:"pl",short:"Поліклініка",kw:"реєстратура консультація",t:"Поліклініка",sub:"Пн–Пт 09:00–16:12",ic:"steth",full:"Міська консультативно-діагностична поліклініка",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 293-64-64","(098) 454-18-39"]},
  {id:"amb",q:1,short:"Амбулаторія № 1",t:"Амбулаторія № 1",sub:"Правобережна",ic:"door",full:"Правобережна психіатрична амбулаторія № 1",k:"1",fl:1,ent:"pnd",kw:"ПНД диспансер реєстратура амбулаторія",note:"реєстратура: Пн–Пт 09:00–16:12, Сб і Нд — вихідні",tel:["(044) 503-87-80","(095) 687-25-90"]},
- {id:"adm",q:1,short:"Адміністрація",kw:"директор дирекція головний лікар канцелярія",t:"Адміністрація",sub:"корпус 12",ic:"build",k:"12",wide:0},
- {id:"kab",q:1,short:"Кабінет прийому",t:"Кабінет амбулаторного прийому",sub:"корпус 5",ic:"chair",k:"5"},
+ {id:"adm",q:1,ent:"adm",short:"Адміністрація",kw:"директор дирекція головний лікар канцелярія",t:"Адміністрація",sub:"корпус 12",ic:"build",k:"12",wide:0},
+ {id:"kab",x:1,short:"Кабінет прийому",t:"Кабінет амбулаторного прийому",sub:"корпус 5",ic:"chair",k:"5"},
  {id:"1",k:"5",ent:"k5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
  {id:"2",k:"5",ent:"k5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
  {id:"3",k:"1",fl:2,ent:"s",d:"Активної терапії гострих психозів",tel:["(044) 503-87-03","(044) 293-85-43"]},
@@ -893,12 +909,13 @@ var D=[
  /* x — не відділення з номером: шукаються текстом, у плитках і номерах їх немає */
  {id:"prm",x:1,t:"Приймальне — чоловічий блок",short:"Приймальне (чол.)",k:"1",ent:"prm",kw:"чоловіки",note:"працює цілодобово",tel:[EM]},
  {id:"prw",x:1,t:"Приймальне — жіночий блок",short:"Приймальне (жін.)",k:"1",ent:"prw",kw:"жінки",note:"працює цілодобово",tel:[EM]},
- {id:"arh",x:1,t:"Архів",k:"1",ent:"arh",note:"двері в галереї під навісом"},
+ {id:"arh",q:1,short:"Архів",t:"Архів",sub:"корпус 1",ic:"door",k:"1",ent:"arh",note:"двері в галереї під навісом"},
  
  {id:"ekopfo",x:1,t:"ЕКОПФО",short:"ЕКОПФО",full:"ЕКОПФО — експертна команда з оцінювання повсякденного функціонування особи",k:"1",fl:1,ent:"n",kw:"експертна команда оцінювання повсякденного функціонування особи мсек інвалідність",note:"вхід той самий, що до відділень 7 і 15"},
  {id:"lift",x:1,t:"Ліфт корпусу 1",short:"Ліфт",k:"1",ent:"lift",note:"до відділень 7, 15 і 16"},
  {id:"vkz",x:1,t:"Велика конференц-зала",short:"Велика конф.-зала",k:"11",ent:"vkz",kw:"конференція зал актова",note:"вхід з внутрішнього двору корпусу 11"},
  {id:"muz",x:1,t:"Музей",short:"Музей",k:"11",ent:"vkz",kw:"музей історії лікарні",note:"вхід з внутрішнього двору корпусу 11"},
+ {id:"ukr11",x:1,t:"Укриття в корпусі 11",short:"Укриття",k:"11",ent:"st11",kw:"сховище бомбосховище тривога",note:"вхід зі сходинками"},
  {id:"cafe",x:1,t:"Кафе",k:"11",ent:"cafe",kw:"їжа кава буфет",note:"вхід зі східного боку корпусу 11"},
  {id:"mkz",x:1,t:"Мала конференц-зала",short:"Мала конф.-зала",k:"12",ent:"mkz",kw:"конференція зал",note:"вхід зі східного боку корпусу"}
 ];
@@ -1197,19 +1214,24 @@ var GEO={pos:null,acc:0,err:"",watch:null,first:true,last:null,auto:false};
 /* «Вести»: маршрут від того місця, де ви зараз; карта йде за вами, екран не гасне. Далеко від лікарні — Google Карти */
 var FOLLOW=false,WL=null,lastDoor=null;
 function awake(on){try{if(on&&!WL&&navigator.wakeLock)navigator.wakeLock.request("screen").then(function(l){WL=l;l.addEventListener("release",function(){WL=null})},function(){});else if(!on&&WL){WL.release();WL=null}}catch(_){}}
-document.addEventListener("visibilitychange",function(){if(FOLLOW&&document.visibilityState==="visible")awake(true)});
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="hidden"){if(GEO.watch!==null){try{navigator.geolocation.clearWatch(GEO.watch)}catch(_){}GEO.watch=null;GEO.paused=true}return}
+  if(GEO.paused){GEO.paused=false;var f=GEO.first;geoStart();GEO.first=f}
+  if(FOLLOW)awake(true)});
 function gmaps(){var p=lastDoor||[40,40];return "https://www.google.com/maps/dir/?api=1&destination="+(LAT0-p[1]/KY).toFixed(6)+","+(LON0+p[0]/KX).toFixed(6)}
 function farCard(m){say("Ви за ≈ "+fmtKm(m||geoFar())+" від лікарні","До лікарні доведуть Google Карти, а територією — Ariadna",[{t:"Відкрити Google Карти",href:gmaps()}])}
-function followCam(first){if(!FOLLOW||!GEO.pos)return;var p=GEO.pos,R=first?60:Math.max(45,Math.min(160,vb.w*.32));fitBox(p[0]-R,p[1]-R,p[0]+R,p[1]+R,0,first?700:450)}
+function followCam(first){if(!FOLLOW||!GEO.pos)return;var p=GEO.pos;
+  if(!first){var cx=(p[0]-vb.x)/vb.w,cy=(p[1]-vb.y)/vb.h;if(cx>.25&&cx<.75&&cy>.25&&cy<.7)return}   /* ви ще в середині екрана — карту не рухаємо */
+  var R=first?60:Math.max(45,Math.min(160,vb.w*.32));fitBox(p[0]-R,p[1]-R,p[0]+R,p[1]+R,0,first?700:450)}
 function lead(){
   if(FOLLOW){stopLead();return}
   if(!navigator.geolocation){say("Браузер не визначає, де ви","йдіть за ниткою від обраної зупинки");return}
   if(GEO.pos&&geoFar()){farCard();return}
-  FOLLOW=true;awake(true);st.start="geo";
+  FOLLOW=true;awake(true);st.start="geo";geoMode();
   var had=!!GEO.pos;geoStart();render(false);
   if(had){followCam(true);say("Ведемо від вас","карта рухатиметься разом з вами")}
   else if(!GEO.err)say("Визначаю, де ви…","дозвольте доступ до геопозиції")}
-function stopLead(quiet){if(!FOLLOW)return;FOLLOW=false;awake(false);render(false);if(!quiet)say("Ведення зупинено","нитка лишається на карті")}
+function stopLead(quiet){if(!FOLLOW)return;FOLLOW=false;awake(false);geoMode();render(false);if(!quiet)say("Ведення зупинено","нитка лишається на карті")}
 function arrived(){if(!lastDoor||!GEO.pos)return;if(Math.hypot(GEO.pos[0]-lastDoor[0],GEO.pos[1]-lastDoor[1])<Math.max(12,Math.min(GEO.acc,25))){stopLead(true);say("Ви на місці",curTitle)}}
 function fmtKm(m){return m<1000?Math.round(m/50)*50+" м":(m/1000).toFixed(m<10000?1:0).replace(".",",")+" км"}
 function geoFar(){if(!GEO.pos)return 0;var d=Math.hypot(GEO.pos[0]-20,GEO.pos[1]+20);return d>650?d:0}
@@ -1219,7 +1241,9 @@ function drawMe(){var g=document.getElementById("me");if(!GEO.pos){g.innerHTML="
 function geoStart(){
   if(!navigator.geolocation){GEO.err="цей браузер не підтримує геопозицію";return false}
   if(GEO.watch!==null)return true;GEO.err="";GEO.first=true;
-  GEO.watch=navigator.geolocation.watchPosition(geoOk,geoFail,{enableHighAccuracy:true,maximumAge:4000,timeout:20000});return true}
+  GEO.hi=FOLLOW;GEO.watch=navigator.geolocation.watchPosition(geoOk,geoFail,FOLLOW?{enableHighAccuracy:true,maximumAge:3000,timeout:20000}:{enableHighAccuracy:false,maximumAge:15000,timeout:20000});return true}
+/* перезапустити стеження з іншою точністю (GPS гріє телефон, тому точне — лише під час «Вести») */
+function geoMode(){if(GEO.watch===null||GEO.hi===FOLLOW)return;try{navigator.geolocation.clearWatch(GEO.watch)}catch(_){}GEO.watch=null;var f=GEO.first;geoStart();GEO.first=f}
 function geoOk(p){
   var x=(p.coords.longitude-LON0)*KX,y=(LAT0-p.coords.latitude)*KY,moved=!GEO.last||Math.hypot(x-GEO.last[0],y-GEO.last[1])>12,first=GEO.first;
   GEO.pos=[x,y];GEO.acc=Math.round(p.coords.accuracy);GEO.first=false;drawMe();
@@ -1265,6 +1289,7 @@ function hideToast(){toast.classList.remove("on");document.body.classList.remove
 function say(t,s,acts,cap){TA=acts&&acts.length?acts:null;
   toast.innerHTML='<b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+(TA?'<div class="ta">'+(cap?'<small>'+esc(cap)+'</small>':'')+TA.map(function(a,i){return a.href?'<a class="gbtn" data-a="'+i+'" href="'+a.href.replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+esc(a.t)+'</a>':'<button type="button" class="gbtn" data-a="'+i+'">'+esc(a.t)+'</button>'}).join("")+'</div>':'');
   toast.classList.add("on");document.body.classList.add("toasting");clearTimeout(toastT);toastT=setTimeout(hideToast,TA?8000:2800)}
+document.addEventListener("pointerdown",function(e){if(toast.classList.contains("on")&&!toast.contains(e.target))hideToast()},true);
 toast.addEventListener("click",function(e){var b=e.target.closest("[data-a]"),a=b&&TA?TA[+b.dataset.a]:null;clearTimeout(toastT);if(a&&a.href){setTimeout(hideToast,300);return}hideToast();if(a&&a.go)a.go()});
 
 ["pTo","pFrom"].forEach(function(id){document.getElementById(id).addEventListener("click",function(e){
@@ -1360,7 +1385,7 @@ function tapOrDouble(x,y){var now=performance.now();
   tapW={t:now,x:x,y:y,id:setTimeout(function(){tapW=null;tapAt(x,y)},260)}}
 function zoomFly(f,cx,cy){var s=size(),px=(cx-s.l)/s.w,py=(cy-s.t)/s.h,wx=vb.x+px*vb.w,wy=vb.y+py*vb.h,nw=Math.min(WMAX,WMAX*s.w/s.h,Math.max(WMIN,vb.w*f));fly({x:wx-px*nw,y:wy-py*nw*s.h/s.w,w:nw},320)}
 /* потягнули карту під час «Вести» — карта більше не йде за вами */
-svg.addEventListener("pointermove",function(){if(FOLLOW&&moved>14&&Object.keys(ptrs).length){FOLLOW=false;awake(false);render(false);say("Карта більше не йде за вами","щоб продовжити, натисніть «Вести»")}});
+svg.addEventListener("pointermove",function(){if(FOLLOW&&moved>14&&Object.keys(ptrs).length){FOLLOW=false;awake(false);geoMode();render(false);say("Карта більше не йде за вами","щоб продовжити, натисніть «Вести»")}});
 /* вхід на карті: що за ним і кнопки, щоб прокласти маршрут */
 function entCard(id){var e=ENT[id],own=D.filter(function(d){return d.ent===id}),list=own.length?own:D.filter(function(d){return (d.ents||[]).indexOf(id)>=0});
   var acts=list.map(function(d){return {t:d.q||d.x?(d.short||d.t):"№ "+d.id,go:function(){choose(d.id)}}});
@@ -1388,7 +1413,7 @@ function pickBuilding(i){
   st.b=i;st.dept=null;dockOpen=false;st.carIn=null;render(true);syncUrl();
 }
 function setStart(k){st.start=k;dockOpen=false;if(k==="geo")geoStart();else if(!STARTS[k].here)prevStart=k;save();render(st.b>=0);if(st.b<0&&k!=="geo")say(STARTS[k].here?STARTS[k].name:"Зупинка «"+STARTS[k].name+"»","початок маршруту обрано")}
-function clearDest(){if(st.b<0&&!st.dept)return;if(FOLLOW){FOLLOW=false;awake(false)}st.dept=null;st.b=-1;if(cur==="det")pop(null);render(false);syncUrl();say("Пункт призначення знято","оберіть «Куди» або торкніться будівлі")}
+function clearDest(){if(st.b<0&&!st.dept)return;if(FOLLOW){FOLLOW=false;awake(false);geoMode()}st.dept=null;st.b=-1;if(cur==="det")pop(null);render(false);syncUrl();say("Пункт призначення знято","оберіть «Куди» або торкніться будівлі")}
 function clearStart(){st.start=null;render(false);say("Початок маршруту знято","оберіть «Звідки» або торкніться зупинки")}
 
 /* ---------- нижні кнопки, смужка з відповіддю, маршрут ---------- */
@@ -1416,7 +1441,6 @@ function drawFrom(){
   keys.forEach(function(k){var S=STARTS[k],R=lastRoutes?lastRoutes[k]:null;
     h+='<button type="button" data-e="'+k+'" class="'+(S.here?"here":S.geo?"geo":"")+'" aria-pressed="'+(k===st.start)+'"><span class="bus">'+(S.here||S.geo?DOT:BUS)+'</span><span class="ft"><b>'+esc(S.here||S.geo?S.name:"Зупинка «"+S.name+"»")+'</b><small>'+esc(S.street+(S.tr?" · "+S.tr:""))+'</small></span>'+(st.b>=0?'<span class="m">'+(R?mins(R.len)+" хв":"—")+'</span>':'')+'</button>'});
   h+='</div>'+switches();
-  h+='<p class="pk-note">Можна також торкнутися зупинки на карті.</p>';
   var bd=document.getElementById("fromBody");bd.innerHTML=h;
   bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);if(x.dataset.e!==st.start)setStart(x.dataset.e);else if(lastBox)fitBox.apply(null,lastBox)}});
   bindSwitches();
@@ -1454,7 +1478,7 @@ function render(zoom){
   var d=dById(st.dept),det=document.getElementById("detBody"),toC=document.getElementById("toC"),toV=document.getElementById("toV");
   STARTS.geo.at=GEO.pos;STARTS.geo.stop=GEO.pos;STARTS.geo.street=geoText();
   function done(){svg.querySelectorAll(".stop").forEach(function(p){p.classList.toggle("on",p.dataset.e===st.start)});setFrom();bFrom.classList.toggle("ask",!st.start&&(st.b>=0||!!d));syncDock();dockH();if(cur==="from")drawFrom()}
-  if(!d&&st.b<0){bTo.classList.add("empty");toC.textContent="";toV.textContent="Куди вам?";resRow.hidden=true;lastDoor=null;if(FOLLOW){FOLLOW=false;awake(false)}det.innerHTML="";lastBox=null;lastRoutes=null;curTitle="";done();apply();return}
+  if(!d&&st.b<0){bTo.classList.add("empty");toC.textContent="";toV.textContent="Куди вам?";resRow.hidden=true;lastDoor=null;if(FOLLOW){FOLLOW=false;awake(false);geoMode()}det.innerHTML="";lastBox=null;lastRoutes=null;curTitle="";done();apply();return}
   bTo.classList.remove("empty");
   var html="";
   if(st.b<0&&!(d&&d.door)){ /* відділення № 9 */
@@ -1548,7 +1572,7 @@ function render(zoom){
 }
 function share(){
   var url=location.href,title="Ariadna — "+curTitle;
-  if(navigator.share){navigator.share({title:title,text:"Як дійти: "+curTitle+" (КНП «ПСИХІАТРІЯ»)",url:url}).catch(function(){})}
+  if(navigator.share){navigator.share({title:title,text:"Як дійти: "+curTitle+" (психіатрична лікарня, Кирилівська, 103)",url:url}).catch(function(){})}
   else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){say("Посилання скопійовано","надішліть його будь-кому")},function(){say("Скопіюйте адресу сторінки")})}
 }
 
