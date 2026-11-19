@@ -161,7 +161,10 @@ function geoFail(e){
 
 /* ---------- значки ---------- */
 function ico(p,w){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
-var BUS=ico('<rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M8 21v-4M16 21v-4M8.5 14h.01M15.5 14h.01"/>');
+/* автобус спереду, як у Google: лобове вікно, фари, колеса (19.11.2026) */
+var BUS=ico('<path d="M5 17V6.6C5 4.4 7.5 3 12 3s7 1.4 7 3.6V17z"/><rect x="7.4" y="6.2" width="9.2" height="5.6" rx="1"/><path d="M7.5 17v2.5M16.5 17v2.5M3.5 8v2.5M20.5 8v2.5"/><circle cx="8.6" cy="14.4" r=".9" fill="currentColor" stroke="none"/><circle cx="15.4" cy="14.4" r=".9" fill="currentColor" stroke="none"/>');
+var TRAM=ico('<rect x="6" y="8" width="12" height="11" rx="2.5"/><rect x="8.2" y="10.2" width="7.6" height="4.2" rx=".8"/><path d="M12 8V5M8.5 4h7M8.5 19l-1.5 2M15.5 19l1.5 2"/><circle cx="9.2" cy="16.6" r=".8" fill="currentColor" stroke="none"/><circle cx="14.8" cy="16.6" r=".8" fill="currentColor" stroke="none"/>');
+function VEH(S){return S&&S.vt==="tram"?TRAM:BUS}
 var CARI=ico('<path d="M4 16.5v-3.2l1.7-4.3A2 2 0 0 1 7.6 7.6h8.8a2 2 0 0 1 1.9 1.4l1.7 4.3v3.2zM6.6 16.5v2.2M17.4 16.5v2.2M4.6 12.6h14.8"/><circle cx="8" cy="14.6" r=".6" fill="currentColor"/><circle cx="16" cy="14.6" r=".6" fill="currentColor"/>');
 var DOT=ico('<circle cx="12" cy="12" r="4" fill="currentColor"/><circle cx="12" cy="12" r="8.5"/>',2.2);
 var NAV=ico('<path d="m3 11 18-8-8 18-2-8z"/>',2.2);
@@ -175,7 +178,10 @@ var ICONS={
  steth:'<path d="M6 3v6a5 5 0 0 0 10 0V3M11 14v2a4 4 0 0 0 8 0v-2"/><circle cx="19" cy="12" r="2"/>',
  door:'<path d="M5 21V4a1 1 0 0 1 1-1h9l4 2v16M3 21h18M12 12v.01"/>',
  chair:'<path d="M7 21v-6h10v6M6 15V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6M9 7V4h6v3"/>',
- build:'<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6M3 21h18"/>'
+ build:'<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6M3 21h18"/>',
+ cart:'<path d="M3 4h2.4l2.2 10.3a1.6 1.6 0 0 0 1.6 1.2h7.6a1.6 1.6 0 0 0 1.6-1.2L20.5 8H6.3"/><circle cx="9.6" cy="19.6" r="1.3"/><circle cx="17" cy="19.6" r="1.3"/>',
+ fuel:'<path d="M5 21V5.2A2.2 2.2 0 0 1 7.2 3h5.6A2.2 2.2 0 0 1 15 5.2V21M3.5 21h13M7.5 7.5h5M15 10h1.6a1.9 1.9 0 0 1 1.9 1.9v4.4a1.5 1.5 0 0 0 3 0V8.2l-2.6-2.7"/>',
+ box:'<path d="M12 3 4 7.2v9.6L12 21l8-4.2V7.2z"/><path d="M4 7.2 12 11.4l8-4.2M12 11.4V21M8 5.1l8 4.2"/>'
 };
 /* ---------- відвідування (поки лише 16 відділення): розклад і що зараз, за київським часом ---------- */
 function kyivMin(){var d=new Date();
@@ -271,6 +277,11 @@ D.forEach(function(d){
   else{b.className="num";b.textContent=d.id;b.setAttribute("aria-label","Відділення номер "+d.id);nums.appendChild(b)}
   b.onclick=function(){choose(d.id)};
 });
+/* поруч з лікарнею (19.11.2026): магазини й пошта — пункти з LAND, у яких є near */
+var nearT=document.getElementById("near");
+SCULPT.concat(LAND).forEach(function(p,i){if(!p.near||!nearT)return;var b=document.createElement("button");b.type="button";b.className="tile";
+  b.innerHTML='<span class="ic">'+ico(ICONS[p.near.ic])+'</span><span><b>'+esc(p.near.t)+'</b><small>'+esc(p.near.sub)+'</small></span>';
+  b.onclick=function(){choose("poi"+i)};nearT.appendChild(b)});
 function flT(f){return f+(typeof f==="string"&&/^\d/.test(f)?" поверхи":" поверх")}   /* 3 поверх · 1–2 поверхи · цокольний поверх */
 function choose(id){var d=dById(id);LOCK=null;st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);geoAsk();render(true);syncUrl()}
 
@@ -395,7 +406,7 @@ function drawFrom(){
   if(st.car){drawFromCar();return}
   var keys=startKeys(),h='<div class="pk-h">Звідки ви йдете?</div><div class="from">';STARTS.geo.street=geoText();
   keys.forEach(function(k){var S=STARTS[k],R=lastRoutes?lastRoutes[k]:null;
-    h+='<button type="button" data-e="'+k+'" class="'+(S.here?"here":S.geo?"geo":"")+'" aria-pressed="'+(k===st.start)+'"><span class="bus">'+(S.here||S.geo?DOT:BUS)+'</span><span class="ft"><b>'+esc(S.here||S.geo?S.name:"Зупинка «"+S.name+"»")+'</b><small>'+esc(S.street+(S.tr?" · "+S.tr:""))+'</small></span>'+(st.b>=0?'<span class="m">'+(R?mins(R.len)+" хв":"—")+'</span>':'')+'</button>'});
+    h+='<button type="button" data-e="'+k+'" class="'+(S.here?"here":S.geo?"geo":"")+'" aria-pressed="'+(k===st.start)+'"><span class="bus">'+(S.here||S.geo?DOT:VEH(S))+'</span><span class="ft"><b>'+esc(S.here||S.geo?S.name:"Зупинка «"+S.name+"»")+'</b><small>'+esc(S.street+(S.tr?" · "+S.tr:""))+'</small></span>'+(st.b>=0?'<span class="m">'+(R?mins(R.len)+" хв":"—")+'</span>':'')+'</button>'});
   h+='</div>'+switches();
   var bd=document.getElementById("fromBody");bd.innerHTML=h;
   bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);if(x.dataset.e!==st.start)setStart(x.dataset.e);else if(lastBox)fitBox.apply(null,lastBox)}});
@@ -420,7 +431,7 @@ function setFrom(){
     var ci=document.getElementById("fromI");ci.className="ic sm "+(lastCarK==="geo"?"me":"bus");ci.innerHTML=lastCarK==="geo"?DOT:CARI;return}
   var S=st.start?STARTS[st.start]:null;bFrom.classList.toggle("empty",!S);
   document.getElementById("fromC").textContent=S?S.cap:"";document.getElementById("fromV").textContent=S?S.short:"Звідки?";
-  var i=document.getElementById("fromI");i.className="ic sm "+(S?(S.geo||S.here?"me":"bus"):"");i.innerHTML=S?(S.geo||S.here?DOT:BUS):PIN;
+  var i=document.getElementById("fromI");i.className="ic sm "+(S?(S.geo||S.here?"me":"bus"):"");i.innerHTML=S?(S.geo||S.here?DOT:VEH(S)):PIN;
 }
 function setRes(main,sub,go,more){resRow.hidden=false;document.getElementById("resB").textContent=main;document.getElementById("resS").innerHTML='<span>'+esc(sub)+(more===false?"":" · докладніше")+'</span>'+UP;document.getElementById("resGo").innerHTML=go||""}
 
