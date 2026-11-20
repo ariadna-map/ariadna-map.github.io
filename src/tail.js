@@ -195,10 +195,10 @@ function geoRoute(from,door,noSteps,acc){
   if(t===undefined)return {path:base.path,tail:tail};
   var R=Math.max(15,Math.min(acc||20,35)),r=dijkstra(g,t),best=-1,bs=Infinity;
   for(var q=0;q<g.nodes.length;q++){if(r.dist[q]===Infinity)continue;var d=Math.hypot(g.nodes[q][0]-from[0],g.nodes[q][1]-from[1]);if(d>R)continue;var sc=d*1.5+r.dist[q];if(sc<bs){bs=sc;best=q}}
-  if(best<0)return {path:base.path,tail:tail};
+  if(best<0)return {path:base.lead&&base.path.length>2?base.path.slice(1):base.path,tail:tail,snap:base.lead||0};
   var path=[];for(var c=best;c>=0;c=r.prev[c])path.push(g.nodes[c]);
   if(path.length<2)path.unshift(path[0]);
-  return {path:path,tail:tail}}
+  return {path:path,tail:tail,snap:Math.hypot(path[0][0]-from[0],path[0][1]-from[1])}}
 function lockMake(path,key,tail){var c=[0];for(var i=1;i<path.length;i++)c.push(c[i-1]+Math.hypot(path[i][0]-path[i-1][0],path[i][1]-path[i-1][1]));
   return {p:path,c:c,L:c[c.length-1],s:0,key:key,tail:tail,off:0,offT:0,back:0,tOn:Date.now(),drawn:false}}
 function lockAt(L,s){for(var i=1;i<L.p.length;i++)if(L.c[i]>=s){var t=(s-L.c[i-1])/((L.c[i]-L.c[i-1])||1);return [L.p[i-1][0]+t*(L.p[i][0]-L.p[i-1][0]),L.p[i-1][1]+t*(L.p[i][1]-L.p[i-1][1])]}return L.p[L.p.length-1].slice()}
@@ -225,7 +225,7 @@ function lockStep(){
 /* маршрут від вас для малювання: решта замкненої нитки від синьої точки до дверей */
 function lockRoute(door,key){
   if(!GEO.f)return null;
-  if(!LOCK||LOCK.key!==key){var gr=geoRoute(GEO.f,door,st.noSteps,GEO.acc);if(!gr){LOCK=null;return null}LOCK=lockMake(gr.path,key,gr.tail);LOCK.acc=GEO.acc;var pr=lockProj(LOCK,GEO.f,0,40);if(pr)LOCK.s=pr.s}
+  if(!LOCK||LOCK.key!==key){var gr=geoRoute(GEO.f,door,st.noSteps,GEO.acc);if(!gr){LOCK=null;return null}LOCK=lockMake(gr.path,key,gr.tail);LOCK.acc=GEO.acc;LOCK.snap=gr.snap||0;var pr=lockProj(LOCK,GEO.f,0,40);if(pr)LOCK.s=pr.s}
   GEO.show=lockAt(LOCK,LOCK.s);
   var out=[GEO.show];for(var i=1;i<LOCK.p.length;i++)if(LOCK.c[i]>LOCK.s)out.push(LOCK.p[i]);
   return {path:out,len:LOCK.L-LOCK.s+LOCK.tail,locked:1}}
@@ -659,7 +659,7 @@ function render(zoom){
   else if(st.car)setRes("Машиною не під’їхати","вимкніть «На авто» у «Звідки»",GL);
   else if(far){isFar=true;setRes("≈ "+fmtKm(geoFar()),"до лікарні · дорогу прокладуть Google Карти",GM,false)}
   else if(r&&farMe&&!s.geo){isFar=true;setRes("≈ "+fmtKm(geoFar()),"до зупинки «"+stopNm(s)+"» · далі ≈ "+mins(r.len)+" хв пішки",GM)}
-  else if(r)setRes("≈ "+mins(r.len)+" хв · "+fmtLen(r.len),FL+(s.geo?"від вас"+(GEO.acc>40?" · ±"+GEO.acc+" м":""):"від зупинки"),GL);
+  else if(r)setRes("≈ "+mins(r.len)+" хв · "+fmtLen(r.len),FL+(s.geo?(LOCK&&LOCK.snap>20&&LOCK.s<5?"від найближчої доріжки":"від вас")+(GEO.acc>40?" · ±"+GEO.acc+" м":""):"від зупинки"),GL);
   else if(!s)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
   else if(s.geo&&GEO.err&&!GEO.pos)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
   else if(s.geo&&!near)setRes(GEO.pos?"Уточнюю, де ви":"Визначаю, де ви…",(GEO.pos?"±"+GEO.acc+" м · ":"")+"або оберіть «Звідки»",GL,false);

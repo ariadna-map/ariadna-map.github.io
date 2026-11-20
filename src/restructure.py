@@ -954,6 +954,20 @@ rep('</style>','/* ---------- v22.1 ---------- */\n'
     '.hbox .hb-ic{display:inline-grid;place-items:center;width:26px;height:26px;margin:0 2px;vertical-align:-7px;border-radius:50%;background:rgba(127,127,127,.22)}\n'
     '.hbox .hb-ic svg{width:17px;height:17px}\n'
     '</style>')
+# ================= v23 (20.11.2026): старт «від мене» — найближча доріжка, з якої справді можна дійти =================
+# Раніше бралася просто найближча точка будь-якої доріжки. У закритих дворах (корпус 1 та ін.) є шматочки доріжок, не з'єднані з рештою —
+# з них до дверей не дійти, і карта писала «Доріжки від вас немає». Тепер беремо найближчу точку лише тих доріжок, що ведуть до дверей.
+rep('''  if(s===undefined){var bd0=Infinity;for(var q=0;q<g.nodes.length;q++){var dd=Math.hypot(g.nodes[q][0]-from[0],g.nodes[q][1]-from[1]);if(dd<bd0){bd0=dd;s=q}}if(bd0>300)return null;lead=bd0}''',
+    '''  if(s===undefined){var C=gcomp(g),ok={},bd0=Infinity,q;
+    for(q=0;q<g.nodes.length;q++)if(Math.hypot(g.nodes[q][0]-door[0],g.nodes[q][1]-door[1])<=40)ok[C[q]]=1;   /* шматки доріжок, що підходять до дверей */
+    for(q=0;q<g.nodes.length;q++){if(!ok[C[q]])continue;var dd=Math.hypot(g.nodes[q][0]-from[0],g.nodes[q][1]-from[1]);if(dd<bd0){bd0=dd;s=q}}
+    if(bd0>300)return null;lead=bd0}''')
+rep('''  return {path:path,len:r.dist[t]+tail+lead};''','''  return {path:path,len:r.dist[t]+tail+lead,lead:lead};''')
+# номер зв'язного шматка для кожної точки доріжок (рахується раз на граф)
+rep('''function findRoute(from,door,noSteps){''','''function gcomp(g){if(g.comp)return g.comp;var C=new Array(g.nodes.length).fill(-1),n=0;
+  for(var i=0;i<C.length;i++){if(C[i]>=0)continue;C[i]=n;var st=[i];while(st.length){var u=st.pop();g.adj[u].forEach(function(e){if(C[e[0]]<0){C[e[0]]=n;st.push(e[0])}})}n++}
+  return g.comp=C}
+function findRoute(from,door,noSteps){''')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
