@@ -25,7 +25,7 @@ function syncUrl(){try{var p=new URLSearchParams(location.search),to=st.dept||(s
 /* ---------- геопозиція: синя точка, маршрут від вас, оновлення в русі ---------- */
 var GEO={pos:null,acc:0,err:"",watch:null,first:true,last:null,t:0,boost:false,bt:0,good:false};
 /* «Вести»: маршрут від того місця, де ви зараз; карта йде за вами, екран не гасне. Далеко від лікарні — Google Карти */
-var FOLLOW=false,WL=null,lastDoor=null,HERE=false;
+var FOLLOW=false,CAM=true,camT=0,camN=0,WL=null,lastDoor=null,HERE=false;
 function awake(on){try{if(on&&!WL&&navigator.wakeLock)navigator.wakeLock.request("screen").then(function(l){WL=l;l.addEventListener("release",function(){WL=null})},function(){});else if(!on&&WL){WL.release();WL=null}}catch(_){}}
 /* сторінку сховали — стеження вимикаємо; повернулися — дивимося ще раз, де ви (рідні повертаються сюди з Google Карт уже біля лікарні) */
 document.addEventListener("visibilitychange",function(){
@@ -81,15 +81,17 @@ function foldFar(){if(!farOpen)return;farOpen=false;farScr.hidden=true;
   a.onfinish=done}
 farScr.addEventListener("pointerdown",function(e){e.preventDefault();foldFar()});
 addEventListener("keydown",function(e){if(e.key==="Escape"&&farOpen)foldFar()});
-function followCam(first){if(!FOLLOW||!GEO.pos)return;var p=meAt();
-  if(!first){var cx=(p[0]-vb.x)/vb.w,cy=(p[1]-vb.y)/vb.h;if(cx>.25&&cx<.75&&cy>.25&&cy<.7)return}   /* ви ще в середині екрана — карту не рухаємо */
-  var R=first?60:Math.max(45,Math.min(160,vb.w*.32));fitBox(p[0]-R,p[1]-R,p[0]+R,p[1]+R,0,first?700:450)}
+/* ведення (FOLLOW) і «камера йде за вами» (CAM) — окремо (20.11.2026): людина відсунула карту — ведення триває (нитка, точний GPS, «Стоп»),
+   лише камера стоїть. Назад — кнопка ⌖ або сама за 10 с без дотиків */
+function followCam(first,force){if(!FOLLOW||!CAM||!GEO.pos)return;var p=meAt();
+  if(!first&&!force){var cx=(p[0]-vb.x)/vb.w,cy=(p[1]-vb.y)/vb.h;if(cx>.25&&cx<.75&&cy>.25&&cy<.7)return}   /* ви ще в середині екрана — карту не рухаємо */
+  var R=first&&!force?60:Math.max(45,Math.min(160,vb.w*.32));fitBox(p[0]-R,p[1]-R,p[0]+R,p[1]+R,0,first?700:450)}
 function lead(){
   if(FOLLOW){stopLead();return}
   if(!navigator.geolocation){if(st.start&&STARTS[st.start])say("Браузер не визначає, де ви","йдіть за ниткою від зупинки «"+stopNm(STARTS[st.start])+"»");else askFrom("Браузер не визначає, де ви");return}
   if(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000){showFar();return}
   st.prevStart=st.start&&st.start!=="geo"?st.start:null;
-  FOLLOW=true;awake(true);st.start="geo";st.auto=false;st.carIn=null;GEO.err="";
+  FOLLOW=true;CAM=true;camN=0;awake(true);st.start="geo";st.auto=false;st.carIn=null;GEO.err="";
   var had=geoNear();if(GEO.pos&&geoFar())GEO.pos=null;geoStart();geoMode();render(false);
   if(had){followCam(true);say("Ведемо від вас","карта рухатиметься разом з вами")}
   else say("Визначаю, де ви…","дозвольте доступ до геопозиції")}
@@ -190,7 +192,7 @@ function hClose(){if(!hOpen)return;hOpen=false;hScr.hidden=true;
   if(hBox.animate&&!(FRM&&FRM.matches))hBox.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(10px) scale(.97)"}],{duration:320,easing:"ease-in",fill:"forwards"}).onfinish=fin;else fin()}
 hScr.addEventListener("pointerdown",function(e){e.preventDefault();hClose()});
 addEventListener("keydown",function(e){if(e.key==="Escape"&&hOpen)hClose()});   /* чому немає «Від мене» — видно в самому списку, у рядку «Моя геопозиція» */
-function stopLead(quiet){if(!FOLLOW)return;FOLLOW=false;awake(false);geoMode();render(false);if(!quiet)say("Ведення зупинено","нитка лишається на карті")}
+function stopLead(quiet){if(!FOLLOW)return;FOLLOW=false;camBack();awake(false);geoMode();render(false);if(!quiet)say("Ведення зупинено","нитка лишається на карті")}
 function arrived(){if(!lastDoor||!GEO.pos)return;var m=meAt(),rem=LOCK&&st.start==="geo"?LOCK.L-LOCK.s+LOCK.tail:Math.hypot(m[0]-lastDoor[0],m[1]-lastDoor[1]);if(rem<(LOCK?12:Math.max(12,Math.min(GEO.acc,25)))){stopLead(true);var dv=st.dept&&dById(st.dept);say("Ви на місці",curTitle+(dv&&dv.vis?" · "+visNow(dv.vis).t:""))}}
 /* довжина в банері: до кілометра — метри (з точністю до 10), далі — «1,2 км», щоб рядок влазив поруч із «×» і «Вести» */
 function fmtLen(m){return m<1000?Math.round(m/10)*10+" м":(m/1000).toFixed(1).replace(".",",")+" км"}
@@ -501,7 +503,14 @@ function tapOrDouble(x,y){var now=performance.now();
   tapW={t:now,x:x,y:y,id:setTimeout(function(){tapW=null;tapAt(x,y)},260)}}
 function zoomFly(f,cx,cy){var s=size(),px=(cx-s.l)/s.w,py=(cy-s.t)/s.h,wx=vb.x+px*vb.w,wy=vb.y+py*vb.h,nw=Math.min(WMAX,WMAX*s.w/s.h,Math.max(WMIN,vb.w*f));fly({x:wx-px*nw,y:wy-py*nw*s.h/s.w,w:nw},320)}
 /* потягнули карту під час «Вести» — карта більше не йде за вами */
-svg.addEventListener("pointermove",function(){if(FOLLOW&&moved>14&&Object.keys(ptrs).length){FOLLOW=false;awake(false);geoMode();render(false);say("Карта більше не йде за вами","щоб продовжити, натисніть «Вести»")}});
+function camFree(){if(!FOLLOW)return;if(CAM){CAM=false;document.body.classList.add("cam-free");
+    if(camN++<2)say("Ведення триває","карта повернеться до вас за 10 с — або натисніть ⌖")}
+  clearTimeout(camT);camT=setTimeout(camBack,10000)}
+function camBack(){clearTimeout(camT);document.body.classList.remove("cam-free");if(!FOLLOW){CAM=true;return}CAM=true;followCam(false,true)}
+svg.addEventListener("pointermove",function(){if(FOLLOW&&moved>14&&Object.keys(ptrs).length)camFree()});
+svg.addEventListener("wheel",function(){if(FOLLOW)camFree()},{passive:true});
+/* ⌖ під час ведення, коли карту відсунули, — назад до вас */
+(function(){var L=document.getElementById("loc"),old=L.onclick;L.onclick=function(e){if(FOLLOW&&!CAM){camBack();return}return old&&old.call(L,e)}})();
 /* вхід на карті: що за ним і кнопки, щоб прокласти маршрут */
 function entCard(id){var e=ENT[id],own=D.filter(function(d){return d.ent===id}),list=own.length?own:D.filter(function(d){return (d.ents||[]).indexOf(id)>=0});
   var acts=list.map(function(d){return {t:d.q||d.x?(d.short||d.t):"№ "+d.id,go:function(){choose(d.id)}}});
@@ -787,6 +796,8 @@ function setAlert(on){on=!!on;if(on===ALERT)return;ALERT=on;drawAlert()}
 function alertPoll(){if(!ALERT_URL||!window.fetch)return;fetch(ALERT_URL,{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){setAlert(j&&j.kyiv===true)},function(){})
   .then(function(){setTimeout(alertPoll,document.hidden?120000:30000)})}
 if(Q.get("alert")==="1")setAlert(true);else alertPoll();
+(function(){var n=document.createElement("div");n.className="north glass";n.setAttribute("aria-label","Північ — угорі карти");n.title="Північ — угорі карти";
+  n.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3 18 19 12 15.5 6 19z" fill="currentColor"/></svg><b>Пн</b>';document.body.appendChild(n)})();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
 }
 </script>

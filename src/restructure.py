@@ -985,6 +985,16 @@ rep('</style>','/* ---------- v26 ---------- */\n'
     '@media (min-width:900px){.alertbar{left:50%;right:auto;width:440px;transform:translateX(-50%)}}\n'
     '@media (prefers-color-scheme:dark){.alertbar{--glass-tint:rgba(170,40,46,.32)}}\n'
     '</style>')
+# ================= v27 (20.11.2026): ведення не вимикається, коли карту рухають; позначка півночі =================
+rep('</style>','/* ---------- v27 ---------- */\n'
+    # ⌖ світиться кольором нитки, поки камера «відпущена» під час ведення
+    'body.cam-free #loc{background:var(--thread);color:#1d2328;box-shadow:0 0 0 3px rgba(201,168,106,.35),0 0 22px rgba(201,168,106,.55)}\n'
+    # північ: під підписом OpenStreetMap, маленька й тиха
+    '.north{position:fixed;z-index:14;top:calc(max(12px,env(safe-area-inset-top)) + 28px);right:max(12px,env(safe-area-inset-right));display:flex;align-items:center;gap:3px;'
+    'padding:4px 8px 4px 5px;border-radius:9px;font-size:11px;line-height:1;color:var(--ink);pointer-events:none;opacity:.85}\n'
+    '.north svg{color:#c0392b}\n'
+    'body.popping .north,body.toasting .north,body.alert-on .north{opacity:0}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
