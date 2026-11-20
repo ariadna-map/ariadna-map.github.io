@@ -1325,7 +1325,7 @@ function copyLink(){var u=location.href,ok=function(){say("Посилання с
   function fb(){var t=document.createElement("textarea");t.value=u;t.setAttribute("readonly","");t.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(t);t.select();try{t.setSelectionRange(0,u.length)}catch(_){}
     var r=false;try{r=document.execCommand("copy")}catch(_){}document.body.removeChild(t);if(r)ok();else say("Скопіюйте посилання вручну",u,null,"",15000)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,fb);else fb()}
-function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;var T,P,S,B="",F="";
+function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kind;hAway=false;var T,P,S,B="",F="";
   if(kind==="app"){T=ENV.ios?"Відкрийте карту в Safari":"Відкрийте карту в браузері";
     P="Усередині "+(ENV.app||"застосунку")+" карта, найімовірніше, не побачить, де ви. "+(ENV.ios?"У Safari":"У браузері")+" — побачить і поведе від вас.";S="";
     /* кнопка, що сама відкриває сторінку в браузері: iPhone — адреса x-safari-https:// (iOS 15, 17 і новіші), Android — intent:// */
@@ -1348,9 +1348,21 @@ function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;var T,P,S,B="",F="
   hBox.style.left=Math.round((innerWidth-W)/2)+"px";hBox.style.top=Math.round(Math.max(70,(innerHeight-H)/2-20))+"px";hBox.style.visibility="";
   hOpen=true;hScr.hidden=false;pop(null);
   if(hBox.animate&&!(FRM&&FRM.matches))hBox.animate([{opacity:0,transform:"translateY(16px) scale(.96)"},{opacity:1,transform:"none"}],{duration:520,easing:"cubic-bezier(.32,.72,0,1)"});
-  hBox.querySelectorAll("[data-h]").forEach(function(b){b.onclick=function(){var k=b.dataset.h;
+  hBind()}
+function hBind(){hBox.querySelectorAll("[data-h]").forEach(function(b){b.onclick=function(){var k=b.dataset.h;
     if(k==="copy"){copyLink();return}if(k==="open"){openWatch();return}hClose();
     if(k==="reload")location.reload();else if(k==="retry")setStart("geo");else if(k==="from")setTimeout(function(){pop("from")},200)}})}
+/* людина пішла в Параметри дозволяти геопозицію й повернулася (20.11.2026): одразу пробуємо ще раз — вдалося, віконце зникне само;
+   ні — віконце стає коротким: «Повернулися? Оновіть сторінку» */
+var hAway=false;
+document.addEventListener("visibilitychange",function(){var k=hBox.dataset.k;if(!hOpen||(k!=="denied"&&k!=="none"))return;
+  if(document.visibilityState==="hidden"){hAway=true;return}if(!hAway)return;hAway=false;hBack()});
+function hBack(){hBox.dataset.k="back";
+  hBox.innerHTML='<div class="fb-in"><b class="fb-t">Повернулися?</b><p>Якщо дозволили геопозицію — оновіть сторінку, і нитка поведе від вас.</p>'
+    +'<div class="hb-b"><button type="button" class="gbtn thread" data-h="reload">Оновити сторінку</button></div><div class="hb-b hb-last"><button type="button" class="gbtn" data-h="from">Обрати зупинку чи в’їзд</button></div></div>';
+  var H=hBox.offsetHeight;hBox.style.top=Math.round(Math.max(70,(innerHeight-H)/2-20))+"px";hBind();
+  if(hBox.animate&&!(FRM&&FRM.matches))hBox.querySelector(".fb-in").animate([{opacity:0},{opacity:1}],{duration:360,easing:"ease-out"});
+  setStart("geo")}
 function hClose(){if(!hOpen)return;hOpen=false;hScr.hidden=true;
   var fin=function(){hBox.hidden=true;hBox.innerHTML="";hBox.style.cssText=""};
   if(hBox.animate&&!(FRM&&FRM.matches))hBox.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(10px) scale(.97)"}],{duration:320,easing:"ease-in",fill:"forwards"}).onfinish=fin;else fin()}
@@ -1441,7 +1453,7 @@ function geoAsk(){if(st.start==="geo"&&GEO.watch===null&&!GEO.err&&!(GEO.pos&&ge
 function geoOk(p){
   var x=(p.coords.longitude-LON0)*KX,y=(LAT0-p.coords.latitude)*KY,first=GEO.first,was=geoNear(),gap=Date.now()-GEO.t;
   GEO.pos=[x,y];GEO.acc=Math.round(p.coords.accuracy);GEO.t=Date.now();GEO.first=false;clearTimeout(GEO.wd);GEO.code=0;
-  if(hOpen&&first)hClose();   /* геопозиція таки працює — підказка більше не потрібна */
+  if(hOpen)hClose();   /* геопозиція таки працює — підказка більше не потрібна */
   if(first&&gap>60000)LOCK=null;   /* довго не було точок (сторінка була схована) — нитку будуємо заново */
   geoFilter(x,y,GEO.acc,GEO.t);
   if(GEO.boost&&GEO.acc<=20){GEO.boost=false;clearTimeout(GEO.bt);geoMode()}   /* точка вже точна — GPS більше не тримаємо */
