@@ -765,6 +765,28 @@ if(st.dept||st.b>=0)syncUrl();   /* /?to=16 → /viddilennia-16 в адресн�
 else{render(false);setTimeout(function(){if(!cur&&st.b<0&&!st.dept)pop("to",true)},450)}
 try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(function(p){if(p.state==="granted")geoAsk()})}catch(_){}
 setTimeout(mastArm,900);
+/* ---------- повітряна тривога (20.11.2026): укриття пульсують червоним, угорі — смуга «Повітряна тривога в Києві · До укриття» ----------
+   Джерело даних ще не підключено: надійні (alerts.in.ua, «Повітряна тривога») видають токен за заявкою, а токен не можна класти у відкриту сторінку —
+   потрібен маленький посередник (напр., Cloudflare Worker), що віддає {"kyiv":true|false}. Його адресу — в ALERT_URL.
+   Поки що для перевірки вигляду: ?alert=1. Карта НІКОЛИ не пише «тривоги немає» — вона лише показує тривогу, коли знає про неї */
+var ALERT_URL="",ALERT=false,alertBar=null;
+function shelters(){var r=[];SCULPT.concat(LAND).forEach(function(p,i){if(/^Укриття/.test(p.n))r.push({to:"poi"+i,n:p.n,at:[p.x,p.y]})});
+  D.forEach(function(d){if(/^Укриття/.test(d.t||"")&&d.ent&&ENT[d.ent])r.push({to:d.id,n:d.t,at:ENT[d.ent].p})});return r}
+function drawAlert(){var g=document.getElementById("alertL");
+  if(!g){g=document.createElementNS("http://www.w3.org/2000/svg","g");g.id="alertL";var me=document.getElementById("me");me.parentNode.insertBefore(g,me)}
+  g.innerHTML=ALERT?shelters().map(function(S){return lbl("shp",S.at[0].toFixed(1),S.at[1].toFixed(1),0,'<circle class="p1" r="13"/><circle class="p2" r="13"/><circle class="c" r="14"/>')}).join(""):"";
+  apply();
+  if(ALERT&&!alertBar){alertBar=document.createElement("div");alertBar.className="alertbar glass";alertBar.setAttribute("role","alert");
+    alertBar.innerHTML='<div class="ab-t"><b>Повітряна тривога в Києві</b><small>укриття позначено червоним</small></div><button type="button" class="gbtn ab-go">До укриття</button>';
+    document.body.appendChild(alertBar);alertBar.querySelector(".ab-go").onclick=toShelter}
+  if(alertBar)alertBar.hidden=!ALERT;document.body.classList.toggle("alert-on",ALERT)}
+/* найближче укриття: від вас (якщо карта знає, де ви), інакше — від того, що зараз на екрані */
+function toShelter(){var L=shelters();if(!L.length)return;var s=size(),o=GEO.pos&&geoNear()?GEO.pos:st.start&&STARTS[st.start]&&!STARTS[st.start].geo?STARTS[st.start].at:[vb.x+vb.w/2,vb.y+vb.h/2];
+  L.sort(function(a,b){return Math.hypot(a.at[0]-o[0],a.at[1]-o[1])-Math.hypot(b.at[0]-o[0],b.at[1]-o[1])});choose(L[0].to)}
+function setAlert(on){on=!!on;if(on===ALERT)return;ALERT=on;drawAlert()}
+function alertPoll(){if(!ALERT_URL||!window.fetch)return;fetch(ALERT_URL,{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){setAlert(j&&j.kyiv===true)},function(){})
+  .then(function(){setTimeout(alertPoll,document.hidden?120000:30000)})}
+if(Q.get("alert")==="1")setAlert(true);else alertPoll();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
 }
 </script>

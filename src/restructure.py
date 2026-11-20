@@ -968,12 +968,29 @@ rep('''function findRoute(from,door,noSteps){''','''function gcomp(g){if(g.comp)
   for(var i=0;i<C.length;i++){if(C[i]>=0)continue;C[i]=n;var st=[i];while(st.length){var u=st.pop();g.adj[u].forEach(function(e){if(C[e[0]]<0){C[e[0]]=n;st.push(e[0])}})}n++}
   return g.comp=C}
 function findRoute(from,door,noSteps){''')
+# ================= v26 (20.11.2026): повітряна тривога — укриття пульсують; смуга вгорі =================
+rep('</style>','/* ---------- v26 ---------- */\n'
+    '.lb.shp circle{fill:none;stroke:#e5484d;transform-box:fill-box;transform-origin:center}\n'
+    '.lb.shp .c{fill:rgba(229,72,77,.16);stroke-width:2.5}\n'
+    '.lb.shp .p1,.lb.shp .p2{stroke-width:3;animation:shp 2.2s cubic-bezier(.2,.6,.3,1) infinite}\n'
+    '.lb.shp .p2{animation-delay:1.1s}\n'
+    '@keyframes shp{0%{transform:scale(1);opacity:.95}100%{transform:scale(3.2);opacity:0}}\n'
+    '@media (prefers-reduced-motion:reduce){.lb.shp .p1,.lb.shp .p2{animation:none;opacity:0}.lb.shp .c{stroke-width:4}}\n'
+    '.alertbar{position:fixed;z-index:57;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;align-items:center;gap:12px;padding:12px 12px 12px 18px;border-radius:24px;'
+    '--glass-tint:rgba(229,72,77,.24)}\n'
+    '.alertbar .ab-t{flex:1;min-width:0;display:flex;flex-direction:column}\n'
+    '.alertbar b{font-size:17px;line-height:1.2}.alertbar small{font-size:13.5px;opacity:.8}\n'
+    '.alertbar .ab-go{flex:none;min-height:44px;padding:0 16px;border-radius:15px;background:#e5484d;color:#fff;border:0;font-weight:600}\n'
+    'body.alert-on #mast{visibility:hidden}\n'
+    '@media (min-width:900px){.alertbar{left:50%;right:auto;width:440px;transform:translateX(-50%)}}\n'
+    '@media (prefers-color-scheme:dark){.alertbar{--glass-tint:rgba(170,40,46,.32)}}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
-h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==12,nth;s=s[:h0]+css_+s[h1:]
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==13,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))
