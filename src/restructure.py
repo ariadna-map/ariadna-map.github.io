@@ -952,7 +952,7 @@ rep('</style>','/* ---------- v22.1 ---------- */\n'
     '.hbox .hb-f{margin-top:14px}\n.hbox .hb-last{margin-top:8px}\n'
     '.hbox .hb-f .gbtn{width:100%;min-height:46px;border-radius:15px}\n'
     '.hbox .hb-ic{display:inline-grid;place-items:center;width:26px;height:26px;margin:0 2px;vertical-align:-7px;border-radius:50%;background:rgba(127,127,127,.22)}\n'
-    '.hbox .hb-ic svg{width:17px;height:17px}\n'
+    '.hbox .hb-ic svg{width:17px;height:17px}\n'    '.hbox .hb-or{margin:16px 0 10px;font-size:14px}\n.hbox .gbtn svg{width:19px;height:19px;margin-right:6px}\n.farbox .fb-here{width:100%;min-height:46px;margin-top:8px;border-radius:15px}\nbody.picking #map{cursor:crosshair}\n.lb.pickme .ring{fill:rgba(255,255,255,.85);stroke:var(--thread);stroke-width:2.5}.lb.pickme .dot{fill:var(--thread)}\n'
     '</style>')
 # ================= v23 (20.11.2026): старт «від мене» — найближча доріжка, з якої справді можна дійти =================
 # Раніше бралася просто найближча точка будь-якої доріжки. У закритих дворах (корпус 1 та ін.) є шматочки доріжок, не з'єднані з рештою —

@@ -538,6 +538,11 @@ body.far-on .res #go{visibility:hidden}
 .hbox .hb-f .gbtn{width:100%;min-height:46px;border-radius:15px}
 .hbox .hb-ic{display:inline-grid;place-items:center;width:26px;height:26px;margin:0 2px;vertical-align:-7px;border-radius:50%;background:rgba(127,127,127,.22)}
 .hbox .hb-ic svg{width:17px;height:17px}
+.hbox .hb-or{margin:16px 0 10px;font-size:14px}
+.hbox .gbtn svg{width:19px;height:19px;margin-right:6px}
+.farbox .fb-here{width:100%;min-height:46px;margin-top:8px;border-radius:15px}
+body.picking #map{cursor:crosshair}
+.lb.pickme .ring{fill:rgba(255,255,255,.85);stroke:var(--thread);stroke-width:2.5}.lb.pickme .dot{fill:var(--thread)}
 </style>
 </head>
 <body>
@@ -1252,7 +1257,7 @@ document.addEventListener("visibilitychange",function(){
 function ll(p){return (LAT0-p[1]/KY).toFixed(6)+","+(LON0+p[0]/KX).toFixed(6)}
 function gmapsTo(p,mode){return "https://www.google.com/maps/dir/?api=1&destination="+ll(p)+(mode?"&travelmode="+mode:"")}
 function stopNm(S){return S.ln||S.short.split(" · ")[0]}
-function myStop(){var S=st.start&&STARTS[st.start];return S&&!S.geo?S:null}
+function myStop(){var S=st.start&&STARTS[st.start];return S&&!S.geo&&!S.here?S:null}
 function myGate(){return st.carIn&&CAR_IN[st.carIn]?st.carIn:null}
 /* Google Карти, коли людина далеко: до обраної нею зупинки чи в’їзду, а як нічого не обрано — до самого місця призначення.
    Вид транспорту не нав’язуємо (Google візьме звичний для людини), лише на авто — «машиною», а до зупинки — «транспортом» */
@@ -1270,14 +1275,17 @@ farScr.className="farscr";farScr.hidden=true;document.body.appendChild(farScr);d
 function farReset(){if(farBox.getAnimations)farBox.getAnimations({subtree:true}).forEach(function(x){try{x.cancel()}catch(_){}})}
 function showFar(){clearTimeout(farT);var m=geoFar();if(!m||resRow.hidden){document.body.classList.remove("far-on");return}farReset();
   farBox.innerHTML='<div class="fb-in"><b class="fb-t">Ви за '+fmtKm(m)+' від лікарні</b><p>Дорогу '+esc(gmWhere())+' прокладуть Google&nbsp;Карти.<br>А&nbsp;на&nbsp;місці повертайтеся — далі поведе&nbsp;нитка.</p>'
-    +'<a class="gbtn thread fb-go" href="'+esc(gmFar())+'" target="_blank" rel="noopener">'+GMAP+'Відкрити Google Карти</a></div><i class="fb-tint" aria-hidden="true"></i>';
+    +'<a class="gbtn thread fb-go" href="'+esc(gmFar())+'" target="_blank" rel="noopener">'+GMAP+'Відкрити Google Карти</a>'
+    +'<button type="button" class="gbtn fb-here">Я вже в лікарні — покажу на карті</button></div><i class="fb-tint" aria-hidden="true"></i>';
   farBox.style.cssText="";farBox.hidden=false;farBox.style.visibility="hidden";
   var W=Math.min(360,innerWidth-40),H;farBox.style.width=W+"px";H=farBox.offsetHeight;
   var top=Math.max(80,Math.min(innerHeight-H-170,(innerHeight-H)/2-30));
   farBox.style.left=Math.round((innerWidth-W)/2)+"px";farBox.style.top=Math.round(top)+"px";farBox.style.visibility="";
   farOpen=true;farScr.hidden=false;document.body.classList.add("far-on");
   if(farBox.animate&&!(FRM&&FRM.matches))farBox.animate([{opacity:0,transform:"translateY(16px) scale(.96)"},{opacity:1,transform:"none"}],{duration:560,easing:"cubic-bezier(.32,.72,0,1)"});
-  farBox.querySelector(".fb-go").onclick=function(){setTimeout(foldFar,250)}}
+  farBox.querySelector(".fb-go").onclick=function(){setTimeout(foldFar,250)};
+  /* телефон каже «далеко», а людина вже тут (стара чи приблизна геопозиція) — віконце геть, показує на карті */
+  farBox.querySelector(".fb-here").onclick=function(){farOpen=false;farScr.hidden=true;farReset();farBox.hidden=true;farBox.innerHTML="";document.body.classList.remove("far-on");pickStart()}}
 /* віконце → кнопка на банері: рамка віконця пливе й стискається до розмірів кнопки, текст тане, скло набуває кольору кнопки */
 function foldFar(){if(!farOpen)return;farOpen=false;farScr.hidden=true;
   var go=document.getElementById("go"),r0=farBox.getBoundingClientRect();
@@ -1309,6 +1317,16 @@ function lead(){
   else say("Визначаю, де ви…","дозвольте доступ до геопозиції")}
 /* звідки йти — питаємо людину, а не обираємо зупинку самі */
 function askFrom(){pop("from")}
+/* «Покажіть на карті, де ви» (20.11.2026): геопозиція не працює чи бреше (стара, приблизна) — людина торкається карти там, де стоїть,
+   і нитка йде звідти. Не потребує ні GPS, ні дозволів, ні налаштувань */
+var PICK=false;
+function pickStart(){PICK=true;pop(null);if(hOpen)hClose();document.body.classList.add("picking");
+  say("Торкніться карти там, де ви стоїте","поруч із яким корпусом чи брамою ви зараз — нитка поведе звідти",[{t:"Скасувати",go:pickEnd}],"",60000)}
+function pickEnd(){PICK=false;document.body.classList.remove("picking")}
+function pickAt(x,y){var s=size(),wx=vb.x+(x-s.l)/s.w*vb.w,wy=vb.y+(y-s.t)/s.h*vb.h;pickEnd();hideToast();
+  STARTS.pin={here:1,pin:1,name:"Місце, яке ви показали",cap:"Звідки",short:"Обране місце",street:"ви показали його на карті",tr:"",at:[wx,wy],stop:[wx,wy],
+    hint:"Нитка йде від місця, яке ви показали на карті."};
+  setStart("pin");if(st.b<0&&!st.dept)setTimeout(function(){pop("to")},350)}
 /* ---------- де відкрито сторінку (20.11.2026): у вбудованому браузері месенджера геопозиція часто не працює ----------
    Telegram, Viber, Facebook, Messenger, Instagram тощо часто підписуються в userAgent; Telegram ще й додає TelegramWebviewProxy.
    Загальні ознаки: Android WebView — «; wv)», iOS WKWebView — без «Safari/». Розпізнається не завжди — тому ще й порада, коли геопозиція відмовила. */
@@ -1342,7 +1360,7 @@ function copyLink(){var u=location.href,ok=function(){say("Посилання с
   function fb(){var t=document.createElement("textarea");t.value=u;t.setAttribute("readonly","");t.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(t);t.select();try{t.setSelectionRange(0,u.length)}catch(_){}
     var r=false;try{r=document.execCommand("copy")}catch(_){}document.body.removeChild(t);if(r)ok();else say("Скопіюйте посилання вручну",u,null,"",15000)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,fb);else fb()}
-function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kind;hAway=false;var T,P,S,B="",F="";
+function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kind;hAway=false;var T,P,S,B="",B2="",F="";
   if(kind==="app"){T="Відкрийте карту в браузері";
     P="Усередині "+(ENV.app||"застосунку")+" карта, найімовірніше, не побачить, де ви. У браузері — побачить і поведе від вас.";S="";
     /* iPhone: дві кнопки в ряд — Safari (x-safari-https://, iOS 15, 17 і новіші) і Chrome (googlechromes://). Браузера «за замовчуванням» сторінка
@@ -1355,14 +1373,19 @@ function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kin
         :"Не відкрилося? Скопіюйте посилання й вставте його в адресний рядок Safari.",
       chr:"Схоже, Chrome на цьому телефоні немає — натисніть «Safari».",
       and:"Не відкрилося? Угорі праворуч натисніть <span class=\"hb-ic\">"+IC_DOTS+"</span> і оберіть «Відкрити в браузері» (чи «у Chrome»)."}}
-  else if(kind==="denied"){T="Дозвольте бачити, де ви";P="Для цієї сторінки геопозицію вимкнено, тому нитку від вас не провести.";
-    S=ENV.ios?(ENV.br==="Chrome"?"Параметри iPhone → Chrome → Місцезнаходження → «Коли використовується». Потім оновіть сторінку.":"Параметри iPhone → Конфіденційність та безпека → Служби визначення місцеперебування: увімкніть їх і для «Сайти Safari» оберіть «Коли використовується». Потім оновіть сторінку й дозвольте.")
-      :ENV.and?"Торкніться значка ліворуч від адреси сторінки → Дозволи → Геодані → «Дозволити». Перевірте, що геодані ввімкнено й у телефоні.":"Дозвольте геопозицію для цієї сторінки в налаштуваннях браузера й оновіть її.";
-    B+='<button type="button" class="gbtn thread" data-h="reload">Оновити сторінку</button>'}
-  else{T="Не вдається визначити, де ви";P="Телефон так і не сказав, де ви.";S="Перевірте, що геолокацію в телефоні ввімкнено, і вийдіть на відкрите місце.";
-    B+='<button type="button" class="gbtn thread" data-h="retry">Спробувати ще раз</button>'}
-  var BF='<button type="button" class="gbtn" data-h="from">Обрати зупинку чи в’їзд</button>';
-  hBox.innerHTML='<div class="fb-in"><b class="fb-t">'+T+'</b><p>'+esc(P)+'</p>'+(S?'<p class="hb-s">'+S+'</p>':'')+'<div class="hb-b">'+B+'</div>'
+  /* 20.11.2026, після випадку з QR-кодом: спершу те, що працює завжди, — показати на карті; налаштування — другим кроком */
+  else if(kind==="denied"){T="Не бачу, де ви";P="Покажіть на карті, де ви стоїте, — і нитка поведе звідти.";
+    B+='<button type="button" class="gbtn thread" data-h="pick">'+PIN+'Показати на карті</button>';
+    S="<b>Або увімкніть геопозицію.</b> "+(ENV.ios?(ENV.br==="Chrome"?"Параметри iPhone → Chrome → Місцезнаходження → «Коли використовується».":"Параметри iPhone → Конфіденційність та безпека → Служби визначення місцеперебування: увімкніть їх, а для «Сайти Safari» оберіть «Коли використовується».")
+      :ENV.and?"Потягніть шторку згори й увімкніть «Місцезнаходження» (чи «Геодані»)."+(ENV.br==="Chrome"?" Якщо не допомогло — у Chrome торкніться значка ліворуч від адреси сайту → «Дозволи» → «Геодані».":" Якщо не допомогло — дозвольте геодані цьому сайту в налаштуваннях браузера.")
+      :"Дозвольте геопозицію для цієї сторінки в налаштуваннях браузера.")+" Потім оновіть сторінку.";
+    B2='<button type="button" class="gbtn" data-h="reload">Оновити сторінку</button>'}
+  else{T="Не вдається визначити, де ви";P="Покажіть на карті, де ви стоїте, — і нитка поведе звідти.";
+    B+='<button type="button" class="gbtn thread" data-h="pick">'+PIN+'Показати на карті</button>';
+    S="<b>Або спробуйте ще раз:</b> перевірте, що місцезнаходження в телефоні ввімкнено, і вийдіть на відкрите місце.";
+    B2='<button type="button" class="gbtn" data-h="retry">Спробувати ще раз</button>'}
+  var BF='<button type="button" class="gbtn" data-h="from">Я біля зупинки — обрати її</button>';
+  hBox.innerHTML='<div class="fb-in"><b class="fb-t">'+T+'</b><p>'+esc(P)+'</p>'+'<div class="hb-b">'+B+'</div>'+(S?'<p class="hb-s hb-or">'+S+'</p>':'')+(B2?'<div class="hb-b">'+B2+'</div>':'')
     +(F?'<div class="hb-f" hidden><p class="hb-s"></p><button type="button" class="gbtn" data-h="copy">Скопіювати посилання</button></div>':'')+'<div class="hb-b hb-last">'+BF+'</div></div>';
   if(hBox.getAnimations)hBox.getAnimations().forEach(function(x){x.cancel()});
   hBox.style.cssText="";hBox.hidden=false;hBox.style.visibility="hidden";var W=Math.min(370,innerWidth-32);hBox.style.width=W+"px";var H=hBox.offsetHeight;
@@ -1372,7 +1395,7 @@ function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kin
   hBind()}
 function hBind(){hBox.querySelectorAll("[data-h]").forEach(function(b){b.onclick=function(){var k=b.dataset.h;
     if(k==="copy"){copyLink();return}if(k==="open"){openWatch(b.dataset.b);return}hClose();
-    if(k==="reload")location.reload();else if(k==="retry")setStart("geo");else if(k==="from")setTimeout(function(){pop("from")},200)}})}
+    if(k==="reload")location.reload();else if(k==="pick")pickStart();else if(k==="retry")setStart("geo");else if(k==="from")setTimeout(function(){pop("from")},200)}})}
 /* людина пішла в Параметри дозволяти геопозицію й повернулася (20.11.2026): одразу пробуємо ще раз — вдалося, віконце зникне само;
    ні — віконце стає коротким: «Повернулися? Оновіть сторінку» */
 var hAway=false;
@@ -1380,7 +1403,7 @@ document.addEventListener("visibilitychange",function(){var k=hBox.dataset.k;if(
   if(document.visibilityState==="hidden"){hAway=true;return}if(!hAway)return;hAway=false;hBack()});
 function hBack(){hBox.dataset.k="back";
   hBox.innerHTML='<div class="fb-in"><b class="fb-t">Повернулися?</b><p>Якщо дозволили геопозицію — оновіть сторінку, і нитка поведе від вас.</p>'
-    +'<div class="hb-b"><button type="button" class="gbtn thread" data-h="reload">Оновити сторінку</button></div><div class="hb-b hb-last"><button type="button" class="gbtn" data-h="from">Обрати зупинку чи в’їзд</button></div></div>';
+    +'<div class="hb-b"><button type="button" class="gbtn thread" data-h="reload">Оновити сторінку</button><button type="button" class="gbtn" data-h="pick">'+PIN+'Показати на карті</button></div></div>';
   var H=hBox.offsetHeight;hBox.style.top=Math.round(Math.max(70,(innerHeight-H)/2-20))+"px";hBind();
   if(hBox.animate&&!(FRM&&FRM.matches))hBox.querySelector(".fb-in").animate([{opacity:0},{opacity:1}],{duration:360,easing:"ease-out"});
   setStart("geo")}
@@ -1394,7 +1417,7 @@ function arrived(){if(!lastDoor||!GEO.pos)return;var m=meAt(),rem=LOCK&&st.start
 /* довжина в банері: до кілометра — метри (з точністю до 10), далі — «1,2 км», щоб рядок влазив поруч із «×» і «Вести» */
 function fmtLen(m){return m<1000?Math.round(m/10)*10+" м":(m/1000).toFixed(1).replace(".",",")+" км"}
 function fmtKm(m){return m<1000?Math.round(m/50)*50+" м":(m/1000).toFixed(m<10000?1:0).replace(".",",")+" км"}
-function geoFar(){if(!GEO.pos)return 0;var d=Math.hypot(GEO.pos[0]-20,GEO.pos[1]+20);return d>650?d:0}
+function geoFar(){if(!GEO.pos)return 0;var d=Math.hypot(GEO.pos[0]-20,GEO.pos[1]+20);return d-Math.min(GEO.acc||0,d)>650?d:0}   /* приблизна точка (±2 км) не каже «далеко» */
 /* точці можна вірити: ви на території чи поруч і точність не гірша за 100 м (якщо вже було точно — терпимо до 300 м, щоб нитка не стрибала) */
 function geoNear(){return !!GEO.pos&&!geoFar()&&GEO.acc<=(GEO.good?300:100)}
 /* ---------- точка на нитці (19.11.2026) ----------
@@ -1472,6 +1495,7 @@ function geoMode(){var hi=FOLLOW||GEO.boost;if(GEO.watch===null||GEO.hi===hi)ret
 /* питаємо геопозицію, коли людина обрала, куди їй, — тоді зрозуміло, навіщо */
 function geoAsk(){if(st.start==="geo"&&GEO.watch===null&&!GEO.err&&!(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000))geoStart()}
 function geoOk(p){
+  if(p.timestamp&&Date.now()-p.timestamp>120000)return;   /* точці понад 2 хв — це «останнє відоме місце», а не де людина зараз (20.11.2026) */
   var x=(p.coords.longitude-LON0)*KX,y=(LAT0-p.coords.latitude)*KY,first=GEO.first,was=geoNear(),gap=Date.now()-GEO.t;
   GEO.pos=[x,y];GEO.acc=Math.round(p.coords.accuracy);GEO.t=Date.now();GEO.first=false;clearTimeout(GEO.wd);GEO.code=0;
   if(hOpen)hClose();   /* геопозиція таки працює — підказка більше не потрібна */
@@ -1504,7 +1528,7 @@ function geoFail(e){
   var S=st.start?STARTS[st.start]:null,dest=st.b>=0||!!st.dept,T=e&&e.code===1?"Геопозиція вимкнена":"Не вдалося визначити, де ви";
   if(hOpen)return;var hk=geoKind();if(!hShown[hk]){geoHelp(hk);return}
   if(!S&&dest&&byLead){askFrom(T);return}
-  say(T,S?"маршрут від зупинки «"+stopNm(S)+"» — іншу можна обрати у «Звідки»":dest?"оберіть, звідки йдете, — кнопка «Звідки»":GEO.err)}
+  say(T,S&&S.here?"нитка — від місця, яке ви показали на карті":S?"маршрут від зупинки «"+stopNm(S)+"» — іншу можна обрати у «Звідки»":dest?"оберіть, звідки йдете, — кнопка «Звідки»":GEO.err)}
 
 /* ---------- значки ---------- */
 function ico(p,w){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
@@ -1605,7 +1629,7 @@ function pop(name,quiet){
 }
 bTo.onclick=function(){pop(cur==="to"?null:"to")};
 bFrom.onclick=function(){pop(cur==="from"?null:"from")};
-res.onclick=function(e){if(e.target.closest("#rx")){cancelAll();return}var g=e.target.closest("#go");if(g){if(g.dataset.k==="share")share();else if(g.dataset.k!=="gm")lead();return}if(e.target.closest("a"))return;pop(cur==="det"?null:"det")};
+res.onclick=function(e){if(e.target.closest("#rx")){cancelAll();return}var g=e.target.closest("#go");if(g){if(g.dataset.k==="share")share();else if(g.dataset.k==="pick")pickStart();else if(g.dataset.k!=="gm")lead();return}if(e.target.closest("a"))return;pop(cur==="det"?null:"det")};
 res.onkeydown=function(e){if((e.key==="Enter"||e.key===" ")&&!e.target.closest("a,#go,#rx")){e.preventDefault();pop(cur==="det"?null:"det")}};
 document.getElementById("scrim").onclick=function(){pop(null)};
 document.getElementById("pToX").onclick=function(){pop(null)};
@@ -1706,6 +1730,7 @@ function entCard(id){var e=ENT[id],own=D.filter(function(d){return d.ent===id}),
   if(!acts.length&&e.k&&bIndex(e.k)>=0)acts=[{t:"Корпус "+e.k,go:function(){pickBuilding(bIndex(e.k))}}];
   say(e.n,e.d,acts,"Прокласти маршрут:")}
 function tapAt(x,y){
+  if(PICK){pickAt(x,y);return}
   legend(false);
   var el=document.elementFromPoint(x,y);if(!el||!el.dataset)return;var ds=el.dataset,dg=el.closest&&el.closest(".door");
   if(ds.ent===undefined&&dg&&dg.dataset.en)ds={ent:dg.dataset.en};
@@ -1783,9 +1808,10 @@ function drawFrom(){
   var keys=startKeys(),h='<div class="pk-h">Звідки ви йдете?</div><div class="from">';STARTS.geo.street=GEO.err&&!GEO.pos?"не працює — торкніться, щоб дізнатися, що зробити":geoText();
   keys.forEach(function(k){var S=STARTS[k],R=lastRoutes?lastRoutes[k]:null;
     h+='<button type="button" data-e="'+k+'" class="'+(S.here?"here":S.geo?"geo":"")+'" aria-pressed="'+(k===st.start)+'"><span class="bus">'+(S.here||S.geo?DOT:VEH(S))+'</span><span class="ft"><b>'+esc(S.here||S.geo?S.name:"Зупинка «"+S.name+"»")+'</b><small>'+esc(S.street+(S.tr?" · "+S.tr:""))+'</small></span>'+(st.b>=0?'<span class="m">'+(R?mins(R.len)+" хв":"—")+'</span>':'')+'</button>'});
+  h+='<button type="button" data-e="__pick" class="here"><span class="bus">'+PIN+'</span><span class="ft"><b>Показати на карті</b><small>торкніться місця, де ви стоїте</small></span></button>';
   h+='</div>'+switches();
   var bd=document.getElementById("fromBody");bd.innerHTML=h;
-  bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);if(x.dataset.e==="geo"&&GEO.err&&!GEO.pos){geoHelp();return}if(x.dataset.e!==st.start)setStart(x.dataset.e);else if(lastBox)fitBox.apply(null,lastBox)}});
+  bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);if(x.dataset.e==="__pick"){pickStart();return}if(x.dataset.e==="geo"&&GEO.err&&!GEO.pos){geoHelp();return}if(x.dataset.e!==st.start)setStart(x.dataset.e);else if(lastBox)fitBox.apply(null,lastBox)}});
   bindSwitches();
 }
 function switches(px){px=px||"";return '<label class="sw"><input type="checkbox" id="'+px+'car"'+(st.car?" checked":"")+'><span class="k"></span><span>На авто</span></label><label class="sw"><input type="checkbox" id="'+px+'ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>'}
@@ -1809,6 +1835,7 @@ function setFrom(){
   document.getElementById("fromC").textContent=S?S.cap:"";document.getElementById("fromV").textContent=S?S.short:"Звідки?";
   var i=document.getElementById("fromI");i.className="ic sm "+(S?(S.geo||S.here?"me":"bus"):"");i.innerHTML=S?(S.geo||S.here?DOT:VEH(S)):PIN;
 }
+var PKB='<button type="button" class="gbtn thread" id="go" data-k="pick">'+PIN+'Показати</button>';
 var XB='<button type="button" class="gbtn rx" id="rx" aria-label="Скасувати маршрут">'+ico('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',2.3)+'</button>';
 function setRes(main,sub,go,more){resRow.hidden=false;document.getElementById("resB").textContent=main;document.getElementById("resS").innerHTML='<span>'+esc(sub)+(more===false?"":" · докладніше")+'</span>'+UP;document.getElementById("resGo").innerHTML=XB+(go||"")}
 /* «×»: скасувати маршрут і всі виділення (20.11.2026). «Від мене» лишається — це не виділення, а звичайний початок */
@@ -1818,7 +1845,10 @@ function cancelAll(){if(st.b<0&&!st.dept)return;farKey=null;var was={dept:st.dep
   pop(null);render(false);syncUrl();
   say("Маршрут скасовано","",[{t:"Повернути",go:function(){st.dept=was.dept;st.b=was.b;st.start=was.start;st.auto=was.auto;st.carIn=was.carIn;LOCK=null;render(true);syncUrl()}}],"",6000)}
 
-function render(zoom){
+function drawPick(){var g=document.getElementById("pickme");
+  if(!g){g=document.createElementNS("http://www.w3.org/2000/svg","g");g.id="pickme";var me=document.getElementById("me");me.parentNode.insertBefore(g,me)}
+  var P=st.start==="pin"&&STARTS.pin;g.innerHTML=P?lbl("pickme",P.at[0].toFixed(1),P.at[1].toFixed(1),0,'<circle class="ring" r="11"/><circle class="dot" r="6"/>'):""}
+function render(zoom){drawPick();
   document.querySelectorAll("#pTo [data-d]").forEach(function(c){c.setAttribute("aria-pressed",c.dataset.d===st.dept?"true":"false")});
   var ARo=st.dept?areaOf(st.dept):null;svg.querySelectorAll(".b").forEach(function(p){p.classList.toggle("on",!ARo&&+p.dataset.b===st.b)});
   svg.querySelectorAll(".badge").forEach(function(p){p.classList.toggle("on",+p.dataset.bb===st.b);p.classList.toggle("pl",!st.dept)});
@@ -1880,10 +1910,10 @@ function render(zoom){
   else if(st.car)setRes("Машиною не під’їхати","вимкніть «На авто» у «Звідки»",GL);
   else if(far){isFar=true;setRes("≈ "+fmtKm(geoFar()),"до лікарні · дорогу прокладуть Google Карти",GM,false)}
   else if(r&&farMe&&!s.geo){isFar=true;setRes("≈ "+fmtKm(geoFar()),"до зупинки «"+stopNm(s)+"» · далі ≈ "+mins(r.len)+" хв пішки",GM)}
-  else if(r)setRes("≈ "+mins(r.len)+" хв · "+fmtLen(r.len),FL+(s.geo?(LOCK&&LOCK.snap>20&&LOCK.s<5?"від найближчої доріжки":"від вас")+(GEO.acc>40?" · ±"+GEO.acc+" м":""):"від зупинки"),GL);
+  else if(r)setRes("≈ "+mins(r.len)+" хв · "+fmtLen(r.len),FL+(s.geo?(LOCK&&LOCK.snap>20&&LOCK.s<5?"від найближчої доріжки":"від вас")+(GEO.acc>40?" · ±"+GEO.acc+" м":""):s.here?"від місця, яке ви показали":"від зупинки"),GL);
   else if(!s)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
   else if(s.geo&&GEO.err&&!GEO.pos)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
-  else if(s.geo&&!near)setRes(GEO.pos?"Уточнюю, де ви":"Визначаю, де ви…",(GEO.pos?"±"+GEO.acc+" м · ":"")+"або оберіть «Звідки»",GL,false);
+  else if(s.geo&&!near)setRes(GEO.pos?"Не знаю точно, де ви":"Визначаю, де ви…",(GEO.pos?"±"+(GEO.acc>=1000?fmtKm(GEO.acc):GEO.acc+" м")+" · ":"")+"або покажіть на карті",PKB,false);
   else if(s.geo)setRes("Доріжки від вас немає","оберіть «Звідки»",GL);
   else if(st.noSteps)setRes("Без сходів не пройти","оберіть інше «Звідки»",GL);
   else setRes("Доріжки на карті немає","орієнтуйтеся за номером корпусу",GL);
@@ -1902,7 +1932,7 @@ function render(zoom){
   if(d&&others.length)html+='<p class="note">У цьому ж корпусі: '+others.map(dName).join(", ")+'.</p>';
   if(b.priv)html+='<p class="note">Закрита територія: вхід лише за дозволом, маршрут не прокладається.</p>';
   html+='<p class="note">Заблукали? Приймальне відділення цілодобово: <a href="tel:+380442938539">'+EM+'</a></p>';
-  html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+'Як доїхати — Google Карти</a><button type="button" class="gbtn" id="shr">'+SHARE+'Надіслати рідним, як дійти</button></div>';
+  html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+(geoNear()?"Google Карти":"Ще їдете? Google Карти")+'</a><button type="button" class="gbtn" id="shr">'+SHARE+'Надіслати рідним, як дійти</button></div>';
   det.innerHTML=html+switches("d");document.getElementById("shr").onclick=share;bindSwitches("d");
   /* якщо відомо, яку частину корпусу займає відділення, обводимо тільки її, а не весь корпус */
   var AR=d?areaOf(d.id):null;
