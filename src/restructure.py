@@ -918,12 +918,28 @@ rep('</style>','/* ---------- v21: віконце «далеко від ліка
     '@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.farbox.glass{background:color-mix(in srgb,var(--bg) 94%,transparent)}}\n'
     '@media (prefers-reduced-transparency:reduce){.farbox.glass{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}\n'
     '</style>')
+# ================= v22 (20.11.2026): віконця ще прозоріші; підказка про геопозицію (месенджери, заборонений доступ) =================
+rep('</style>','/* ---------- v22 ---------- */\n'
+    # усі віконця ще прозоріші: «Куди», «Звідки», «Докладніше», легенда, підказки — фон 0,32 → 0,25 (темна 0,34 → 0,26);
+    # «Ви за N км» і підказка про геопозицію — 0,18 → 0,14 (темна 0,26 → 0,2). Розмиття трохи сильніше, щоб текст лишався читабельним
+    '.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(255,255,255,.25);--glass-glow:rgba(255,255,255,.28);--glass-spec:rgba(255,255,255,.26);'
+    '-webkit-backdrop-filter:blur(44px) saturate(2.1) brightness(1.05);backdrop-filter:blur(44px) saturate(2.1) brightness(1.05)}\n'
+    '.farbox.glass{--glass-tint:rgba(255,255,255,.14);--glass-glow:rgba(255,255,255,.26);--glass-spec:rgba(255,255,255,.24);'
+    '-webkit-backdrop-filter:blur(38px) saturate(2.2) brightness(1.07);backdrop-filter:blur(38px) saturate(2.2) brightness(1.07)}\n'
+    '@media (prefers-color-scheme:dark){.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(44,52,59,.26);'
+    '-webkit-backdrop-filter:blur(44px) saturate(1.8) brightness(.9);backdrop-filter:blur(44px) saturate(1.8) brightness(.9)}'
+    '.farbox.glass{--glass-tint:rgba(36,44,50,.2);-webkit-backdrop-filter:blur(38px) saturate(1.8) brightness(.86);backdrop-filter:blur(38px) saturate(1.8) brightness(.86)}}\n'
+    # підказка про геопозицію
+    '.hbox .hb-s{margin:0 0 14px;font-size:14.5px;line-height:1.45;opacity:.92}\n'
+    '.hbox .hb-b{display:flex;flex-direction:column;gap:8px}\n'
+    '.hbox .hb-b .gbtn{width:100%;min-height:46px;border-radius:15px;text-decoration:none}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
-h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==10,nth;s=s[:h0]+css_+s[h1:]
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==11,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))

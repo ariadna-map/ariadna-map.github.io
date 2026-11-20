@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script>try{var t=localStorage.getItem("ariadna-theme");if(t==="dark"||t==="light")document.documentElement.classList.add(t)}catch(e){}</script>
+<meta name="theme-color" content="#e8eae4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222b31" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Ariadna — карта-план психіатричної лікарні (Київ, вул. Кирилівська, 103): де корпус і відділення, як дійти від зупинки.">
+<title>Ariadna — карта-план психіатричної лікарні</title>
+<link rel="icon" type="image/svg+xml" href="brand/ariadna-favicon.svg">
+<link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
+<link rel="preload" href="fonts/FixelText-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/FixelText-Medium.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Fixel (MacPaw × AlfaBravo, SIL OFL 1.1) — лише українська й латиниця, файли в папці fonts */
+@font-face{font-family:"Fixel Text";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/FixelText-Regular.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/FixelText-Medium.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/FixelText-SemiBold.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:700;font-style:normal;font-display:swap;src:url(fonts/FixelText-Bold.woff2) format("woff2")}
+/* Ariadna. Ідея: карта на весь екран і завжди головна; над нею — лише скляні елементи керування.
+   Питання «Куди вам потрібно?» відкривається скляним вікном і саме зникає після вибору. */
+:root{
+  --bg:#eef0ea; --ink:#16181a; --muted:#5c6166; --faint:#7a8086;
+  --accent:#222b31; --accent-ink:#f3efe6; --accent-soft:rgba(34,43,49,.08);
+  --thread:#94702f; --thread-soft:rgba(148,112,47,.2); --case:#ffffff; --key-b:#2c3236; --key-t:#ffffff;
+  --glass-tint:rgba(255,255,255,.66); --glass-glow:rgba(255,255,255,.75);
+  --rim-hi:rgba(255,255,255,.95); --rim-mid:rgba(255,255,255,.45); --rim-lo:rgba(255,255,255,.14);
+  --btn-glass:rgba(255,255,255,.62); --btn-glass-hi:rgba(255,255,255,.88); --btn-in:rgba(22,24,26,.06);
+  --btn-sheen:linear-gradient(155deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.3) 44%,rgba(255,255,255,0) 72%);
+  --shadow:0 1px 2px rgba(20,22,24,.06),0 22px 50px -14px rgba(20,22,24,.28);
+  --line:rgba(22,24,26,.09);
+  /* map */
+  --land:#eef0ea; --park:#d9e7cf; --park-edge:#c9dcbc; --terr:#f8f7f1; --terr-edge:#c9cfc7;
+  --road:#ffffff; --road-edge:#d3d8d2; --major:#f6e7ad; --major-edge:#e2cf86; --path:#b5bcb6; --steps:#8d958f; --lawn:#d4e5c6; --lawn-edge:#c4dab4; --gate:#5d4c3c;
+  --ctx:#dfe1db; --ctx-edge:#cfd2cb;
+  --r-grey:#c4c9cb; --r-graph:#9aa0a4; --r-blue:#c3cfd8; --r-terra:#d3a594; --r-green:#a9cbb3; --r-dgreen:#7fa48d; --r-white:#f1ece0; --r-sage:#bcc7bb;
+  --contour:#bba98c; --hach:#97815f; --relief:.9; --wall:#8c7a63; --dome1:#7fd0b4; --dome2:#1f7d63; --dome3:#0d4a3a;
+  --b-edge:rgba(40,46,50,.28); --b-shadow:rgba(30,36,40,.13); --hi:rgba(30,36,40,.09);
+  --label:#2c3236; --label-halo:rgba(248,247,241,.92);
+  /* «Чіткий» (обрано 16.11.2026): контрастніші газон, доріжки й корпуси — карту читають надворі, на сонці */
+  --bg:#e8eae4;--land:#e8eae4;--lawn:#b9d7a0;--lawn-edge:#9fc685;--park:#c4dcae;--park-edge:#a9cb8f;--road:#ffffff;--road-edge:#99a39b;--terr-edge:#76847a;--ctx:#d7dad3;--ctx-edge:#b9bdb5;--r-grey:#a8afb3;--r-graph:#7c848a;--r-blue:#a2b4c2;--r-terra:#c8876f;--r-green:#8cb999;--r-dgreen:#5c8d6f;--r-sage:#9fb19f;--b-edge:rgba(16,20,24,.6);--label:#0d1012;--major:#f3d97c;--major-edge:#cdb056;--steps:#5f6862;--wall:#6f5e48;--gate:#3d3026;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){html:not(.light){
+  --bg:#0e1316; --ink:#eceae5; --muted:#a3a8ae; --faint:#8d939a;
+  --accent:#cdaa62; --accent-ink:#222b31; --accent-soft:rgba(205,170,98,.16);
+  --thread:#cdaa62; --thread-soft:rgba(205,170,98,.22); --case:#0e1316; --key-b:#e3e6e4; --key-t:#15181b;
+  --glass-tint:rgba(30,35,41,.6); --glass-glow:rgba(255,255,255,.09);
+  --rim-hi:rgba(255,255,255,.55); --rim-mid:rgba(255,255,255,.16); --rim-lo:rgba(255,255,255,.05);
+  --btn-glass:rgba(255,255,255,.08); --btn-glass-hi:rgba(255,255,255,.14); --btn-in:rgba(255,255,255,.08);
+  --btn-sheen:linear-gradient(155deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.04) 44%,rgba(255,255,255,0) 72%);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 26px 60px -18px rgba(0,0,0,.75);
+  --line:rgba(255,255,255,.09);
+  --land:#11171b; --park:#15241c; --park-edge:#1b2e23; --terr:#182025; --terr-edge:#2c383e;
+  --road:#2f3a41; --road-edge:#11171b; --major:#4e4a2f; --major-edge:#3a3722; --path:#55626a; --steps:#7d8a92;
+  --ctx:#1e262b; --ctx-edge:#273036;
+  --r-grey:#4c565c; --r-graph:#3b4247; --r-blue:#4f5e6a; --r-terra:#7c5246; --r-green:#3f6a52; --r-dgreen:#2f5141; --r-white:#6d6a60; --r-sage:#4c5a50;
+  --contour:#4a4438; --hach:#6f6350; --relief:1; --wall:#7a6c58; --dome1:#4fa98e; --dome2:#1a5f4c; --dome3:#0b3328;
+  --b-edge:rgba(0,0,0,.45); --b-shadow:rgba(0,0,0,.35); --hi:rgba(0,0,0,.18);
+  --label:#e3e6e4; --label-halo:rgba(17,23,27,.9);
+  color-scheme:dark;
+;--lawn:#24372c;--lawn-edge:#2d4235;--gate:#d8cab2;
+  /* «Графіт» (обрано 17.11.2026; до того був «Сланець») */
+  --bg:#222b31;--land:#232c32;--terr:#2c363d;--terr-edge:#46535b;--park:#26392e;--park-edge:#30473a;--road:#46535c;--road-edge:#232c32;--path:#74828a;--steps:#95a2a9;--ctx:#2f3940;--ctx-edge:#3a454d;--r-grey:#65717a;--r-graph:#4f5961;--r-blue:#677887;--r-terra:#8a5d4f;--r-green:#4a765d;--r-dgreen:#3a5d4b;--r-sage:#617366;--r-white:#7a776c;--glass-tint:rgba(44,52,59,.62);--contour:#5c5745;--hach:#776a56;--label-halo:rgba(35,44,50,.9);--relief:.6
+}}html.dark{
+  --bg:#0e1316; --ink:#eceae5; --muted:#a3a8ae; --faint:#8d939a;
+  --accent:#cdaa62; --accent-ink:#222b31; --accent-soft:rgba(205,170,98,.16);
+  --thread:#cdaa62; --thread-soft:rgba(205,170,98,.22); --case:#0e1316; --key-b:#e3e6e4; --key-t:#15181b;
+  --glass-tint:rgba(30,35,41,.6); --glass-glow:rgba(255,255,255,.09);
+  --rim-hi:rgba(255,255,255,.55); --rim-mid:rgba(255,255,255,.16); --rim-lo:rgba(255,255,255,.05);
+  --btn-glass:rgba(255,255,255,.08); --btn-glass-hi:rgba(255,255,255,.14); --btn-in:rgba(255,255,255,.08);
+  --btn-sheen:linear-gradient(155deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.04) 44%,rgba(255,255,255,0) 72%);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 26px 60px -18px rgba(0,0,0,.75);
+  --line:rgba(255,255,255,.09);
+  --land:#11171b; --park:#15241c; --park-edge:#1b2e23; --terr:#182025; --terr-edge:#2c383e;
+  --road:#2f3a41; --road-edge:#11171b; --major:#4e4a2f; --major-edge:#3a3722; --path:#55626a; --steps:#7d8a92;
+  --ctx:#1e262b; --ctx-edge:#273036;
+  --r-grey:#4c565c; --r-graph:#3b4247; --r-blue:#4f5e6a; --r-terra:#7c5246; --r-green:#3f6a52; --r-dgreen:#2f5141; --r-white:#6d6a60; --r-sage:#4c5a50;
+  --contour:#4a4438; --hach:#6f6350; --relief:1; --wall:#7a6c58; --dome1:#4fa98e; --dome2:#1a5f4c; --dome3:#0b3328;
+  --b-edge:rgba(0,0,0,.45); --b-shadow:rgba(0,0,0,.35); --hi:rgba(0,0,0,.18);
+  --label:#e3e6e4; --label-halo:rgba(17,23,27,.9);
+  color-scheme:dark;
+;--lawn:#24372c;--lawn-edge:#2d4235;--gate:#d8cab2;
+  /* «Графіт» (обрано 17.11.2026; до того був «Сланець») */
+  --bg:#222b31;--land:#232c32;--terr:#2c363d;--terr-edge:#46535b;--park:#26392e;--park-edge:#30473a;--road:#46535c;--road-edge:#232c32;--path:#74828a;--steps:#95a2a9;--ctx:#2f3940;--ctx-edge:#3a454d;--r-grey:#65717a;--r-graph:#4f5961;--r-blue:#677887;--r-terra:#8a5d4f;--r-green:#4a765d;--r-dgreen:#3a5d4b;--r-sage:#617366;--r-white:#7a776c;--glass-tint:rgba(44,52,59,.62);--contour:#5c5745;--hach:#776a56;--label-halo:rgba(35,44,50,.9);--relief:.6
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg)}
+body{position:fixed;inset:0;color:var(--ink);font:15px/1.45 "Fixel Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,a,input,label{touch-action:manipulation}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;-webkit-user-select:none;user-select:none}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- map ---------- */
+#map{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;background:var(--land)}
+#map.drag{cursor:grabbing}
+#map text{font-family:"Fixel Text",system-ui,sans-serif;paint-order:stroke;stroke:var(--label-halo);stroke-width:3.2px;stroke-linejoin:round;fill:var(--label);pointer-events:none}
+.land{fill:var(--land)} .park{fill:var(--park);stroke:var(--park-edge);stroke-width:1}
+.major-e{fill:none;stroke:var(--major-edge);stroke-linecap:round;stroke-linejoin:round}
+.major{fill:none;stroke:var(--major);stroke-linecap:round;stroke-linejoin:round}
+.terr{fill:var(--lawn);stroke:var(--terr-edge);stroke-width:1.6;stroke-dasharray:5 4}
+.ctx{fill:var(--ctx);stroke:var(--ctx-edge);stroke-width:.8}
+.rd-e{fill:none;stroke:var(--road-edge);stroke-width:8.4;stroke-linecap:round;stroke-linejoin:round}
+.rd{fill:none;stroke:var(--road);stroke-width:6.4;stroke-linecap:round;stroke-linejoin:round}
+.lawn{fill:var(--lawn);stroke:var(--lawn-edge);stroke-width:.5;stroke-linejoin:round}
+.fw-e{fill:none;stroke:var(--road-edge);stroke-width:3.9;stroke-linecap:round;stroke-linejoin:round}
+.fw{fill:none;stroke:var(--road);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.stp-b{fill:none;stroke:var(--road);stroke-width:3.6}
+.stp{fill:none;stroke:var(--steps);stroke-width:3.4;stroke-dasharray:1 1.3}
+.b{stroke:var(--b-edge);stroke-width:.7;stroke-linejoin:round;fill-rule:evenodd;transition:fill .3s,stroke .3s}
+.b.r-grey{fill:var(--r-grey)} .b.r-graph{fill:var(--r-graph)} .b.r-blue{fill:var(--r-blue)} .b.r-terra{fill:var(--r-terra)}
+.b.r-green{fill:var(--r-green)} .b.r-dgreen{fill:var(--r-dgreen)} .b.r-white{fill:var(--r-white)} .b.r-sage{fill:var(--r-sage)}
+.relief{opacity:var(--relief);pointer-events:none} .cont{fill:none;stroke:var(--contour);stroke-width:.7;opacity:.55} .cont.i{stroke-width:1.2;opacity:.75}
+.hach{fill:none;stroke:var(--hach);stroke-width:1.15;stroke-linecap:round;opacity:.6}
+.cliff{fill:none;stroke:var(--wall);stroke-width:1.4;stroke-linejoin:round} .cliff-t{fill:none;stroke:var(--wall);stroke-width:1;opacity:.85}
+.shd{fill:#000;pointer-events:none} .shg{opacity:.16} .shg.ctxs{opacity:.08}
+.fac{pointer-events:none;stroke:rgba(0,0,0,.14);stroke-width:.35;stroke-linejoin:round}
+.hib{stroke:var(--b-edge);stroke-width:.6;pointer-events:none}
+.dome{pointer-events:none}
+.b.priv{opacity:.75}
+.hi{fill:var(--hi);pointer-events:none}
+.ring{fill:none;stroke:var(--b-edge);stroke-width:.6;pointer-events:none}
+.b.on{stroke:var(--thread);stroke-width:2.2}
+.pave{fill:var(--road);stroke:var(--road-edge);stroke-width:.3;pointer-events:none}
+.slope{pointer-events:none}.slp-t{fill:none;stroke:var(--hach);stroke-width:.3;stroke-linecap:round;opacity:.8}
+.bench{fill:var(--wall);pointer-events:none}
+.gz circle{fill:var(--r-white);stroke:var(--b-edge);stroke-width:.35}.gz .gz-c{fill:var(--b-edge);stroke:none}
+.dar{fill:var(--accent);fill-opacity:.1;stroke:var(--thread);stroke-width:2.2;stroke-linejoin:round;pointer-events:none}.dar-g{fill:none;stroke:var(--thread);stroke-width:7;opacity:.22;stroke-linejoin:round;pointer-events:none}
+.glow{fill:none;stroke:var(--thread);stroke-width:7;opacity:.22;pointer-events:none;stroke-linejoin:round}
+/* проходи крізь будівлі — відкриті галереї під верхнім поверхом */
+.gal-b{fill:none;stroke:var(--terr);stroke-width:6.5;stroke-linecap:butt;pointer-events:none}
+.gal-d{fill:none;stroke:var(--steps);stroke-width:.8;stroke-dasharray:1.6 1.4;pointer-events:none}
+.priv-line{fill:none;stroke:var(--faint);stroke-width:1.2;stroke-dasharray:2 2;opacity:.8}
+/* маршрут — «нитка Аріадни» */
+.route{fill:none;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.route.case{stroke:var(--case);stroke-width:var(--rw-case,5);opacity:.5}
+.route.halo{stroke:var(--thread-soft);stroke-width:var(--rw-halo,11)}
+.route.main{stroke:var(--thread);stroke-width:var(--rw-main,2.8);opacity:.82}
+.route.flow{stroke:rgba(255,255,255,.9);stroke-width:var(--rw-flow,1);stroke-dasharray:2 12;animation:flow 1.1s linear infinite}
+.route.last{stroke:var(--thread);stroke-width:var(--rw-last,1.8);stroke-dasharray:2 5;opacity:.85}
+@keyframes flow{to{stroke-dashoffset:-14}}
+.draw{animation:draw 1s cubic-bezier(.32,.72,0,1) both}
+@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+/* мітки (постійний розмір незалежно від масштабу) */
+.lb{pointer-events:none}
+.stn text{font-size:11.5px;font-weight:500;fill:var(--muted);letter-spacing:.02em}
+.badge circle{fill:#fff;stroke:var(--b-edge);stroke-width:1}
+.badge text{font-size:12.5px;font-weight:700;text-anchor:middle;dominant-baseline:central;stroke:none;fill:#1d2226}
+.badge.key circle{fill:var(--key-b);stroke:rgba(255,255,255,.9);stroke-width:1.6}
+.badge.key text{fill:var(--key-t)}
+.badge.sec circle{fill:rgba(255,255,255,.88)} .badge.sec text{font-size:10.5px;font-weight:600;fill:#4b5257}
+.badge.on circle{fill:var(--accent);stroke:var(--thread);stroke-width:2.6}
+.badge.on text{fill:var(--accent-ink)}
+.badge .pulse{fill:none;stroke:var(--thread);stroke-width:2;opacity:0}
+.badge.on.pl .pulse{animation:pulse 2.2s cubic-bezier(.2,.7,.3,1) infinite}
+@keyframes pulse{0%{r:13;opacity:.55}100%{r:30;opacity:0}}
+.poi .dot{fill:#fff;stroke:var(--b-edge);stroke-width:.8}
+.poi path{fill:none;stroke:#5b4c3f;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.poi.lm path{stroke:#222b31}
+.poi .f{fill:#5b4c3f;stroke:none}.poi.lm .f{fill:#222b31}
+#map.mid .amen{display:none}
+.poi text{font-size:11px;font-weight:500}
+.hit{fill:transparent;stroke:none;pointer-events:all;cursor:pointer}
+.gate-b{stroke:var(--gate);stroke-width:1.3}
+.gate-p{fill:var(--gate)}
+.stop rect{fill:#2f6db5;stroke:#fff;stroke-width:1.6}
+.stop path{fill:#fff}
+.stop text{font-size:11.5px;font-weight:600}
+.stop.on rect{fill:var(--thread);stroke-width:2.4}
+.stop.here rect{fill:var(--accent)}.stop.here path,.stop.on path{fill:var(--accent-ink)}
+.me .dot{fill:#2f7cf6;stroke:#fff;stroke-width:2.6}
+.me .wave{fill:#2f7cf6;opacity:.25;animation:wave 2s ease-out infinite}
+.acc{fill:rgba(47,124,246,.1);stroke:rgba(47,124,246,.4);stroke-width:.8;pointer-events:none}
+.from .geo .bus{background:#2f7cf6}
+.pin .core{fill:var(--thread);stroke:#fff;stroke-width:2.4}
+.pin .wave{fill:var(--thread);opacity:.25;animation:wave 2s ease-out infinite}
+@keyframes wave{0%{r:7;opacity:.35}100%{r:24;opacity:0}}
+#map.far .lb.sec,#map.far .poi text,#map.far .stop text{display:none}
+#map.mid .poi text{display:none}
+.door .dr{fill:var(--key-b);stroke:var(--key-t);stroke-width:1.4}
+.door .dg{fill:none;stroke:var(--key-t);stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+.door text{font-size:10.5px;font-weight:600}
+.door.on .dr{fill:var(--thread);stroke:#fff}
+.door.on .dg{stroke:var(--accent-ink)}
+#map.mid .door:not(.on) text{display:none}
+#map.far .door.on{display:inline}
+
+/* ---------- glass ---------- */
+.glass{position:relative;color:var(--ink);background:radial-gradient(120% 60% at 10% 0%,var(--glass-glow),transparent 62%),var(--glass-tint);
+  -webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:var(--shadow)}
+.glass::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;padding:1.2px;z-index:3;
+  background:linear-gradient(135deg,var(--rim-hi) 0%,var(--rim-mid) 12%,var(--rim-lo) 34%,var(--rim-lo) 66%,var(--rim-mid) 88%,var(--rim-hi) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.glass{background:color-mix(in srgb,var(--bg) 94%,transparent)}}
+@media (prefers-reduced-transparency:reduce){.glass{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
+.gbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;min-height:44px;padding:0 14px;font-weight:600;
+  background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line),0 8px 20px -12px rgba(0,0,0,.35);transition:background-color .15s,transform .12s;
+  -webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);color:var(--ink);text-decoration:none}
+@media (hover:hover){.gbtn:hover{background:var(--btn-sheen),var(--btn-glass-hi)}}
+.gbtn:active,.tile:active,.num:active,.from button:active,.dk:active,.found button:active{transform:scale(.97)}
+.gbtn svg{width:20px;height:20px;flex:none}
+.gbtn.prime{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px rgba(20,26,30,.5)}
+.gbtn.thread{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 24px -12px rgba(20,26,30,.5)}
+
+/* ---------- нижні кнопки «Куди» і «Звідки» та смужка з відповіддю ---------- */
+.mast{position:absolute;z-index:14;transition:opacity .2s,transform .2s;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:15px;pointer-events:none;max-width:calc(100vw - 92px)}
+body.popping .mast{opacity:0;transform:translateY(-6px)}
+.mast .bi{width:34px;height:34px;flex:none;border-radius:9px}
+.mast .bt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.mast .bw{display:block;width:auto;height:13px}
+.mast .bs{font-size:11px;line-height:1.15;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock{position:absolute;z-index:32;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.dock>*{pointer-events:auto}
+.res{display:flex;align-items:center;gap:10px;border-radius:22px;padding:8px 8px 8px 16px;min-height:60px;cursor:pointer;animation:rise .45s cubic-bezier(.32,.72,0,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.res .tx{flex:1;min-width:0}
+.res b{display:block;font-size:18px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res .s{display:flex;align-items:center;gap:3px;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.res .s span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.res .s svg{width:13px;height:13px;flex:none;transition:transform .3s}
+.res[aria-expanded=true] .s svg{transform:rotate(180deg)}
+.res[aria-expanded=true],.dk[aria-expanded=true]{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--accent)}
+.dk-row{display:flex;gap:8px}
+.dk{flex:1;min-width:0;display:flex;align-items:center;gap:8px;text-align:left;border-radius:22px;padding:9px 12px 9px 9px;min-height:58px;transition:transform .12s,box-shadow .2s}
+.dk.to{flex:1.3}
+.dk.frm{padding-right:10px}
+@media (max-width:379px){.dk.to{flex:1.45;padding-right:10px}.dk .v{font-size:14px}.dk.empty .v{font-size:15px}.dk.to .ic{width:32px;height:32px;border-radius:11px}.dk.to .ic svg{width:18px;height:18px}.dk.frm .ic{display:none}.dk.frm{padding-left:14px}}
+.dk.frm .v{font-size:14px}
+.note a,.pk-note a{color:var(--accent);text-underline-offset:2px}
+.dk .ic{width:36px;height:36px;flex:none;border-radius:13px;display:grid;place-items:center;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line);color:var(--accent)}
+.dk .ic svg{width:20px;height:20px}
+.dk .ic.sm{width:30px;height:30px;border-radius:10px;color:var(--muted)}
+.dk .ic.sm svg{width:17px;height:17px}
+.dk .ic.bus{background:#2f6db5;color:#fff;box-shadow:none}
+.dk .ic.me{background:#2f7cf6;color:#fff;box-shadow:none}
+.dk .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.dk .c{font-size:11.5px;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk .v{font-size:15px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk.empty .c{display:none}
+.dk.empty .v{font-size:16px}
+.dk.ask{box-shadow:var(--shadow),inset 0 0 0 1.6px var(--accent);animation:nudge 1.6s ease-in-out 2}
+@keyframes nudge{0%,100%{transform:none}50%{transform:translateY(-3px)}}
+.logo{width:42px;height:42px;flex:none;border-radius:11px;display:grid;place-items:center;overflow:hidden}.logo img{width:42px;height:42px;display:block}.brand .wm{display:block;width:auto;height:15px;margin:2px 0 5px}
+.logo svg{width:28px;height:28px}
+
+/* ---------- map controls ---------- */
+.ctl{position:absolute;z-index:15;right:max(12px,env(safe-area-inset-right));display:flex;flex-direction:column;gap:8px;transition:bottom .45s cubic-bezier(.32,.72,0,1),opacity .2s}
+.ctl .gbtn{width:46px;height:46px;padding:0;border-radius:16px}
+.ctl .grp{display:flex;flex-direction:column;border-radius:16px;overflow:hidden}
+.ctl .grp .gbtn{border-radius:0;box-shadow:none}
+.ctl .grp .gbtn+.gbtn{border-top:1px solid var(--line)}
+.ctl .grp{box-shadow:0 0 0 .5px var(--line),0 8px 20px -12px rgba(0,0,0,.35)}
+
+/* ---------- віконця ---------- */
+.scrim{position:absolute;inset:0;z-index:25;background:rgba(10,14,16,.14);opacity:0;pointer-events:none;transition:opacity .3s}
+body.popping .scrim{opacity:1;pointer-events:auto}
+.pop{outline:none;position:absolute;z-index:30;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));
+  bottom:calc(var(--dockh,70px) + max(12px,env(safe-area-inset-bottom)) + 10px);
+  max-height:calc(100dvh - var(--dockh,70px) - max(12px,env(safe-area-inset-bottom)) - max(12px,env(safe-area-inset-top)) - 22px);
+  border-radius:26px;display:flex;flex-direction:column;transform-origin:50% 100%;opacity:0;transform:translateY(14px) scale(.96);pointer-events:none;visibility:hidden;
+  transition:opacity .22s ease-out,transform .42s cubic-bezier(.32,.72,0,1),visibility 0s .42s}
+.pop.on{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition:opacity .22s ease-out,transform .46s cubic-bezier(.32,.72,0,1),visibility 0s}
+.pop.top{bottom:auto;top:calc(var(--vvt,0px) + max(12px,env(safe-area-inset-top)));max-height:calc(var(--vvh,100dvh) - max(12px,env(safe-area-inset-top)) - 12px);transform-origin:50% 0}
+.brand{display:flex;align-items:center;gap:12px;margin:0 2px 14px;padding-right:46px}
+.pclose{position:absolute;z-index:4;top:12px;right:12px;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:var(--muted);background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line);transition:transform .12s}
+.pclose:active{transform:scale(.94)}
+.pclose svg{width:19px;height:19px}
+.way b{color:var(--ink);font-weight:700}
+.brand b{display:block;font-size:17px;font-weight:700;letter-spacing:.01em;line-height:1.2}
+.brand small{display:block;font-size:12.5px;color:var(--muted)}
+.srch{display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:0 6px 0 14px;height:50px;border-radius:17px;background:var(--btn-in);box-shadow:inset 0 0 0 1px var(--line);cursor:text;transition:box-shadow .2s}
+.srch>svg{width:19px;height:19px;flex:none;color:var(--muted)}
+.srch input{flex:1;min-width:0;height:100%;border:0;background:none;outline:none;font:inherit;font-size:16px;color:var(--ink);-webkit-appearance:none;appearance:none}
+.srch input::placeholder{color:var(--faint)}
+.srch:focus-within{box-shadow:inset 0 0 0 1.6px var(--accent)}
+.srch .x{width:38px;height:38px;border-radius:12px;display:none;place-items:center;color:var(--muted)}
+.srch .x svg{width:18px;height:18px}
+.srch.has .x{display:grid}
+.found{display:flex;flex-direction:column;gap:6px}
+.found button{display:flex;align-items:center;gap:12px;text-align:left;padding:9px 12px;border-radius:16px;background:var(--btn-in);min-height:54px;transition:transform .12s}
+.found .n{width:36px;height:36px;flex:none;border-radius:12px;display:grid;place-items:center;background:var(--key-b);color:var(--key-t);font-weight:700;font-size:14.5px;font-variant-numeric:tabular-nums}
+.found .n.g{background:var(--accent-soft);color:var(--accent)}
+.found .n svg{width:19px;height:19px}
+.found b{display:block;font-size:14.5px;font-weight:600;line-height:1.25}
+.found small{display:block;font-size:12.5px;color:var(--muted);line-height:1.3}
+.found .pk-note{margin:2px 4px 10px}
+.pk-body{overflow:auto;overscroll-behavior:contain;padding:16px 14px 14px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.pk-h{font-size:12.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:2px 4px 10px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.tile{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:18px;min-height:58px;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line);transition:transform .12s,background-color .15s}
+.tile .ic{width:36px;height:36px;flex:none;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.tile .ic svg{width:20px;height:20px}
+.tile b{display:block;font-size:14px;font-weight:600;line-height:1.2}
+.tile small{display:block;font-size:12px;color:var(--muted);line-height:1.25;margin-top:2px}
+.tile.wide{grid-column:1/-1}
+.tile[aria-pressed=true]{box-shadow:inset 0 0 0 1.6px var(--accent);background:var(--btn-sheen),var(--accent-soft)}
+.nums{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.num{height:48px;border-radius:14px;font-weight:600;font-size:16px;font-variant-numeric:tabular-nums;background:var(--btn-sheen),var(--btn-glass);box-shadow:0 0 0 .5px var(--line);transition:transform .12s}
+.num[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+@media (hover:hover){.tile:hover,.num:hover{background:var(--btn-sheen),var(--btn-glass-hi)}.num[aria-pressed=true]:hover{background:var(--accent)}}
+.pk-note{font-size:12.5px;color:var(--muted);margin:14px 4px 2px;line-height:1.45}
+.pk-note a{color:inherit}
+
+/* ---------- вміст віконець ---------- */
+.head{display:flex;align-items:center;gap:12px}
+.kb{width:50px;height:50px;flex:none;border-radius:16px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:20px;box-shadow:0 10px 22px -12px rgba(20,26,30,.55)}
+.kb small{display:block;font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-bottom:-6px;text-align:center}
+.kb.none{background:var(--btn-in);color:var(--muted);box-shadow:none;font-size:18px}
+.head .tx{flex:1;min-width:0}
+.head .t{font-weight:650;font-weight:600;font-size:17px;line-height:1.25}
+.head .d{font-size:13px;color:var(--muted);line-height:1.35;margin-top:2px}
+.blk{margin-top:16px}
+.blk h3{font-size:12.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 2px 8px}
+.from{display:flex;flex-direction:column;gap:6px}
+.from button{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:16px;background:var(--btn-in);transition:transform .12s,background-color .15s}
+.from button[aria-pressed=true]{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.from .bus{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;background:#2f6db5;color:#fff}
+.from .here .bus{background:var(--accent);color:var(--accent-ink)}
+.from .bus svg{width:17px;height:17px}
+.from .ft{flex:1;min-width:0}
+.from .ft b{display:block;font-size:14px;font-weight:600;line-height:1.25}
+.from .ft small{display:block;font-size:12px;color:var(--muted);line-height:1.3}
+.from .m{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.from button[aria-pressed=true] .m{color:var(--accent)}
+.sw{display:flex;align-items:center;gap:12px;padding:12px 4px 2px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.sw input{position:absolute;opacity:0;pointer-events:none}
+.sw .k{width:46px;height:28px;flex:none;border-radius:20px;background:var(--btn-in);box-shadow:inset 0 0 0 1px var(--line);position:relative;transition:background-color .2s}
+.sw .k::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+.sw input:checked+.k{background:var(--accent)}
+.sw input:checked+.k::after{transform:translateX(18px)}
+.sw input:focus-visible+.k{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:14px;line-height:1.5;margin:12px 2px 0}
+.note{font-size:13px;color:var(--muted);line-height:1.45;margin:10px 2px 0}
+.tels{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tels .gbtn{font-variant-numeric:tabular-nums;font-weight:600}
+.acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.foot{font-size:11.5px;color:var(--faint);line-height:1.45;margin:18px 2px 4px}
+.foot a{color:inherit}
+
+/* ---------- toast ---------- */
+.toast{position:absolute;z-index:40;left:50%;top:max(12px,env(safe-area-inset-top));width:max-content;max-width:min(92vw,420px);padding:10px 16px;border-radius:16px;font-size:14px;line-height:1.4;
+  transform:translate(-50%,-8px);opacity:0;pointer-events:none;transition:opacity .2s,transform .35s cubic-bezier(.32,.72,0,1)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast b{display:block;font-weight:600}
+.toast span{color:var(--muted);font-size:13px}
+
+/* ---------- legend ---------- */
+.legend{position:absolute;z-index:35;right:max(12px,env(safe-area-inset-right));width:min(310px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;border-radius:22px;padding:14px 16px;font-size:13.5px;
+  opacity:0;transform:scale(.94);transform-origin:100% 100%;pointer-events:none;visibility:hidden;transition:opacity .2s,transform .4s cubic-bezier(.32,.72,0,1),visibility 0s .4s}
+.legend.on{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition:opacity .2s,transform .4s cubic-bezier(.32,.72,0,1),visibility 0s}
+.legend h3{margin:0 0 8px;font-size:12.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.legend ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.legend li{display:flex;align-items:center;gap:10px}
+.legend svg{width:30px;height:16px;flex:none}
+
+/* ---------- desktop ---------- */
+@media (min-width:900px){
+  .dock{left:16px;right:auto;width:400px;bottom:16px}
+  .pop,.pop.top{left:16px;right:auto;width:400px;top:auto;bottom:calc(var(--dockh,70px) + 26px);max-height:calc(100dvh - var(--dockh,70px) - 42px);transform-origin:50% 100%}
+  .ctl{right:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+/* ---------- v14 ---------- */
+:root{--on-thread:#fff}
+@media (prefers-color-scheme:dark){html:not(.light){--on-thread:#222b31}}html.dark{--on-thread:#222b31}
+/* віконця прозоріші (кнопки всередині — як були) */
+.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(255,255,255,.4);--glass-glow:rgba(255,255,255,.42)}
+@media (prefers-color-scheme:dark){html:not(.light) .pop.glass,html:not(.light) .legend.glass,html:not(.light) .toast.glass{--glass-tint:rgba(44,52,59,.42);--glass-glow:rgba(255,255,255,.05)}}html.dark .pop.glass,html.dark .legend.glass,html.dark .toast.glass{--glass-tint:rgba(44,52,59,.42);--glass-glow:rgba(255,255,255,.05)}
+/* шапка */
+.mast{pointer-events:auto;gap:0;transition:opacity .2s,transform .2s,padding .6s cubic-bezier(.32,.72,0,1)}
+.mast .bi{display:block;padding:0;border:0;background:none;border-radius:9px;cursor:pointer;flex:none}
+.mast .bi img{display:block;width:34px;height:34px;border-radius:9px}
+.mast .bt{gap:3px;max-width:260px;margin-left:10px;overflow:hidden;transition:max-width .6s cubic-bezier(.32,.72,0,1),margin .6s cubic-bezier(.32,.72,0,1),opacity .35s}
+.mast .bh{font-size:15.5px;font-weight:700;letter-spacing:.005em;line-height:1.15;white-space:nowrap}
+.mast .bs{display:flex;align-items:center;gap:4px}
+.mast .bw{height:8px;width:auto;display:block}
+.mast.mini{padding-right:6px}
+.mast.mini .bt{max-width:0;margin-left:0;opacity:0}
+.osm{position:absolute;z-index:14;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));font-size:10.5px;line-height:1;padding:5px 8px;border-radius:9px;color:var(--muted);background:var(--glass-tint);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);text-decoration:none;opacity:0;pointer-events:none;transition:opacity .5s}
+.osm.on{opacity:1;pointer-events:auto}
+body.popping .osm{opacity:0;pointer-events:none}
+/* віконце про вхід: на нього можна натискати, карта під ним не реагує */
+.toast.on{pointer-events:auto;cursor:pointer}
+.toast .ta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px}
+.toast .ta small{font-size:12.5px;color:var(--muted);margin-right:2px}
+.toast .ta .gbtn{min-height:38px;padding:0 13px;font-size:14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+#map .door text{pointer-events:auto}
+/* номер обраного відділення пульсує біля дверей */
+.dnum{transform-box:fill-box;transform-origin:center;animation:dnum 1.7s ease-in-out infinite}
+.dnum .dn-b{fill:var(--thread);stroke:#fff;stroke-width:1.6}
+#map .dnum text{font-size:12.5px;font-weight:700;text-anchor:middle;dominant-baseline:central;fill:var(--on-thread);stroke:none}
+.dn-w{fill:none;stroke:var(--thread);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:dnw 1.7s ease-out infinite}
+@keyframes dnum{0%,100%{transform:scale(1)}50%{transform:scale(1.17)}}
+@keyframes dnw{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.9);opacity:0}}
+#map .door.np text{display:none}
+/* нижня панель */
+.res-row{display:flex;align-items:stretch;position:relative;z-index:1}
+.res-row[hidden]{display:none}
+.res-row .res{flex:1;min-width:0}
+.dk.mini{flex:none;width:0;min-height:0;padding:0;margin-right:0;justify-content:center;overflow:hidden;opacity:0;transform:scale(.5);pointer-events:none;color:var(--accent)}
+.dk.mini svg{width:25px;height:25px;flex:none}
+.res .ft{display:none;font-size:12px;color:var(--muted);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res .ft i{font-style:normal;font-weight:700;color:var(--thread);margin:0 3px}
+/* довгі переходи — лише поки панель згортається чи розгортається (клас anim), щоб натискання кнопок лишалось швидким */
+.dk-row{position:relative;z-index:0}
+.dk-row .dk{transform-origin:0 100%}
+.dock.anim .dk-row{transition:margin .95s cubic-bezier(.45,0,.2,1),visibility 0s}
+.dock.anim .dk-row .dk{transition:transform .95s cubic-bezier(.45,0,.2,1),opacity .55s .4s}
+.dock.anim .dk.mini{transition:width .95s cubic-bezier(.45,0,.2,1),margin .95s cubic-bezier(.45,0,.2,1),opacity .45s,transform .95s cubic-bezier(.45,0,.2,1)}
+#go.on{background:var(--btn-sheen),var(--btn-glass);color:var(--ink);box-shadow:0 0 0 .5px var(--line)}
+@media (max-width:899px){
+  .dock.min .dk.mini{width:60px;margin-right:8px;opacity:1;transform:none;pointer-events:auto}
+  .dock.anim.min .dk.mini{transition-delay:.35s,.35s,.5s,.35s}
+  .dock.min .res .ft{display:block}
+  /* ряд кнопок лишається внизу, а банер з’їжджає на його місце; кнопки стискаються в лівий нижній кут, звідки виростає одна кнопка */
+  .dock.min .dk-row{margin-top:-66px;pointer-events:none;visibility:hidden}
+  .dock.anim.min .dk-row{transition:margin .95s cubic-bezier(.45,0,.2,1) .15s,visibility 0s 1.2s}
+  .dock.min #bTo{transform:scale(.3);opacity:0}
+  .dock.min #bFrom{transform:translateX(-135%) scale(.3);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){.dnum,.dn-w{animation:none}.dn-w{display:none}}
+/* ---------- v15 ---------- */
+.tun-e{fill:none;stroke:var(--road-edge);stroke-width:3.9;stroke-dasharray:1.6 1.2}
+.tun{fill:none;stroke:var(--road);stroke-width:2.5;opacity:.8}
+.route.drive{stroke:var(--thread);stroke-width:var(--rw-main,2.8);stroke-dasharray:6 4;opacity:.9}
+.lb.park .pk{fill:#fff;stroke:var(--thread);stroke-width:1.8}
+.lb.park .pk-c{fill:none;stroke:#222b31;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
+.from .car-h{font-size:12.5px;color:var(--muted);margin:2px 4px 8px}
+/* ---------- v16 ---------- */
+/* на авто: відрізок машиною — як дорога (смуга з розміткою), пішки — золота нитка */
+.route.drive-b{stroke:#222b31;stroke-width:calc(var(--rw-main,2.8) * 2.6);opacity:.78}
+.route.drive{stroke:#fff;stroke-width:calc(var(--rw-main,2.8) * .55);stroke-dasharray:4 3.2;opacity:.95}
+@media (prefers-color-scheme:dark){html:not(.light) .route.drive-b{stroke:#f3efe6;opacity:.85}html:not(.light) .route.drive{stroke:#222b31}}html.dark .route.drive-b{stroke:#f3efe6;opacity:.85}html.dark .route.drive{stroke:#222b31}
+.lb.carin .ci{fill:#222b31;stroke:#fff;stroke-width:1.6}
+.lb.carin .cc{fill:none;stroke:#fff;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
+@media (prefers-color-scheme:dark){html:not(.light) .lb.carin .ci{fill:#f3efe6;stroke:#222b31}html:not(.light) .lb.carin .cc{stroke:#222b31}}html.dark .lb.carin .ci{fill:#f3efe6;stroke:#222b31}html.dark .lb.carin .cc{stroke:#222b31}
+#detBody .sw{padding-top:10px}
+/* шапка з логотипом не налазить на віконце-підказку: поки воно відкрите, шапка й © OpenStreetMap ховаються */
+body.toasting .mast,body.toasting .osm{opacity:0;transform:translateY(-6px);pointer-events:none}
+#map .lb.park .pk-t{font-size:11.5px;font-weight:800;text-anchor:middle;dominant-baseline:central;fill:#222b31;stroke:none}
+/* ---------- v17 ---------- */
+.osm-l{margin:8px 0 0;font-size:10.5px;text-align:right}.osm-l a{color:var(--muted);text-decoration:none}
+/* шапка: «Карта-план психіатричної лікарні» довша за стару назву */
+.mast .bh{font-size:14px;line-height:1.18}
+.mast .bt{max-width:220px}
+/* віконця з'являються й ховаються плавніше */
+.scrim{transition:opacity .45s ease}
+.pop{transition:opacity .32s cubic-bezier(.4,0,1,1),transform .42s cubic-bezier(.4,0,.9,.6),visibility 0s .42s}
+.pop.on{transition:opacity .42s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.16,1,.3,1),visibility 0s}
+.legend{transition:opacity .3s cubic-bezier(.4,0,1,1),transform .4s cubic-bezier(.4,0,.9,.6),visibility 0s .4s}
+.legend.on{transition:opacity .4s cubic-bezier(.2,.8,.2,1),transform .58s cubic-bezier(.16,1,.3,1),visibility 0s}
+/* щоб телефон не грівся: «вічні» анімації зупиняються за кілька секунд */
+.route.flow{animation-iteration-count:8}
+.badge.on.pl .pulse,.pin .wave,.dnum,.dn-w{animation-iteration-count:6}
+/* ---------- v18 ---------- */
+/* утримання пункту в «Куди»: пункт повільно втискається, потім над ним спливає «Поділитися» */
+#pTo .pk-body button{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+#pTo .lp-hold{transform:scale(.94)!important;transition:transform .48s cubic-bezier(.3,.6,.2,1)!important}
+.lp{position:fixed;left:0;top:0;z-index:80;opacity:0;pointer-events:none;transform-origin:50% 100%;
+  transform:translate(-50%,calc(-100% - 12px)) scale(.55);transition:opacity .16s ease,transform .2s ease}
+.lp.on{opacity:1;pointer-events:auto;transform:translate(-50%,calc(-100% - 12px)) scale(1);transition:opacity .2s ease,transform .42s cubic-bezier(.2,1.5,.35,1)}
+.lp.below{transform-origin:50% 0;transform:translate(-50%,12px) scale(.55)}
+.lp.below.on{transform:translate(-50%,12px) scale(1)}
+.lp-b{display:flex;align-items:center;gap:8px;padding:11px 18px 11px 14px;border-radius:999px;font:inherit;font-weight:600;font-size:15px;white-space:nowrap;
+  background:var(--accent);color:var(--accent-ink);box-shadow:0 14px 34px -10px rgba(20,26,30,.55),0 0 0 .5px rgba(0,0,0,.08)}
+.lp-b small{font-weight:500;opacity:.72;font-size:13px}
+.lp::after{content:"";position:absolute;left:calc(50% + var(--ax,0px));bottom:-5px;width:12px;height:12px;margin-left:-6px;background:var(--accent);transform:rotate(45deg);border-radius:2px}
+.lp.below::after{bottom:auto;top:-5px}
+.lp-b svg{width:18px;height:18px;flex:none}
+@media (prefers-reduced-motion:reduce){.lp,.lp.on{transition:opacity .15s}}
+/* відвідування: розклад і що зараз */
+.vis{margin:12px 0 0;padding:11px 13px;border-radius:16px;background:var(--btn-in);box-shadow:0 0 0 .5px var(--line)}
+.vis b{display:block;font-size:14px}
+.vis .vs{display:inline-flex;align-items:center;gap:6px;margin:6px 0 2px;font-size:13px;font-weight:600}
+.vis .vs::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.vis .vs.ok{color:#2f8f4e}.vis .vs.no{color:#b5462f}
+.vis p{margin:4px 0 0;font-size:13px;line-height:1.45;color:var(--muted)}
+@media (prefers-color-scheme:dark){html:not(.light) .vis .vs.ok{color:#5fc77f}html:not(.light) .vis .vs.no{color:#f08a6c}}html.dark .vis .vs.ok{color:#5fc77f}html.dark .vis .vs.no{color:#f08a6c}
+/* перемикач теми: місяць — увімкнути темну, сонце — світлу */
+#thm .sun{display:none}
+@media (prefers-color-scheme:dark){html:not(.light) #thm .moon{display:none}html:not(.light) #thm .sun{display:block}}html.dark #thm .moon{display:none}html.dark #thm .sun{display:block}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
+/* ---------- v19: стадіон, футбольне поле, зебра ---------- */
+.trk{fill:#d9a387;stroke:#c68a6c;stroke-width:.6;pointer-events:none}
+.pitch{fill:#9dcc84;stroke:#f4f7f0;stroke-width:.7;pointer-events:none}
+.pitch-l{fill:none;stroke:#f4f7f0;stroke-width:.6;pointer-events:none}
+.zeb-b{fill:none;stroke:#4a535a;stroke-width:5.2;pointer-events:none}
+.zeb{fill:none;stroke:#fff;stroke-width:4.2;stroke-dasharray:.9 .9;pointer-events:none}
+@media (prefers-color-scheme:dark){html:not(.light) .trk{fill:#5b4036;stroke:#6e4c40}html:not(.light) .pitch{fill:#2f4b36;stroke:#7f9887}html:not(.light) .pitch-l{stroke:#7f9887}html:not(.light) .zeb-b{stroke:#141a1e}html:not(.light) .zeb{stroke:#cfd5d9}}html.dark .trk{fill:#5b4036;stroke:#6e4c40}html.dark .pitch{fill:#2f4b36;stroke:#7f9887}html.dark .pitch-l{stroke:#7f9887}html.dark .zeb-b{stroke:#141a1e}html.dark .zeb{stroke:#cfd5d9}
+/* ---------- v20 ---------- */
+.ctl{transition:opacity .2s}
+#resGo{display:flex;align-items:center;gap:5px;flex:none}
+.res .rx{width:36px;height:36px;min-height:36px;padding:0;border-radius:50%;color:var(--muted);flex:none}
+.res #go{padding:0 12px}
+@media (max-width:899px){.dock.min .res b{font-size:17px}}
+.res .rx svg{width:17px;height:17px}
+.res .rx:active{transform:scale(.94)}
+.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(255,255,255,.32);--glass-glow:rgba(255,255,255,.34);--glass-spec:rgba(255,255,255,.3);--rim-hi:rgba(255,255,255,1);--rim-mid:rgba(255,255,255,.6);--rim-lo:rgba(255,255,255,.2);background:linear-gradient(180deg,var(--glass-spec) 0%,rgba(255,255,255,0) 34%),radial-gradient(120% 60% at 10% 0%,var(--glass-glow),transparent 62%),var(--glass-tint);-webkit-backdrop-filter:blur(40px) saturate(2) brightness(1.04);backdrop-filter:blur(40px) saturate(2) brightness(1.04);box-shadow:var(--shadow),inset 0 1px 1px rgba(255,255,255,.8),inset 0 -1px 1px rgba(255,255,255,.22),0 0 0 .5px rgba(255,255,255,.4),0 0 32px -6px rgba(255,255,255,.45)}
+@media (prefers-color-scheme:dark){html:not(.light) .pop.glass,html:not(.light) .legend.glass,html:not(.light) .toast.glass{--glass-tint:rgba(44,52,59,.34);--glass-glow:rgba(255,255,255,.04);--glass-spec:rgba(255,255,255,.08);--rim-hi:rgba(255,255,255,.42);--rim-mid:rgba(255,255,255,.16);--rim-lo:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(40px) saturate(1.8) brightness(.94);backdrop-filter:blur(40px) saturate(1.8) brightness(.94);box-shadow:var(--shadow),inset 0 1px 1px rgba(255,255,255,.22),inset 0 -1px 1px rgba(255,255,255,.06),0 0 0 .5px rgba(255,255,255,.12),0 0 34px -8px rgba(150,185,210,.22)}}html.dark .pop.glass,html.dark .legend.glass,html.dark .toast.glass{--glass-tint:rgba(44,52,59,.34);--glass-glow:rgba(255,255,255,.04);--glass-spec:rgba(255,255,255,.08);--rim-hi:rgba(255,255,255,.42);--rim-mid:rgba(255,255,255,.16);--rim-lo:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(40px) saturate(1.8) brightness(.94);backdrop-filter:blur(40px) saturate(1.8) brightness(.94);box-shadow:var(--shadow),inset 0 1px 1px rgba(255,255,255,.22),inset 0 -1px 1px rgba(255,255,255,.06),0 0 0 .5px rgba(255,255,255,.12),0 0 34px -8px rgba(150,185,210,.22)}
+@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.pop.glass,.legend.glass,.toast.glass{background:color-mix(in srgb,var(--bg) 94%,transparent)}}
+@media (prefers-reduced-transparency:reduce){.pop.glass,.legend.glass,.toast.glass{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
+/* ---------- v21: віконце «далеко від лікарні» ---------- */
+.farscr{position:fixed;inset:0;z-index:58;background:transparent;touch-action:none}
+.farbox{position:fixed;z-index:59;box-sizing:border-box;overflow:hidden;padding:22px;border-radius:30px}
+.farbox.glass{--glass-tint:rgba(255,255,255,.18);--glass-glow:rgba(255,255,255,.3);--glass-spec:rgba(255,255,255,.28);--rim-hi:rgba(255,255,255,1);--rim-mid:rgba(255,255,255,.6);--rim-lo:rgba(255,255,255,.2);background:linear-gradient(180deg,var(--glass-spec) 0%,rgba(255,255,255,0) 34%),radial-gradient(120% 60% at 10% 0%,var(--glass-glow),transparent 62%),var(--glass-tint);-webkit-backdrop-filter:blur(34px) saturate(2.1) brightness(1.06);backdrop-filter:blur(34px) saturate(2.1) brightness(1.06);box-shadow:0 24px 60px -18px rgba(20,26,30,.45),inset 0 1px 1px rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.22),0 0 0 .5px rgba(255,255,255,.45),0 0 40px -6px rgba(255,255,255,.5)}
+.farbox .fb-in{position:relative;z-index:1}
+.farbox .fb-t{display:block;font-size:21px;font-weight:700;letter-spacing:-.01em;line-height:1.2;margin:0 0 8px}
+.farbox p{margin:0 0 16px;font-size:15.5px;line-height:1.45;opacity:.86}
+.farbox .fb-go{width:100%;min-height:50px;border-radius:16px;font-size:16px;text-decoration:none}
+.farbox .fb-tint{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;border-radius:inherit}
+body.far-on .res #go{visibility:hidden}
+.res a#go{text-decoration:none}
+@media (prefers-color-scheme:dark){html:not(.light) .farbox.glass{--glass-tint:rgba(36,44,50,.26);--glass-glow:rgba(255,255,255,.05);--glass-spec:rgba(255,255,255,.09);--rim-hi:rgba(255,255,255,.45);--rim-mid:rgba(255,255,255,.16);--rim-lo:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(34px) saturate(1.8) brightness(.9);backdrop-filter:blur(34px) saturate(1.8) brightness(.9);box-shadow:0 24px 60px -18px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.24),inset 0 -1px 1px rgba(255,255,255,.06),0 0 0 .5px rgba(255,255,255,.12),0 0 40px -8px rgba(150,185,210,.25)}}html.dark .farbox.glass{--glass-tint:rgba(36,44,50,.26);--glass-glow:rgba(255,255,255,.05);--glass-spec:rgba(255,255,255,.09);--rim-hi:rgba(255,255,255,.45);--rim-mid:rgba(255,255,255,.16);--rim-lo:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(34px) saturate(1.8) brightness(.9);backdrop-filter:blur(34px) saturate(1.8) brightness(.9);box-shadow:0 24px 60px -18px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.24),inset 0 -1px 1px rgba(255,255,255,.06),0 0 0 .5px rgba(255,255,255,.12),0 0 40px -8px rgba(150,185,210,.25)}
+@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.farbox.glass{background:color-mix(in srgb,var(--bg) 94%,transparent)}}
+@media (prefers-reduced-transparency:reduce){.farbox.glass{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
+/* ---------- v22 ---------- */
+.pop.glass,.legend.glass,.toast.glass{--glass-tint:rgba(255,255,255,.25);--glass-glow:rgba(255,255,255,.28);--glass-spec:rgba(255,255,255,.26);-webkit-backdrop-filter:blur(44px) saturate(2.1) brightness(1.05);backdrop-filter:blur(44px) saturate(2.1) brightness(1.05)}
+.farbox.glass{--glass-tint:rgba(255,255,255,.14);--glass-glow:rgba(255,255,255,.26);--glass-spec:rgba(255,255,255,.24);-webkit-backdrop-filter:blur(38px) saturate(2.2) brightness(1.07);backdrop-filter:blur(38px) saturate(2.2) brightness(1.07)}
+@media (prefers-color-scheme:dark){html:not(.light) .pop.glass,html:not(.light) .legend.glass,html:not(.light) .toast.glass{--glass-tint:rgba(44,52,59,.26);-webkit-backdrop-filter:blur(44px) saturate(1.8) brightness(.9);backdrop-filter:blur(44px) saturate(1.8) brightness(.9)}html:not(.light) .farbox.glass{--glass-tint:rgba(36,44,50,.2);-webkit-backdrop-filter:blur(38px) saturate(1.8) brightness(.86);backdrop-filter:blur(38px) saturate(1.8) brightness(.86)}}html.dark .pop.glass,html.dark .legend.glass,html.dark .toast.glass{--glass-tint:rgba(44,52,59,.26);-webkit-backdrop-filter:blur(44px) saturate(1.8) brightness(.9);backdrop-filter:blur(44px) saturate(1.8) brightness(.9)}html.dark .farbox.glass{--glass-tint:rgba(36,44,50,.2);-webkit-backdrop-filter:blur(38px) saturate(1.8) brightness(.86);backdrop-filter:blur(38px) saturate(1.8) brightness(.86)}
+.hbox .hb-s{margin:0 0 14px;font-size:14.5px;line-height:1.45;opacity:.92}
+.hbox .hb-b{display:flex;flex-direction:column;gap:8px}
+.hbox .hb-b .gbtn{width:100%;min-height:46px;border-radius:15px;text-decoration:none}
+</style>
+</head>
+<body>
+<svg id="map" role="img" aria-label="Карта території лікарні: корпуси, доріжки, проходи, зупинки"></svg>
+<div class="mast glass" id="mast"><button type="button" class="bi" id="mastA" aria-label="Показати назву лікарні" aria-expanded="true"><img src="brand/ariadna-favicon.svg" alt="" width="34" height="34"></button><span class="bt"><span class="bh">Карта-план<br>психіатричної лікарні</span><span class="bs">Кирилівська, 103 · <picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="bw" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="49" height="8"></picture></span></span></div>
+<a class="osm on" id="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>
+
+<div class="ctl" id="ctl">
+  <button type="button" class="gbtn" id="thm" aria-label="Темна тема" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg></button>
+  <button type="button" class="gbtn" id="info" aria-label="Як читати карту" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg></button>
+  <div class="grp">
+    <button type="button" class="gbtn" id="zin" aria-label="Наблизити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="gbtn" id="zout" aria-label="Віддалити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+  </div>
+  <button type="button" class="gbtn" id="loc" aria-label="Де я зараз"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/></svg></button>
+  <button type="button" class="gbtn" id="zfit" aria-label="Показати маршрут або всю територію"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/><circle cx="12" cy="12" r="2.5"/></svg></button>
+</div>
+
+<div class="legend glass" id="legend" role="dialog" aria-label="Як читати карту">
+  <h3>Як читати карту</h3>
+  <ul>
+    <li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--thread)" stroke-width="4" stroke-linecap="round"/></svg>ваш маршрут</li>
+    <li><svg viewBox="0 0 30 16"><rect x="1" y="2" width="28" height="12" rx="2" fill="var(--r-grey)" stroke="var(--b-edge)"/><path d="M15 2v12" stroke="var(--terr)" stroke-width="5"/><path d="M12.5 2v12M17.5 2v12" stroke="var(--steps)" stroke-width=".8" stroke-dasharray="1.6 1.4"/></svg>прохід крізь будівлю (галерея)</li>
+    <li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--road)" stroke-width="3.6"/><path d="M2 8h26" stroke="var(--steps)" stroke-width="3.4" stroke-dasharray="1 1.3"/></svg>сходи</li>
+    <li><svg viewBox="0 0 30 16"><rect x="1" y="2" width="28" height="12" rx="3" fill="var(--lawn)"/><path d="M2 8h26" stroke="var(--road-edge)" stroke-width="4.4"/><path d="M2 8h26" stroke="var(--road)" stroke-width="2.8"/></svg>пішохідна доріжка, тротуар</li>
+    <li><svg viewBox="0 0 30 16"><rect x="2" y="2" width="26" height="12" rx="5" fill="var(--lawn)" stroke="var(--lawn-edge)"/></svg>газон, дерева, кущі</li>
+    <li><svg viewBox="0 0 30 16"><circle cx="15" cy="8" r="6.5" fill="#fff" stroke="var(--b-edge)"/><path d="M15 4.6v.1M13.3 7.2h3.4M15 7.2v4.4" stroke="#5b4c3f" stroke-width="1.4" stroke-linecap="round"/></svg>скульптура, пам’ятний знак</li>
+    <li><svg viewBox="-15 -8 30 16"><rect x="-7" y="-7" width="14" height="14" rx="4" fill="#2f6db5" stroke="#fff"/><g transform="scale(.72)" fill="#fff"><path fill-rule="evenodd" d="M-4.9-3.5c0-1.4 1.1-2.2 2.6-2.2h4.6c1.5 0 2.6.8 2.6 2.2V3.3h-9.8zM-3.7-3.6h7.4v3.7h-7.4zM-3.4 1.7a.85.85 0 1 0 1.7 0a.85.85 0 1 0-1.7 0zM1.7 1.7a.85.85 0 1 0 1.7 0a.85.85 0 1 0-1.7 0z"/><path d="M-4.3 3.3h1.9v1.5a.5.5 0 0 1-.5.5h-.9a.5.5 0 0 1-.5-.5zM2.4 3.3h1.9v1.5a.5.5 0 0 1-.5.5h-.9a.5.5 0 0 1-.5-.5zM-6.1-3.2h.8v2h-.8zM5.3-3.2h.8v2h-.8z"/></g></svg>зупинка автобуса, тролейбуса, маршрутки</li>
+    <li><svg viewBox="-15 -8 30 16"><rect x="-7" y="-7" width="14" height="14" rx="4" fill="#2f6db5" stroke="#fff"/><g transform="scale(.72)" fill="#fff"><path fill-rule="evenodd" d="M-4.4-2.1c0-.9.6-1.5 1.5-1.5h5.8c.9 0 1.5.6 1.5 1.5V3.7h-8.8zM-3.2-2.4h6.4v3h-6.4zM-3 2.2a.75.75 0 1 0 1.5 0a.75.75 0 1 0-1.5 0zM1.5 2.2a.75.75 0 1 0 1.5 0a.75.75 0 1 0-1.5 0z"/><path d="M-.4-5.3h.8v1.7h-.8zM-2.8-6.3h5.6v1h-5.6zM-3.7 3.7h1.7v1.3h-1.7zM2 3.7h1.7v1.3H2z"/></g></svg>зупинка трамвая</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><path d="M-4.9-3.4h1.7v6.7h-1.7zM-5.7 3.2h3.3v1.4h-3.3z" fill="#222b31"/><path d="M-3.2-2.95h8.5v1.95h-8.5z" fill="#fff" stroke="#c63a2f" stroke-width=".55"/><path d="M-1.2-2.95h1.75v1.95h-1.75zM2.3-2.95h1.75v1.95H2.3z" fill="#c63a2f"/></svg>шлагбаум</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" fill="#f28c00"/><path d="M0-3.4 3.4 2.6H-3.4z" fill="#1d4fc4"/></svg>укриття</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4" y="-5" width="8" height="10" rx="1.3" fill="#2e7d4f"/><rect x="-2.7" y="-3.7" width="5.4" height="3.3" rx=".5" fill="#fff"/><path d="M-2.4 1.5h4.8M-1.2 3.2h2.4" stroke="#fff" stroke-width=".9" stroke-linecap="round"/></svg>банкомат</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" fill="#1f8a4c"/><path d="M-1-3.4h2v2.4h2.4v2H1v2.4h-2V1h-2.4v-2H-1z" fill="#fff"/></svg>аптека</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#6e4fc2;stroke:none"/><path d="M-3.7-2.9h1.2l1 4h4.1l1-2.9H-2.2" style="fill:none;stroke:#fff;stroke-width:.85;stroke-linecap:round;stroke-linejoin:round"/><circle cx="-1.1" cy="2.7" r=".75" style="fill:#fff;stroke:none"/><circle cx="2.5" cy="2.7" r=".75" style="fill:#fff;stroke:none"/></svg>супермаркет</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#4d5b66;stroke:none"/><path d="M-3.1-3.6h4.2v7.4h-4.2z" style="fill:#fff;stroke:none"/><path d="M-2.3-2.8h2.6v2h-2.6z" style="fill:#4d5b66;stroke:none"/><path d="M1.1-1.4h.9a.6.6 0 0 1 .6.6v2.3a.55.55 0 0 0 1.1 0V-1.9L2.8-3.1" style="fill:none;stroke:#fff;stroke-width:.65;stroke-linecap:round;stroke-linejoin:round"/></svg>АЗС з магазином</li>
+    <li><svg viewBox="-15 -8 30 16"><circle r="7" fill="#fff" stroke="var(--b-edge)" stroke-width=".8"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#c8352c;stroke:none"/><path d="M0-3.5 3.2-1.85v3.7L0 3.5-3.2 1.85v-3.7z" style="fill:#fff;stroke:none"/><path d="M-3.2-1.85 0-.2 3.2-1.85M0-.2v3.7" style="fill:none;stroke:#c8352c;stroke-width:.6;stroke-linejoin:round"/></svg>пошта</li>
+    <li><svg viewBox="0 0 30 16"><rect class="pitch" x="3" y="2" width="24" height="12" rx="1" style="stroke-width:.8"/><path class="pitch-l" d="M15 2v12" style="stroke-width:.8"/><circle class="pitch-l" cx="15" cy="8" r="2.6" style="stroke-width:.8"/></svg>футбольне поле</li>
+    <li><svg viewBox="0 0 30 16"><path d="M3 8h24" stroke="var(--road-edge)" stroke-width="5" stroke-dasharray="2.5 2"/><path d="M3 8h24" stroke="var(--road)" stroke-width="3"/></svg>підземний перехід</li>
+    <li><svg viewBox="0 0 30 16"><path class="zeb-b" d="M3 8h24" style="stroke-width:7"/><path class="zeb" d="M3 8h24" style="stroke-width:5.6;stroke-dasharray:1.6 1.6"/></svg>пішохідний перехід (зебра)</li>
+    <li><svg viewBox="0 0 30 16"><path d="M2 8h26" stroke="var(--road-edge)" stroke-width="8"/><path d="M2 8h26" stroke="var(--road)" stroke-width="6"/><path d="M15 2v12" stroke="var(--gate)" stroke-width="1.8"/><circle cx="15" cy="2" r="1.7" fill="var(--gate)"/><circle cx="15" cy="14" r="1.7" fill="var(--gate)"/></svg>брама, ворота</li>
+    <li><svg viewBox="-15 -8 30 16"><path d="M0 0-6.2-3.6A7.2 7.2 0 1 0-6.2 3.6Z" transform="translate(9 0)" fill="var(--key-b)" stroke="var(--key-t)" stroke-width="1.3"/><path transform="translate(-3.4 0)" d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3" fill="none" stroke="var(--key-t)" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>вхід (двері) до корпусу чи відділення</li>
+    <li><svg viewBox="0 0 30 16"><path d="M2 6h26" stroke="var(--wall)" stroke-width="1.4"/><path d="M4 6v4.5M8 6v4.5M12 6v4.5M16 6v4.5M20 6v4.5M24 6v4.5" stroke="var(--wall)" stroke-width="1"/></svg>обрив, підпірна стіна</li>
+  </ul>
+  <p class="note" style="margin-top:10px">Торкніться будівлі, входу чи зупинки, щоб обрати.</p>
+  <p class="foot" style="margin-top:10px">Перелік корпусів і відділень — сайт лікарні (psychiatry-kyiv.itmed.org, 14.11.2026). У невідкладному стані — 103.</p>
+  <p class="osm-l"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></p>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<section class="pop glass" id="pTo" tabindex="-1" role="dialog" aria-label="Куди вам потрібно?">
+  <button type="button" class="pclose" id="pToX" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <div class="pk-body">
+    <div class="brand"><span class="logo" aria-hidden="true"><img src="brand/ariadna-favicon.svg" alt="" width="42" height="42"></span><span><b><picture><source srcset="brand/ariadna-wordmark-small-reverse.svg" media="(prefers-color-scheme: dark)"><img class="wm" src="brand/ariadna-wordmark-small.svg" alt="Ariadna" width="104" height="17"></picture></b><small>Карта-план психіатричної лікарні · Кирилівська, 103</small></span></div>
+    <label class="srch" id="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="q" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Номер, назва або корпус" aria-label="Пошук: номер відділення, назва або корпус"><button type="button" class="x" id="qx" aria-label="Очистити пошук"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></label>
+    <div class="found" id="found" hidden></div>
+    <div id="pkMain">
+      <div class="pk-h">Найчастіше шукають</div>
+      <div class="tiles" id="tiles"></div>
+      <div class="pk-h">Відділення №</div>
+      <div class="nums" id="nums"></div>
+      <div class="pk-h" style="margin-top:18px">Поруч з лікарнею</div>
+      <div class="tiles" id="near"></div>
+      <p class="pk-note">Не знаєте номера відділення? Оберіть «Приймальне відділення» — воно працює цілодобово, там підкажуть.<br>Можна також торкнутися будівлі чи входу на карті.<br>Щоб надіслати рідним, як дійти, — утримайте номер чи пункт.</p>
+    </div>
+  </div>
+</section>
+<section class="pop glass" id="pFrom" tabindex="-1" role="dialog" aria-label="Звідки ви йдете?"><div class="pk-body" id="fromBody"></div></section>
+<section class="pop glass" id="pDet" tabindex="-1" role="dialog" aria-label="Докладніше про маршрут"><div class="pk-body" id="detBody"></div></section>
+
+<div class="dock" id="dock">
+  <div class="res-row" id="resRow" hidden><button type="button" class="dk mini glass" id="bMini" aria-label="Змінити, куди і звідки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="18.5" r="2.3"/><path d="M8 18.5h7a3.2 3.2 0 0 0 0-6.4H9a3.2 3.2 0 0 1 0-6.4h4.5"/><path d="M18.5 10.4s-2.7-2.3-2.7-4.6a2.7 2.7 0 0 1 5.4 0c0 2.3-2.7 4.6-2.7 4.6z" fill="currentColor" stroke-width="1.4"/></svg></button><div class="res glass" id="res" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-live="polite"><div class="tx"><span class="ft" id="resF"></span><b id="resB"></b><span class="s" id="resS"></span></div><span id="resGo"></span></div></div>
+  <div class="dk-row" id="dkRow">
+    <button type="button" class="dk to glass empty" id="bTo" aria-haspopup="dialog" aria-expanded="false"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></span><span class="tx"><span class="c" id="toC"></span><span class="v" id="toV">Куди вам?</span></span></button>
+    <button type="button" class="dk frm glass" id="bFrom" aria-haspopup="dialog" aria-expanded="false"><span class="ic sm" id="fromI" aria-hidden="true"></span><span class="tx"><span class="c" id="fromC">Звідки</span><span class="v" id="fromV">Звідки?</span></span></button>
+  </div>
+</div>
+
+<div class="toast glass" id="toast" role="status"></div>
+
+<script>
+/* Координати: метри на схід (x) і на південь (y) від точки 50.4820 пн. ш., 30.4695 сх. д.
+   Контури — OpenStreetMap, звірені із супутниковим знімком mapy.com 15.11.2026. Колір — колір даху на знімку. */
+var LAT0=50.4820, LON0=30.4695, KX=70840, KY=111320;
+
+var TERR="-345,245 -334,186 -322,147 -268,94 -236,84 -181,147 -154,143 -171,33 -97,15 -100,-11 -95,-118 16,-119 40,-131 64,-143 84,-153 99,-157 121,-156 165,-119 177,-120 189,-124 200,-126 221,-121 229,-124 236,-183 214,-187 201,-188 175,-209 158,-226 208,-320 211,-325 219,-335 224,-337 229,-336 237,-334 244,-327 246,-281 250,-190 249,-102 268,-66 338,-27 348,-2 350,31 267,41 232,27 207,41 198,98 156,184 138,201 118,208 95,208 70,189 38,180 9,136 -38,149 -94,171 -130,214 -193,272 -226,288 -292,302 -317,286 -338,260";
+var GREEN="-1115,264 -980,152 -821,71 -720,35 -622,-2 -500,-54 -377,-87 -324,-96 -181,-113 -125,-120 -59,-145 -3,-165 14,-152 32,-160 64,-143 16,-119 -95,-118 -100,-11 -97,15 -171,33 -154,143 -181,147 -236,84 -268,94 -322,147 -334,186 -345,245 -338,260 -317,286 -292,302 -226,288 -193,272 -130,214 -94,171 -38,149 9,136 38,180 70,189 95,208 118,208 150,238 155,242 183,297 142,350 120,379 -230,508 -359,577 -448,636 -442,840 -1115,840";
+var GREEN2="268,-66 338,-27 348,-2 350,31 386,31 420,6 452,-19 467,-31 474,-44 475,-58 473,-83 467,-105 460,-120 393,-212 263,-154 249,-102";
+var MAJOR=[
+ [24,"-760,-20 -560,-70 -394,-111 -338,-120 -164,-139 -120,-147 -65,-165 -9,-193 19,-211 62,-247 102,-292 145,-366 167,-404 197,-445 255,-496 330,-560"],
+ [16,"110,-286 197,-347 255,-410"],
+ [18,"220,-460 261,-417 301,-371 329,-328 379,-253 469,-120 491,-89 600,30"],
+ [14,"469,-120 484,-80 485,-52 478,-22 470,-4 459,10 418,48 401,70 395,100 402,127 501,294 600,470"]
+];
+var STREETS=[["Стадіон «Спартак»",382.4,-132,0],["вул. Олени Теліги",-215,-150,-6],["вул. Кирилівська",455,-140,56],["Подільський узвіз",444,190,60],["Врубелівський узвіз",300,96,-35],["Кирилівський гай",-250,-40,0],["Кирилівський гай",-180,330,0]];
+
+var CTX=`/*CTX*/`;
+/* пам’ятки біля території (не лікарня) */
+var LMB=[
+ {p:"181,-185 160,-167 176,-149 197,-168",c:"r-white",n:"Кирилівська церква"},
+ {p:"206,-141 214,-180 229,-176 221,-138 219,-138 218,-135 209,-137 210,-140",c:"r-green",n:"Музей «Кирилівська церква»"}
+];
+
+/* Будівлі лікарні. k — номер корпусу, key — є відділення за сайтом лікарні, r — колір даху, p — кільця (перше зовнішнє, далі дворики),
+   lab — де стоїть номер, door — головний вхід, n — назва, hi — вищі частини (тінь об’єму) */
+var B=[
+ {k:"1",lv:4,key:1,r:"r-grey",lab:[-4,119],door:[27.5,73.2],p:["5.2,56.1 1.6,44.1 21.2,38.2 33.1,78.1 41.6,106.6 34.7,108.6 8.5,116.5 -18.6,124.5 -29,127.7 -39.9,91.4 -42.8,81.6 -43.4,79.7 -69.2,87.4 -83.9,91.8 -70.2,137.8 -94.2,145 -134.9,157.1 -151.6,101.2 -145.1,99.3 -138.6,97.3 -137.1,102.5 -97.8,90.7 -99.4,85.5 -100.8,80.6 -111,46.5 -86.4,39.2 -84.7,38.7 -83,38.2 -45.3,26.9 -31.5,72.8 -30.2,77.2 -27.1,87.6 -20,111.5 5,104.1 18.3,100.1 8.1,65.8 6.8,61.4","-96.7,94.5 -86.3,129.2 -125.6,140.9 -136,106.2","-86.9,81.8 -88.4,76.8 -95,54.8 -80.9,50.6 -54.4,42.6 -44.6,75.5 -70.6,83.3 -85.2,87.6"]},
+ {k:"2",lv:4.5,key:1,r:"r-grey",lab:[34,-42],door:[69.3,-38],p:["-2.1,-52.4 -2.8,-45.5 -3.6,-38.6 34.8,-34.5 32.5,-12.7 36.4,-12.3 38.7,-34.3 68.6,-31.2 69.3,-38 70,-44.9"]},
+ {k:"3",key:1,r:"r-sage",lv:2,lab:[-70,-80],door:[-63.5,-75.1],p:["-86.3,-89.2 -85.8,-99.5 -55,-97.9 -50.3,-97.7 -50.8,-87.7 -62.8,-88.3 -63.5,-75.1 -64.1,-61.8 -58,-61.5 -58.5,-52.2 -89.5,-53.8 -88.9,-64.5 -82.2,-64.1 -82.4,-61 -76.9,-60.8 -75.4,-90.4 -79.3,-90.6 -79.4,-88.8"]},
+ {k:"4",r:"r-dgreen",lv:1,lab:[-12,-104],door:[-13.2,-96.6],n:"Центр медико-соціальної реабілітації",p:["-37.5,-113.7 18.3,-110.4 17.2,-91.1 10.9,-91.5 11.1,-95.1 -13.2,-96.6 -31.6,-97.6 -31.8,-94.9 -38.6,-95.3"]},
+ {k:"5",lv:2,key:1,r:"r-blue",lab:[82,-118],door:[73.8,-114.1],p:["77.1,-143.1 60.9,-130.4 73.8,-114.1 89.7,-94.2 98.5,-102.2 103.7,-107.3 97.5,-115.5 90.8,-110.4 87.4,-115.2 92,-118.1 85.2,-127.5 80,-123.9 75.3,-130.9 82.2,-136.4"]},
+ {k:"7",lv:2,key:1,r:"r-terra",nt:"Відділення 6 переїхало в корпус 2",lab:[290,-24],door:[207.5,-35.8],p:["325.3,-8.8 328.4,-27.6 318,-33.3 313.2,-24.6 280.6,-42.6 284.2,-49 274.7,-54.2 261.5,-28.5 254.8,-30.1 256.2,-39.1 255.3,-42.6 253.5,-44.7 250.6,-45.6 247.8,-45.4 245.3,-43.7 243.4,-40.8 242.7,-35.3 236.7,-36.1 237,-38.2 208.3,-42 207.5,-35.8 206.6,-29.7 222.2,-27.6 220.2,-12.6 204.2,-14.8 203.4,-9 202.7,-3.2 231.9,0.7 235.5,-26.7 241.5,-25.9 240.6,-19.4 253.4,-17.7 254.6,-24.6 260.2,-23.4 265.6,-22.2 269.6,-19.8 275.6,-30.5 307.5,-12.9 305.5,-9.3 303.5,-5.6 319.5,1.6 311.3,3.4 279.1,8.8 264.3,11.2 266,21.4 314.5,13.3 322.6,17.8 333.8,-2.4"]},
+ {k:"8",lv:2,key:1,r:"r-terra",lab:[231,-222],door:[220.5,-225.3],p:["214.2,-250.3 224,-248.9 220.5,-225.3 216.4,-197.9 236.9,-194.8 245.4,-251.9 215.1,-256.5"]},
+ {k:"9",lv:1,r:"r-grey",lab:[170,82],door:[163,93],p:["154,88.8 177,65.5 186.4,74.8 163.4,98"]},
+ {k:"10",r:"r-sage",lv:1,lab:[176,-226],door:[180.1,-219.7],n:"Патологічна анатомія",kw:"морг патанатомія",p:["171.9,-213.2 168.9,-215.9 172.3,-219.7 167.6,-224.8 173.9,-231.6 175.2,-230.7 180.5,-236.4 184.8,-232.4 179.3,-226.6 183.2,-223 180.1,-219.7 176.6,-215.9 175.5,-217"]},
+ {k:"11",lv:1,key:1,r:"r-grey",lab:[80,92],door:[80,71.3],p:["101.7,36.8 94.6,34 98,26.3 100.8,22.5 104.8,20.1 109.8,19.2 115,20 119.5,22.8 122.9,27 124.8,31.8 124.5,37.3 95.2,115.5 85.4,115.7 61.4,121.9 58.9,112 52.7,113.6 33.6,40.3 46.3,37 48.3,44.7 50.7,42.8 55.4,41.5 59.4,42 63.3,43.7 66.4,47.3 68.2,51.8 67.9,57.1 65.3,61.5 61.1,64.6 56.2,65.5 53.6,65 55.4,72 57.7,76.4 61,79.1 65.4,80.8 70.4,80.5 74.4,79.1 77.8,75.8 81.9,66.8 88.6,49.5 92.2,50.9 95.7,52.2 96.9,49.1"],
+   hi:["56.8,104 53.6,91.5 83.4,83.8 85.4,78.6 97.2,83.2 92.7,94.7 87.3,96.1","85.4,78.6 92,61.8 103.8,66.4 97.2,83.2","108.7,53.7 103.8,66.4 92,61.8 95.7,52.2 96.9,49.1"],hl:[7,6,4],
+   ring:"48.3,44.7 50.7,42.8 55.4,41.5 59.4,42 63.3,43.7 66.4,47.3 68.2,51.8 67.9,57.1 65.3,61.5 61.1,64.6 56.2,65.5 53.6,65 51.9,64.7 48.1,62.4 45.6,59.1 44.3,54.9 44.6,50 47,45.8"},
+ {k:"12",lv:1,key:1,r:"r-grey",lab:[120,-24],door:[100.6,-34.1],p:["125.7,-33.1 131.6,-36.8 138.2,-26.6 132.8,-14.6 129,-16.2 127.9,-13.8 125,-7.4 129.3,-5.5 126.9,-1.9 124.1,0.7 120.6,1.7 114.6,1.7 108.6,-1 105.3,-6.1 103.7,-10 105.2,-16.3 112.7,-12.9 117.4,-23.3 111.1,-33.3 100.6,-34.1 86.5,-35.1 87.3,-47 102.3,-46 102.8,-52.7 106.2,-52.5 105.7,-45.7 118.2,-44.8"],
+   hi:["112.7,-12.9 117.4,-23.3 111.1,-33.3 100.6,-34.1 86.5,-35.1 87.3,-47 102.3,-46 102.8,-52.7 106.2,-52.5 105.7,-45.7 118.2,-44.8 125.7,-33.1 130.6,-25.4 122.9,-8.3"],hl:[4]},
+ {k:"13",lv:2,r:"r-grey",lab:[90,145],n:"Пральня",p:["53.9,139.1 66.5,135.8 65.8,133.2 72.5,131.4 73.3,134.5 116.6,123.3 118.2,129.2 104.3,132.8 109,151 80,158.5 80.9,161.7 74,163.5 67.6,138.9 54.7,142.2"]},
+ {k:"14",lv:1,r:"r-grey",lab:[56,153],n:"Котельня",p:["53.9,139.1 53.2,136.4 45.7,138.4 52.8,165.7 57,164.6 58.1,168.7 64.3,167.1 63,161.9 60,162.7 54.7,142.2"]},
+ {k:"15",lv:4,r:"r-grey",lab:[126,110],n:"Харчоблок",kw:"їдальня кухня",p:["116.6,123.3 118.2,129.2 142.4,122.9 134.3,91.5 131.1,92.3 110,97.8"]},
+ {k:"16",lv:1,r:"r-grey",lab:[138,164],n:"Овочесховище",p:["125.1,159.7 148.4,153.3 152,166.4 125.9,173.5 124.8,169.6 127.6,168.9"]},
+ {k:"17",lv:1,r:"r-grey",lab:[30,137],n:"Гараж",p:["46.8,125.5 48.1,130 27.8,136 29.7,142.4 19.5,145.4 16.3,134.6"]},
+ {k:"22",lv:1,r:"r-grey",lab:[89,172],n:"Майстерні",p:["80.6,171.4 88.4,163.3 98.3,172.9 90.6,180.9"]},
+ {k:"23",lv:2,r:"r-green",priv:1,lab:[-269,235],n:"Центр судово-психіатричної експертизи (закрита територія)",p:["-296.6,220.8 -291.1,241.2 -285.6,261.6 -242.3,250 -253.3,209.1","-278.9,229.9 -262.4,225.5 -258.7,239.3 -275.2,243.8"]},
+ {k:"",r:"r-green",priv:1,p:["-297.8,243.3 -305,245.3 -313.9,212.2 -306.7,210.2"]},
+ {k:"26",lv:2,r:"r-graph",lab:[-185,195],door:[-180.7,177.8],n:"Лікувально-виробничі майстерні",p:["-209.2,208.5 -193.2,204.4 -203.5,164.9 -185.2,160.2 -180.7,177.8 -174.7,200.9 -164.5,198.5 -160.5,199.2 -158.1,201.3 -157,203.6 -156.9,206.7 -157,208.3 -157.5,210.3 -159.5,212.9 -205,224.7"]},
+ {k:"",r:"r-dgreen",lab:[156,26],p:["142.4,38.8 147.5,33.4 145.3,31.3 147.8,28.7 150.1,31 152.4,28.6 148.2,24.6 153.3,19.4 163.6,8.6 168,12.8 165.8,15 168.3,17.4 165.1,20.6 168.9,24.3 148.9,45.1"]},
+ {k:"",r:"r-grey",p:["173.3,21.9 178.1,26.5 172.6,32.1 167.6,27.6"]},
+ {k:"",r:"r-grey",p:["133.4,-148.4 129.8,-151.7 130.9,-152.8 122.4,-160.9 125.5,-164.1 134,-156 135.1,-157.3 138.7,-153.9"]},
+ {k:"",r:"r-grey",p:["97.2,-130.3 103.2,-134.7 105.3,-131.7 99.4,-127.3"]},
+ {k:"",r:"r-graph",p:["126.7,-65.6 138.8,-64.9 138.4,-58.1 126.3,-58.8"]}
+];
+/* проходи крізь будівлі (у OSM — tunnel=building_passage): на місцевості це відкриті галереї під верхнім поверхом */
+var GAL=["-84.7,38.7 -80.9,50.6","-100.8,80.6 -88.4,76.8","-70.6,83.3 -69.2,87.4","5,104.1 8.5,116.5"];
+/* галерея вздовж фасаду: відкрита під навісом верхнього поверху; a-b — фасад, w — глибина, двері — на внутрішній лінії */
+var GALF=[{a:[21.2,38.2],b:[41.6,106.6],w:4}];
+/* входи: p — двері, k — корпус, t — підпис на карті, a — бік підпису (r, l, t, b), n і d — назва й пояснення, w — як знайти */
+var ENT={
+ n:{k:"1",dir:55,ta:"t",p:[-81.4,43.4],t:"7 · 15 · ЕКОПФО",a:"r",n:"Вхід до відділень 7, 15 і ЕКОПФО",d:"двері в проході крізь корпус · 15 — 3 поверх, 7 — 2 поверх, ЕКОПФО — 1 поверх",w:"Двері — у наскрізному проході крізь північне крило корпусу; на карті це пунктирний канал."},
+ v4:{k:"1",p:[-42.8,81.6],t:"4",a:"l",n:"Вхід до відділення 4",d:"двері з двору корпусу 1",w:"Двері — у дворі між крилами корпусу, у куті біля галереї."},
+ lift:{k:"1",p:[-39.9,91.4],t:"Ліфт",a:"l",n:"Ліфт",d:"до відділень 7, 15 і 16 · двері з двору корпусу 1",w:"Двері ліфта — у дворі між крилами корпусу."},
+ s:{k:"1",dir:-121,p:[4.3,109.6],t:"3 · 16 · 23 · 24",a:"l",n:"Вхід до відділень 3, 16, 23 і 24",d:"двері в проході крізь корпус · 16 і 24 — 3 поверх, 3 і 23 — 2 поверх",w:"Двері — у наскрізному проході крізь південне крило корпусу; на карті це пунктирний канал."},
+ pnd:{k:"1",p:[-22.5,125.7],t:"Амбулаторія № 1",a:"b",n:"Правобережна психіатрична амбулаторія № 1",d:"двері з південного боку корпусу 1 · 1 поверх · реєстратура Пн–Пт 09:00–16:12",w:"Двері — з південного боку корпусу, з дороги."},
+ w19:{k:"1",p:[-145.1,99.3],t:"19 · 18 · 20",a:"t",n:"Вхід до відділень 19, 18 і 20",d:"двері із західного краю корпусу 1 · 19 — 1–2 поверхи, 18 і 20 — 3 поверх",w:"Двері — із західного краю корпусу."},
+ arh:{k:"1",p:[21.7,53.8],t:"Архів",a:"r",n:"Архів",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
+ prm:{k:"1",p:[25.3,65.7],t:"Приймальне · чол.",a:"r",n:"Приймальне — чоловічий блок",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
+ prw:{k:"1",p:[29.7,80.6],t:"Приймальне · жін.",a:"r",n:"Приймальне — жіночий блок",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
+ g4:{k:"1",p:[34.4,96.5],t:"",n:"Двері в галереї",d:"корпус 1"},
+ k2:{k:"2",p:[69.3,-38],t:"6 · 9",a:"r",n:"Вхід до відділень 6 і 9",d:"двері зі східного торця корпусу 2",w:"Двері — зі східного торця корпусу; від дороги до них ведуть сходинки."},
+ k8:{k:"8",p:[220.5,-225.3],t:"8 · 10",a:"l",n:"Вхід до відділень 8 і 10",d:"єдиний вхід у корпус 8",w:"Це єдині двері корпусу 8: через них і до 8-го, і до 10-го відділення."},
+ k5:{k:"5",p:[73.8,-114.1],t:"1 · 2",a:"l",n:"Вхід до відділень 1 і 2",d:"один вхід для обох відділень",w:"Через ці двері — і до 1-го, і до 2-го відділення."},
+ pl:{k:"11",p:[80,71.3],t:"Поліклініка · 5 · 22",a:"l",n:"Вхід до поліклініки, відділень 5 і 22 та аптеки",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його східного боку."},
+ vkz:{k:"11",p:[58.5,76.5],t:"Конференц-зала · Музей",a:"r",n:"Вхід до великої конференц-зали й музею",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його західного боку."},
+ st11:{k:"11",p:[86.3,57],t:"Укриття",a:"l",n:"Вхід до укриття",d:"корпус 11, зі сходинками, з боку пішохідної доріжки",w:"Вхід до укриття — зі сходинками, з боку пішохідної доріжки."},
+ cafe:{k:"11",p:[112.4,70.7],t:"Кафе",a:"r",n:"Кафе",d:"вхід зі східного боку корпусу 11",w:"Вхід — зі східного боку корпусу 11."},
+ adm:{k:"12",p:[100.6,-34.1],t:"Адміністрація",a:"l",n:"Вхід до адміністрації",d:"корпус 12"},
+ mkz:{k:"12",p:[127,-12],t:"Мала конференц-зала",a:"r",n:"Мала конференц-зала",d:"вхід зі східного боку корпусу 12",w:"Вхід — зі східного боку корпусу."}
+};
+B.forEach(function(b){if(!b.k||b.k==="1"||!b.door)return;
+  if(Object.keys(ENT).some(function(id){var p=ENT[id].p;return Math.hypot(p[0]-b.door[0],p[1]-b.door[1])<4}))return;
+  ENT["b"+b.k]={k:b.k,p:b.door,t:"",n:"Вхід до корпусу "+b.k,d:b.n||"головний вхід"}});
+if(ENT.b11)ENT.b11.dir=60;
+var PRIV="-306.7,210.2 -236.7,192.4 -234.5,194 -216.6,260.3 -285.7,280.5 -288.2,279";
+
+/* v дорога, f доріжка, p стежка, s сходи; x у кінці коду — закрито (малюється, але маршрут не прокладається) */
+var WAYS=`u 118,-282 94,-299
+s 94,-299 99.9,-306.8
+s 94,-299 85.6,-292.9
+f 99.9,-306.8 100.5,-321
+s 125,-291 118,-282
+f 110,-270 110,-273
+v 167,-32 171,-36 179,-56 184,-77 191,-107 208,-175 206,-195 199,-200 197,-215 198.8,-232 202,-262
+f 328,-313 333.1,-305.7 410.8,-194 465,-116 477,-84 479,-53 476,-34 471,-21 444,3 444,9 444,17 405,50 397,62 387,92 388,109 392,124
+z 333.1,-305.7 348.9,-316.7
+f 348.9,-316.7 370.1,-331.4 404,-280.6 408.5,-273.9 502.1,-133.5
+v -35,-165 -14,-168 16,-167 47,-158 64,-167 62,-193 73,-213 79,-235 85,-253
+f 110,-270 113,-267 125,-264 138,-260 158,-244
+sx 158,-244 172,-232
+v -331,-108 -322,-99 -317,-95 -293,-76 -233,-29 -219,-20 -196,-12 -44,-1
+v -396,176 -382,161 -314,92 -272,52 -265,49 -255,44 -239,42 -157,39
+v 185,219 193,177 205,155 249,114 281,91 305,74 373,53 393,47 430,20 444,9 459,10
+v -44,-1 -38,-1 26,4 60,7 67,7.6 72,8 93,10 101,11 136,16
+f 67,7.6 67.5,2.6
+s 67.5,2.6 73,-14
+f 73,-14 73,-32 71.5,-38
+f -68,91 -47,85 -44.4,82.1
+f -47,85 -41.5,91.9
+f -19,-167 -132,-123 -322,-99 -361,-95 -390,-90
+v 266,7 207,2 197,-5 201,-43 197,-43 179,-56
+f 198.8,-232 192,-235 184,-242 172,-232
+v -142,157 -115,172
+v -328,218 -325,209 -294,193 -284,183 -253,145 -248,130 -237,118
+v -156,64 -127,57
+s -14,-47 -14,-56
+v 138,-9 150,-4
+f -8,-47 -14,-47
+s -3,-16 -38,-1
+v -159,56 -86,35 -47,24
+f 99,-102 106,-93
+v 191,-107 202,-104 214,-85 227,-63 227,-54 221,-48 201,-43
+v 191,-107 185,-107 141,-88 100,-64
+f -14,-77 -13,-97
+v 135,21 138,24 147,22 163,5
+v 61,-117 76,-92 80,-79 80,-57
+f 72,8 90,-19
+v 101,11 103,-13 101,-18 90,-19
+v 93,10 84,54 73.3,64.2 65,72
+f 27,37.9 31.6,37.9
+s 31.6,37.9 35.6,36.3 40,35 45,34.2 50.4,34.6 55.7,36.3 60.4,38.6
+f 41.2,18.4 40.6,29.5 40,35
+f 60.4,38.6 81.9,54 85.3,56.4
+f 73.3,64.2 79.4,70.6
+f 65,72 59.2,75.9
+v 124,75 137,90 148,119 147,147 141,152 99,161
+v 136,16 135,21 133,32 124,75 110,89 99,117 37,138
+v -138,197 -115,172 -107,165 -58,142 41,114 44,108 27,37.9 26,34 25,28 26,4
+f 60,7 28,-12 -3,-16 -8,-47 -6,-57 -1,-56
+v 100,-124 107,-107 106,-93 100,-64 99,-56
+v 205,155 198,143 225,65 226,54 167,-32
+v -138,197 -150,214 -161,226
+v -44,-1 -50,7 -60,11 -139,34 -157,39
+v -157,39 -159,56 -156,64 -156,97 -142,157 -138,197
+v 136,16 150,-4 158,-21 161,-28 167,-32
+v 99,-56 128,-53 148,-26 158,-21
+s 129,-224 135,-215 149,-218 142,-198 141,-192
+v 157,-164 173,-143 177,-120 185,-107
+p 142,-198 172,-232
+s -142,157 -171,158
+f -171,158 -178,175 -171,194
+s -171,194 -160,197 -155,204
+f -155,204 -150,214
+s 19,37 -2,42
+f 19,37 26,34
+s 19,36.5 19.4,28.4
+f 19.4,28.4 25,28
+f -47,24 -18,32 -7,43 -2,42
+f -7,43 -6,65
+f -86,35 -85,39
+f -85,39 -81,51
+f -81,51 -74,72 -71,83
+f -71,83 -69,87
+v -72,95 -59,139 -58,142
+f 8,116 9,119 -59,139 -114,165 -127,164 -115,172
+f 5,104 8,116
+f -6,65 -5,70
+f -5,70 5,104
+f 25,28 30,25
+s 30,25 41.2,18.4 52,12
+f 52,12 60,7
+f 444,3 425,13 410,22 388,32 301,49 255,50 242,46
+f 229,36 171,-36
+s 242,46 229,36
+v 169,-326 172,-320 176,-314 157,-302 137,-273
+f 214,-85 184,-77
+v -63,-75 -14,-77 24,-77 80,-57 99,-56
+f -14,-77 -14,-56
+v 202,-104 222,-116
+v 281,91 254,60
+s 110,-273 118,-282
+s 138,-234 136,-236
+f 125,-264 122,-280
+f 113,-267 122,-280 130,-290
+f 139,-156 154,-168 182,-191 197,-180 200,-165 173,-143
+f 136,-236 108,-267
+s 138,-260 138,-234
+s 138,-234 129,-224
+f -143,93 -101,81
+s -101,81 -97,79.8
+f -97,79.8 -88,77
+f -138.8,91.8 -139,84 -137.2,77.8 -133.6,74.5 -128,74.5 -124.4,77.8 -122.8,83 -123,87.3
+f -56.3,66.6 -55,78.4
+f -46.5,97.9 -45.2,108.1
+f -34,27.6 -29.5,42 -22.5,78 -18.5,103
+f -88,77 -74,72
+v 153,52 133,32
+s 9,119 29,113 41,114
+f -69,87 -68,91 -72,95
+v -143,93 -156,97
+f 110,-270 108,-267 84,-236 79,-235`;
+
+var STARTS={
+ e1:{at:[-322,-99],stop:[-344,-96],name:"Лікарня ім. Павлова",cap:"Від зупинки",short:"Павлова",street:"вул. Олени Теліги",tr:"тролейбуси 27, 30, 31 · автобус 50",
+     hint:"Від зупинки йдіть асфальтовою дорогою, що відходить від вулиці вглиб гаю. Цією ж дорогою заїжджають автомобілі."},
+ e2:{at:[100.5,-321],stop:[100.5,-324.3],name:"Музей «Кирилівська церква»",cap:"Від зупинки",short:"Музей · через дорогу",street:"вул. Олени Теліги, протилежний від церкви бік",tr:"тролейбуси 27, 30, 31 · автобус 50",
+     hint:"Ця зупинка — на протилежному від церкви боці вул. Олени Теліги. Перейдіть вулицю підземним переходом, далі сходами до дороги, обійдіть нею корпус 10 з північного боку й вийдіть на дорогу зі східного боку Кирилівської церкви; нею — на південь до лікарні. Повз церкву із західного боку проходу немає. На цьому шляху є сходи."},
+ e4:{at:[110,-270],stop:[101,-260],name:"Музей «Кирилівська церква»",ln:"Музей",cap:"Від зупинки",short:"Музей · бік церкви",street:"вул. Олени Теліги, бік церкви",tr:"тролейбуси 27, 30, 31 · автобус 50",
+     hint:"Ця зупинка — на боці церкви. Від неї пройдіть сходами до дороги, обійдіть нею корпус 10 з північного боку й вийдіть на дорогу зі східного боку Кирилівської церкви; нею — на південь до лікарні. Повз церкву із західного боку проходу немає. На цьому шляху є сходи."},
+ e3:{at:[444,9],stop:[455,24],name:"вул. Кирилівська",cap:"Від зупинки",short:"Кирилівська",street:"ріг Подільського узвозу",tr:"тролейбуси 6, 18, 28, 33 · поруч трамваї 11, 12, 16, 19",
+     hint:"Від зупинки зверніть на Врубелівський узвіз. Пішки коротше стежкою зі сходами; без сходів — узвозом до в’їзду."},
+ e5:{at:[410.8,-194],stop:[416.5,-198],vt:"bus",name:"Стадіон «Спартак»",cap:"Від зупинки",short:"Спартак · маршрутки",street:"вул. Кирилівська, бік стадіону",tr:"маршрутки",
+     hint:"Зупинка — на боці стадіону. Йдіть тротуаром униз до Подільського узвозу; на розі зверніть на Врубелівський узвіз. Пішки коротше стежкою зі сходами; без сходів — узвозом до в’їзду."},
+ e6:{at:[404,-280.6],stop:[385.7,-280.6],vt:"tram",name:"Стадіон «Спартак»",ln:"Спартак",cap:"Від зупинки",short:"Спартак · трамвай",street:"вул. Кирилівська, через дорогу від стадіону",tr:"трамваї 11, 12, 16, 19",
+     hint:"Трамвайна зупинка — через дорогу від стадіону, на боці Нової Пошти. Перейдіть Кирилівську переходом біля перехрестя з вул. Олени Теліги, далі тротуаром повз стадіон униз до Подільського узвозу; на розі — Врубелівським узвозом до лікарні."}
+};
+/* частини корпусу, які займають відділення (обведено на роздруківці 17.11.2026): ids — відділення, поверхи — у D */
+var AREAS={
+ n:{ids:["4","7","15"],p:"-79.5,37.2 -45.3,26.9 -31.5,72.8 -44.6,75.5 -54.4,42.6 -79.5,50.2"},
+ s:{ids:["16","3","amb"],p:"-43.4,79.7 -30.2,77.2 -27.1,87.6 -20,111.5 -4.5,106.9 -2,119.6 -18.6,124.5 -29,127.7 -39.9,91.4 -42.8,81.6"},
+ e:{ids:["23","24","pr","prm","prw","arh"],p:"1.6,44.1 21.2,38.2 33.1,78.1 41.6,106.6 34.7,108.6 8.5,116.5 5,104.1 18.3,100.1 8.1,65.8 6.8,61.4 5.2,56.1"},
+ w:{ids:["19","18","20"],p:"-151.6,101.2 -145.1,99.3 -138.6,97.3 -137.1,102.5 -136,106.2 -125.6,140.9 -86.3,129.2 -73.9,125.5 -70.2,137.8 -94.2,145 -134.9,157.1"}
+};
+function areaOf(id){for(var k in AREAS)if(AREAS[k].ids.indexOf(id)>=0)return AREAS[k];return null}
+/* заасфальтовані майданчики (решта території — газон) */
+var PAVE=["-83.9,91.8 -69.2,87.4 -68,91 -72,95 -59,139 -70.2,144.3 -70.2,137.8",
+ "-69.2,87.4 -43.4,79.7 -42.8,81.6 -39.9,91.4 -38.1,97.4 -45.6,97.6 -65.2,103.5 -69.6,104 -72,95 -68,91",
+ "-38.1,97.4 -29,127.7 -32,128.6 -41,98.3"];
+/* асфальт східного двору корпусу 1 (скрин 18.11.2026); малюється поверх схилу */
+var PAVE_E=["-54.7,24 -54.7,27.7 -52.7,28.8 -43,27 -34.4,29.6 -32.7,32.6 -28.7,31 -22.7,32.8 -19,36.3 -6.2,69.1 0.2,92.1 -0.8,95.3 1.3,97.7 1,101.2 1.8,103.7 3.2,104.5 6.8,102.9 10.3,102.8 16.6,100.8 17.7,99.5 17.6,97.9 15.9,94.9 15,89.4 1.9,45.7 0.6,44 0.2,41.9 -13.5,30.2 -36.1,21.3 -43.9,20.1 -48.6,21 -50.2,22.6"];
+/* схили: a — напрямок горизонталі, штрихи йдуть униз по схилу */
+var SLOPES=[{a:-15.4,p:"-151.2,41.6 -32.2,8.8 -30.7,12.5 -47,24 -86,35 -151,53.7"},
+ {a:18.7,p:"-30.7,12.5 13.8,27.6 15.8,33.5 19,37 -2,42 -7,43 -18,32 -47,24"},
+ {a:73.3,p:"-44.5,29.5 -31.5,72.8 -27.1,87.6 -24.9,95 -21.1,93.9 -23.3,86.5 -27.7,71.7 -40.7,28.4"}];
+/* сходинки всередині наскрізного проходу (малюються поверх корпусу) */
+var STEPS_IN=["-101,81 -97,79.8"];
+var BENCH=[[-140.6,83.5],[-121.3,79.5],[38,28.8]];
+var GAZEBO=[[-56.2,64.2],[-44.4,110.4]];
+var SCULPT=[
+ {n:"Дон Кіхот",d:"кована скульптура; поруч — Санчо Панса та віслюк",x:142,y:-31,ic:"st"},
+ {n:"Статуя",d:"у внутрішньому дворі корпусу 1",x:-76.2,y:65.8,ic:"st"},
+ {n:"Лаокоон і його сини",d:"копія античної скульптури, встановлена 2025 року",x:-130.8,y:82,ic:"st"},
+ {n:"Стела «Фахівцям лікарні»",d:"пам’ятний знак працівникам",x:137.7,y:66.7,ic:"sl"},
+ {n:"Пам’ятний знак 1806 року",d:"тут стояв перший у Києві будинок для психічнохворих",x:143.3,y:52.8,ic:"sl"},
+ {n:"Хрест пам’яті жертв Куренівської катастрофи",d:"біля Кирилівської церкви",x:145.5,y:-178.5,ic:"cr"},
+ {n:"Статуя Ісуса Христа",d:"біля Кирилівської церкви",x:197.3,y:-90.3,ic:"st"},
+ {n:"Статуя",d:"біля Кирилівської церкви",x:157.9,y:-85.9,ic:"st"}
+];
+var LAND=[
+ {n:"Кирилівська церква",d:"пам’ятка XII століття, музей",x:166,y:-148,ic:"ch",show:1},
+ {n:"Сад відновлення",d:"терапевтичний сад (Nordic Therapy Garden)",x:-182,y:42,ic:"gd",show:1},
+ {n:"Наріжна вежа XVIII ст.",d:"залишок мурів Кирилівського монастиря",x:207.7,y:-51.5,ic:"tw"},
+ {n:"Шлагбаум",d:"на дорозі біля адміністрації",x:86.7,y:16.9,ic:"br"},
+ {n:"Укриття",d:"у східному дворі корпусу 1",x:-8.6,y:89.8,ic:"sh",show:1,kw:"сховище бомбосховище тривога"},
+ {n:"Дзвіниця",d:"біля Кирилівської церкви",x:177.7,y:-93.4,ic:"bl"},
+ {n:"Банкомат Укргазбанку",d:"ліворуч від входу до малої конференц-зали, корпус 12",x:129.5,y:-7.5,ic:"atm",show:1,sh:"Банкомат",kw:"гроші готівка картка укргазбанк"},
+ {n:"Аптека",d:"корпус 11, цокольний поверх; вхід — як до поліклініки та відділень 5 і 22",x:88,y:66,door:[80,71.3],fl:"цокольний",ic:"ph",show:1,kw:"ліки медикаменти фармація препарати"},
+ {n:"Нова Пошта № 146",d:"вул. Кирилівська, через дорогу від стадіону «Спартак»; перейти — переходом біля вул. Олени Теліги",x:420.2,y:-273.9,ic:"np",show:1,sh:"Нова Пошта",kw:"пошта посилка відправлення отримати нп",near:{t:"Нова Пошта № 146",sub:"вул. Кирилівська",ic:"box"}},
+ {n:"Супермаркет «Фора»",d:"вул. Кирилівська, через дорогу від стадіону «Спартак»; перейти — переходом біля вул. Олени Теліги",x:519.2,y:-132.8,ic:"shop",show:1,sh:"Фора",kw:"магазин супермаркет продукти їжа вода фора",near:{t:"Супермаркет «Фора»",sub:"через Кирилівську",ic:"cart"}},
+ {n:"АЗС «БРСМ-Нафта»",d:"заправка з магазином: продукти, кава, хот-доги й бургери (не супермаркет); вул. Олени Теліги, на північ від корпусу 5",x:53.9,y:-168,door:[71.5,-179],ic:"fuel",show:1,sh:"АЗС",kw:"магазин заправка азс бензин кава перекус продукти їжа хот-дог хотдог бургер брсм нафта",near:{t:"Магазин на АЗС",sub:"продукти, хот-доги, бургери",ic:"fuel"}},
+ {n:"Футбольне поле",d:"на північ від корпусу 7",x:233,y:-100,door:[218.6,-87.8],ic:"ball",kw:"футбол спорт стадіон майданчик м’яч"}
+];
+/* підпірні стіни й уступи (OSM barrier=retaining_wall): нижчий бік — праворуч від напрямку лінії */
+var WALLS=["44,119 4,131","15.8,33.5 13.8,27.6 -30.7,12.5 -32.2,8.8 -151.2,41.6","-152.4,151.5 -148.5,148.3 -161,102.7 -162.2,76.6 -166,48.3","172.5,193.8 184.4,168.2 221.7,57.2","437.9,18 400.4,49.1 385.7,52.6","272.9,-226.4 267.4,-234.7 265.3,-291.5 256,-314.6 256.7,-329.9 238.1,-375.4","238.1,-375.4 231.6,-373 196.1,-334.6","-169.6,-335.7 -210.1,-295.4"];
+var ROOFS=/*ROOFS*/;
+var TERRAIN=/*TERRAIN*/;
+var GATES=[[-13,-167],[141.3,-192.4],[176.9,-120.4],[253.6,101]];
+var EM="(044) 293-85-39";
+var D=[
+ {id:"pr",q:1,short:"Приймальне",kw:"приймальня приймальний покій госпіталізація",t:"Приймальне відділення",sub:"цілодобово",ic:"cross",k:"1",door:[27.5,73.2],ents:["prm","prw"],way:"Вхід — із галереї під навісом уздовж корпусу. Двері чоловічого й жіночого блоків підписані на карті.",note:"Працює цілодобово",tel:[EM]},
+ {id:"pol",q:1,ent:"pl",short:"Поліклініка",kw:"реєстратура консультація",t:"Поліклініка",sub:"Пн–Пт 09:00–16:12",ic:"steth",full:"Міська консультативно-діагностична поліклініка",k:"11",note:"Пн–Пт 09:00–16:12",tel:["(044) 293-64-64","(098) 454-18-39"]},
+ {id:"amb",q:1,short:"Амбулаторія № 1",t:"Амбулаторія № 1",sub:"Правобережна",ic:"door",full:"Правобережна психіатрична амбулаторія № 1",k:"1",fl:1,ent:"pnd",kw:"ПНД диспансер реєстратура амбулаторія",note:"реєстратура: Пн–Пт 09:00–16:12, Сб і Нд — вихідні",tel:["(044) 503-87-80","(095) 687-25-90"]},
+ {id:"adm",q:1,ent:"adm",short:"Адміністрація",kw:"директор дирекція головний лікар канцелярія",t:"Адміністрація",sub:"корпус 12",ic:"build",k:"12",wide:0},
+ {id:"kab",x:1,short:"Кабінет прийому",t:"Кабінет амбулаторного прийому",sub:"корпус 5",ic:"chair",k:"5"},
+ {id:"1",k:"5",ent:"k5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
+ {id:"2",k:"5",ent:"k5",d:"Центр первинного психотичного епізоду та сучасних методів лікування"},
+ {id:"3",k:"1",fl:2,ent:"s",d:"Активної терапії гострих психозів",tel:["(044) 503-87-03","(044) 293-85-43"]},
+ {id:"4",k:"1",fl:1,ent:"v4",d:"Лікувально-діагностичне",tel:["(044) 503-87-04","(044) 503-87-05"]},
+ {id:"5",k:"11",ent:"pl",d:"Лікувально-діагностичне",tel:["(044) 293-64-65"]},
+ {id:"6",k:"2",ent:"k2",note:"переїхало з корпусу 7: старі корпуси закривають на капітальний ремонт",d:"Лікувально-діагностичне",tel:["(044) 293-64-52","(044) 293-64-53"]},
+ {id:"7",k:"1",fl:2,ent:"n",lift:1},{id:"8",k:"8",ent:"k8"},
+ {id:"9",k:"2",ent:"k2",note:"переїхало в корпус 2: старі корпуси закривають на капітальний ремонт"},
+ {id:"10",k:"8",ent:"k8"},
+ {id:"13",k:"3",d:"Комплексної терапії резистентних форм хімічної залежності"},
+ {id:"14",k:"3",d:"Інфекційне",tel:["(044) 503-87-14"]},
+ {id:"15",k:"1",fl:3,ent:"n",lift:1,d:"Психіатричної та паліативної допомоги",tel:["(044) 503-87-29","(044) 293-64-61"]},
+ {id:"16",k:"1",fl:3,ent:"s",lift:1,d:"Для хворих із супутньою соматичною патологією",tel:["(044) 503-87-16"],vis:{o:[[570,900],[1020,1080]],q:[900,1020]}},
+ {id:"18",k:"1",fl:3,ent:"w19",d:"Геронтологічне",tel:["(044) 293-64-62"]},
+ {id:"19",k:"1",fl:"1–2",d:"Для хворих на епілепсію",tel:["(044) 293-85-36","(044) 293-64-63"],ent:"w19"},
+ {id:"20",k:"1",fl:3,ent:"w19"},{id:"22",k:"11",ent:"pl"},{id:"23",k:"1",fl:2,ent:"s"},{id:"24",k:"1",fl:3,ent:"s"},
+ /* x — не відділення з номером: шукаються текстом, у плитках і номерах їх немає */
+ {id:"prm",x:1,t:"Приймальне — чоловічий блок",short:"Приймальне (чол.)",k:"1",ent:"prm",kw:"чоловіки",note:"працює цілодобово",tel:[EM]},
+ {id:"prw",x:1,t:"Приймальне — жіночий блок",short:"Приймальне (жін.)",k:"1",ent:"prw",kw:"жінки",note:"працює цілодобово",tel:[EM]},
+ {id:"arh",q:1,short:"Архів",t:"Архів",sub:"корпус 1",ic:"door",k:"1",ent:"arh",note:"двері в галереї під навісом"},
+ 
+ {id:"ekopfo",x:1,t:"ЕКОПФО",short:"ЕКОПФО",full:"ЕКОПФО — експертна команда з оцінювання повсякденного функціонування особи",k:"1",fl:1,ent:"n",kw:"експертна команда оцінювання повсякденного функціонування особи мсек інвалідність",note:"вхід той самий, що до відділень 7 і 15"},
+ {id:"lift",x:1,t:"Ліфт корпусу 1",short:"Ліфт",k:"1",ent:"lift",note:"до відділень 7, 15 і 16"},
+ {id:"vkz",x:1,t:"Велика конференц-зала",short:"Велика конф.-зала",k:"11",ent:"vkz",kw:"конференція зал актова",note:"вхід з внутрішнього двору корпусу 11"},
+ {id:"muz",x:1,t:"Музей",short:"Музей",k:"11",ent:"vkz",kw:"музей історії лікарні",note:"вхід з внутрішнього двору корпусу 11"},
+ {id:"ukr11",x:1,t:"Укриття в корпусі 11",short:"Укриття",k:"11",ent:"st11",kw:"сховище бомбосховище тривога",note:"вхід зі сходинками"},
+ {id:"cafe",x:1,t:"Кафе",k:"11",ent:"cafe",kw:"їжа кава буфет",note:"вхід зі східного боку корпусу 11"},
+ {id:"mkz",x:1,t:"Мала конференц-зала",short:"Мала конф.-зала",k:"12",ent:"mkz",kw:"конференція зал",note:"вхід зі східного боку корпусу"}
+];
+
+/* ---------- маршрути (чиста логіка) ---------- */
+function pts(s){return s.trim().split(/\s+/).map(function(a){var c=a.split(",");return [+c[0],+c[1]]})}
+var GCACHE={};
+function graph(noSteps){
+  var key=noSteps?"n":"a";if(GCACHE[key])return GCACHE[key];
+  var idx={},nodes=[],adj=[];
+  function node(p){var k=p[0].toFixed(1)+","+p[1].toFixed(1);if(idx[k]===undefined){idx[k]=nodes.length;nodes.push(p);adj.push([])}return idx[k]}
+  WAYS.split("\n").forEach(function(line){
+    var sp=line.indexOf(" "),code=line.slice(0,sp),p=pts(line.slice(sp+1));
+    if(code.indexOf("x")>0)return; if(noSteps&&code==="s")return;
+    for(var i=1;i<p.length;i++){
+      var a=p[i-1],b=p[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(1,Math.ceil(L/10)),prev=node(a);
+      for(var j=1;j<=n;j++){var q=j===n?b:[a[0]+(b[0]-a[0])*j/n,a[1]+(b[1]-a[1])*j/n],cur=node(q);adj[prev].push([cur,L/n]);adj[cur].push([prev,L/n]);prev=cur}
+    }
+  });
+  return GCACHE[key]={idx:idx,nodes:nodes,adj:adj};
+}
+function dijkstra(g,s){
+  var n=g.nodes.length,dist=new Float64Array(n).fill(Infinity),prev=new Int32Array(n).fill(-1),h=[[0,s]];dist[s]=0;
+  function push(x){h.push(x);var i=h.length-1;while(i>0){var p=(i-1)>>1;if(h[p][0]<=h[i][0])break;var t=h[p];h[p]=h[i];h[i]=t;i=p}}
+  function pop(){var top=h[0],last=h.pop();if(h.length){h[0]=last;var i=0;for(;;){var l=2*i+1,r=l+1,m=i;if(l<h.length&&h[l][0]<h[m][0])m=l;if(r<h.length&&h[r][0]<h[m][0])m=r;if(m===i)break;var t=h[m];h[m]=h[i];h[i]=t;i=m}}return top}
+  while(h.length){var cur=pop(),u=cur[1];if(cur[0]>dist[u])continue;var a=g.adj[u];for(var k=0;k<a.length;k++){var v=a[k][0],nd=dist[u]+a[k][1];if(nd<dist[v]){dist[v]=nd;prev[v]=u;push([nd,v])}}}
+  return {dist:dist,prev:prev};
+}
+function findRoute(from,door,noSteps){
+  var g=graph(noSteps),s=g.idx[from[0].toFixed(1)+","+from[1].toFixed(1)],lead=0;
+  if(s===undefined){var bd0=Infinity;for(var q=0;q<g.nodes.length;q++){var dd=Math.hypot(g.nodes[q][0]-from[0],g.nodes[q][1]-from[1]);if(dd<bd0){bd0=dd;s=q}}if(bd0>300)return null;lead=bd0}
+  var r=dijkstra(g,s),t=-1,bd=Infinity;
+  for(var k=0;k<g.nodes.length;k++){if(r.dist[k]===Infinity)continue;var d=Math.hypot(g.nodes[k][0]-door[0],g.nodes[k][1]-door[1]),score=d*3+r.dist[k]*0.02;if(score<bd){bd=score;t=k}}
+  if(t<0)return null;
+  var tail=Math.hypot(g.nodes[t][0]-door[0],g.nodes[t][1]-door[1]);if(tail>40)return null;
+  var path=[];for(var c=t;c>=0;c=r.prev[c])path.push(g.nodes[c]);path.reverse();if(lead)path.unshift(from);
+  return {path:path,len:r.dist[t]+tail+lead};
+}
+/* ---------- «На авто» (18.11.2026): машиною — лише дорогами («v»), не під будівлями; шлагбаум біля адміністрації вважаємо закритим.
+   Заїзд — дорогою від зупинки «Лікарня ім. Павлова» (e1) і Врубелівським узвозом від вул. Кирилівської (e3).
+   Машину лишаємо там, звідки найшвидше дійти до дверей; далі — пішки. Місць для паркування поки немає. ---------- */
+var CAR_IN={e1:[-322,-99],e3:[444,9]},CAR_BLOCK=[[91.4,17.6]],CAR_V=250,WALK_V=70,CARG=null;
+function inRings(p,rings){var c=false;rings.forEach(function(r){for(var i=0,j=r.length-1;i<r.length;j=i++){var a=r[i],b=r[j];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])c=!c}});return c}
+function carGraph(){
+  if(CARG)return CARG;
+  var idx={},nodes=[],adj=[],BR=B.map(function(b){return b.p.map(pts)});
+  function node(p){var k=p[0].toFixed(1)+","+p[1].toFixed(1);if(idx[k]===undefined){idx[k]=nodes.length;nodes.push(p);adj.push([])}return idx[k]}
+  function blocked(a,b){var m=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    if(CAR_BLOCK.some(function(q){return Math.hypot(q[0]-m[0],q[1]-m[1])<6}))return true;
+    return BR.some(function(r){return inRings(m,r)})}
+  WAYS.split("\n").forEach(function(line){
+    var sp=line.indexOf(" "),code=line.slice(0,sp);if(code!=="v")return;var p=pts(line.slice(sp+1));
+    for(var i=1;i<p.length;i++){
+      var a=p[i-1],b=p[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(1,Math.ceil(L/10)),pa=a,prev=node(a);
+      for(var j=1;j<=n;j++){var q=j===n?b:[a[0]+(b[0]-a[0])*j/n,a[1]+(b[1]-a[1])*j/n],cur=node(q);if(!blocked(pa,q)){adj[prev].push([cur,L/n]);adj[cur].push([prev,L/n])}prev=cur;pa=q}
+    }
+  });
+  return CARG={idx:idx,nodes:nodes,adj:adj};
+}
+function nearestNode(g,p,max){var s=-1,bd=max;for(var q=0;q<g.nodes.length;q++){var d=Math.hypot(g.nodes[q][0]-p[0],g.nodes[q][1]-p[1]);if(d<bd&&g.adj[q].length){bd=d;s=q}}return s}
+/* маршрут машиною від точки from до місця, звідки найшвидше дійти до дверей; повертає дві частини: drive і walk */
+function carRoute(from,door,noSteps){
+  var cg=carGraph(),s=nearestNode(cg,from,40);if(s<0)return null;
+  var g=graph(noSteps),dn=nearestNode(g,door,40);if(dn<0)return null;
+  var tail=Math.hypot(g.nodes[dn][0]-door[0],g.nodes[dn][1]-door[1]);
+  var dr=dijkstra(cg,s),wr=dijkstra(g,dn),best=-1,bc=Infinity;
+  for(var c=0;c<cg.nodes.length;c++){if(dr.dist[c]===Infinity)continue;var gi=g.idx[cg.nodes[c][0].toFixed(1)+","+cg.nodes[c][1].toFixed(1)];if(gi===undefined||wr.dist[gi]===Infinity)continue;
+    var cost=dr.dist[c]/CAR_V+(wr.dist[gi]+tail)/WALK_V;if(cost<bc){bc=cost;best=c}}
+  if(best<0)return null;
+  var drive=[];for(var x=best;x>=0;x=dr.prev[x])drive.push(cg.nodes[x]);drive.reverse();
+  var walk=[],gb=g.idx[cg.nodes[best][0].toFixed(1)+","+cg.nodes[best][1].toFixed(1)];for(var y=gb;y>=0;y=wr.prev[y])walk.push(g.nodes[y]);
+  var dl=dr.dist[best],wl=wr.dist[gb]+tail;
+  return {drive:drive,walk:walk,park:cg.nodes[best],dlen:dl,wlen:wl,len:dl+wl,min:Math.max(1,Math.ceil(dl/CAR_V+wl/WALK_V))};
+}
+/* найкращий в'їзд для цієї точки призначення */
+function carBest(door,noSteps){var o=null;Object.keys(CAR_IN).forEach(function(k){var r=carRoute(CAR_IN[k],door,noSteps);if(r&&(!o||r.min<o.r.min||(r.min===o.r.min&&r.len<o.r.len)))o={k:k,r:r}});return o}
+if(typeof document==="undefined"){
+  B.filter(function(b){return b.key}).forEach(function(b){
+    var out=["k"+b.k];Object.keys(STARTS).forEach(function(e){[false,true].forEach(function(ns){var r=findRoute(STARTS[e].at,b.door,ns);out.push(e+(ns?"-ns":"")+":"+(r?Math.round(r.len):"—"))})});
+    console.log(out.join("  "));
+  });
+  D.forEach(function(d){var p=d.ent?ENT[d.ent].p:d.door;if(!p)return;var o=["dept "+d.id];["e1","e2","e3"].forEach(function(e){[false,true].forEach(function(ns){var q=ns&&d.lift?ENT.lift.p:p,r=findRoute(STARTS[e].at,q,ns);o.push(e+(ns?"-ns":"")+":"+(r?Math.round(r.len)+"/"+Math.round(Math.hypot(r.path[r.path.length-1][0]-q[0],r.path[r.path.length-1][1]-q[1])):"—"))})});console.log(o.join("  "))});
+} else {
+
+/* ---------- малювання карти ---------- */
+var svg=document.getElementById("map");
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function lbl(cls,x,y,rot,inner,attrs){return '<g class="lb '+cls+'" data-x="'+x+'" data-y="'+y+'" data-r="'+(rot||0)+'" '+(attrs||"")+'>'+inner+'</g>'}
+function ringsPath(rs){return rs.map(function(r){return "M"+r.trim().split(/\s+/).join("L")+"Z"}).join("")}
+var IC={
+ st:'<circle class="f" cy="-3.9" r="1.15"/><path class="f" d="M-1.7-2.5h3.4l-.45 3H.55V1.7h-1.1V.5h-.7z"/><path class="f" d="M-3 1.9h6v.9h-.6v1.3h.6v.9h-6v-.9h.6V2.8h-.6z"/>',
+ bu:'<circle class="f" cy="-3" r="1.5"/><path class="f" d="M-2.7.9c0-1.9 1.1-2.5 2.7-2.5s2.7.6 2.7 2.5zM-1.5.9h3v2.6h-3zM-2.6 3.5h5.2v1h-5.2z"/>',
+ sl:'<path class="f" d="M-1.25 3V-2.7L0-4.7l1.25 2V3zM-2.8 3h5.6v1.5h-5.6z"/>',
+ cr:'<path class="f" d="M-.65-4.8h1.3v2.3h2.3v1.3H.65v4.5H-.65v-4.5h-2.3v-1.3h2.3zM-2.2 3.3h4.4v1.2h-4.4z"/>',
+ bn:'<path class="f" d="M-4-3.1h8v1.2h-8zM-3.3-1.9h1v1.4h-1zM2.3-1.9h1v1.4h-1zM-4.2-.5h8.4v1.3h-8.4zM-3.4.8h1.1v2.8h-1.1zM2.3.8h1.1v2.8H2.3z"/>',
+ gz:'<path class="f" d="M0-5.1l.5.8 4 3.1h-9l4-3.1zM-3.7-1h1v3.9h-1zM-.5-1h1v3.9h-1zM2.7-1h1v3.9h-1zM-4.4 2.9h8.8v1.2h-8.8z"/>',
+ ch:'<path d="M0-4.8v1.6M-1 -4h2M-2.6 3.6v-3.4l2.6-2.4 2.6 2.4v3.4zM-.9 3.6v-1.8h1.8v1.8"/>',
+ tw:'<path d="M-2.2 3.6v-6.2h4.4v6.2zM-2.2-2.6l2.2-2 2.2 2"/>',
+ bl:'<path class="f" d="M0-4.8c-.5 0-.8.3-.8.7v.3C-2.5-3.3-3.1-1.7-3.1.4v1.7l-1.1 1.1v.7h8.4v-.7L3.1 2.1V.4c0-2.1-.6-3.7-2.3-4.2v-.3c0-.4-.3-.7-.8-.7zM-1.2 4.1a1.2 1.2 0 0 0 2.4 0z"/>',
+ atm:'<rect x="-4" y="-5" width="8" height="10" rx="1.3" style="fill:#2e7d4f;stroke:none"/><rect x="-2.7" y="-3.7" width="5.4" height="3.3" rx=".5" style="fill:#fff;stroke:none"/><path d="M-2.4 1.5h4.8M-1.2 3.2h2.4" style="fill:none;stroke:#fff;stroke-width:.9;stroke-linecap:round"/>',
+ np:'<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#c8352c;stroke:none"/><path d="M0-3.5 3.2-1.85v3.7L0 3.5-3.2 1.85v-3.7z" style="fill:#fff;stroke:none"/><path d="M-3.2-1.85 0-.2 3.2-1.85M0-.2v3.7" style="fill:none;stroke:#c8352c;stroke-width:.6;stroke-linejoin:round"/>',
+ shop:'<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#6e4fc2;stroke:none"/><path d="M-3.7-2.9h1.2l1 4h4.1l1-2.9H-2.2" style="fill:none;stroke:#fff;stroke-width:.85;stroke-linecap:round;stroke-linejoin:round"/><circle cx="-1.1" cy="2.7" r=".75" style="fill:#fff;stroke:none"/><circle cx="2.5" cy="2.7" r=".75" style="fill:#fff;stroke:none"/>',
+ fuel:'<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#4d5b66;stroke:none"/><path d="M-3.1-3.6h4.2v7.4h-4.2z" style="fill:#fff;stroke:none"/><path d="M-2.3-2.8h2.6v2h-2.6z" style="fill:#4d5b66;stroke:none"/><path d="M1.1-1.4h.9a.6.6 0 0 1 .6.6v2.3a.55.55 0 0 0 1.1 0V-1.9L2.8-3.1" style="fill:none;stroke:#fff;stroke-width:.65;stroke-linecap:round;stroke-linejoin:round"/>',
+ ball:'<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#2f8a4a;stroke:none"/><circle r="3.3" style="fill:#fff;stroke:none"/><path d="M0-1.35 1.28-.42.79 1.09H-.79L-1.28-.42z" style="fill:#2f8a4a;stroke:none"/><path d="M0-1.35V-3.2M1.28-.42 3.1-.98M.79 1.09l1.1 1.6M-.79 1.09l-1.1 1.6M-1.28-.42-3.1-.98" style="fill:none;stroke:#2f8a4a;stroke-width:.45"/>',
+ ph:'<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#1f8a4c;stroke:none"/><path d="M-1-3.4h2v2.4h2.4v2H1v2.4h-2V1h-2.4v-2H-1z" style="fill:#fff;stroke:none"/>',
+ sh:'<rect x="-4.7" y="-4.7" width="9.4" height="9.4" rx="1.7" style="fill:#f28c00;stroke:none"/><path d="M0-3.4 3.4 2.6H-3.4z" style="fill:#1d4fc4;stroke:none"/>',
+ br:'<path class="f" d="M-4.9-3.4h1.7v6.7h-1.7zM-5.7 3.2h3.3v1.4h-3.3z"/><path d="M-3.2-2.95h8.5v1.95h-8.5z" style="fill:#fff;stroke:#c63a2f;stroke-width:.55;stroke-linejoin:miter"/><path d="M-1.2-2.95h1.75v1.95h-1.75zM2.3-2.95h1.75v1.95H2.3z" style="fill:#c63a2f;stroke:none"/>',
+ gd:'<path d="M0 4V-.5M0 -.5c-2.6 0-3.6-1.6-3.2-3.2C-2.6-5.4-1-5.6 0-4.6c1-1 2.6-.8 3.2 1C3.6-2 2.6-.5 0-.5z"/>'
+};
+var h='<defs><radialGradient id="dg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="var(--dome1)"/><stop offset=".55" stop-color="var(--dome2)"/><stop offset="1" stop-color="var(--dome3)"/></radialGradient></defs>';
+h+='<rect class="land" x="-4000" y="-4000" width="8000" height="8000"/>';
+h+='<polygon class="park" points="'+GREEN+'"/><polygon class="park" points="'+GREEN2+'"/>';
+var tb=TERRAIN.box;h+='<image class="relief" href="data:image/png;base64,'+TERRAIN.png+'" x="'+tb[0]+'" y="'+tb[1]+'" width="'+tb[2]+'" height="'+tb[3]+'" preserveAspectRatio="none"/>';
+h+='<path class="cont" d="'+TERRAIN.c+'"/><path class="cont i" d="'+TERRAIN.ci+'"/><path class="hach" d="'+TERRAIN.h+'"/>';
+MAJOR.forEach(function(m){h+='<polyline class="major-e" stroke-width="'+(m[0]+2.4)+'" points="'+m[1]+'"/>'});
+MAJOR.forEach(function(m){h+='<polyline class="major" stroke-width="'+m[0]+'" points="'+m[1]+'"/>'});
+h+='<polygon class="terr" points="'+TERR+'"/>';
+/* стадіон «Спартак» і футбольне поле — зі скринів Google (19.11.2026) */
+var STAD={o:"442.2,-119.5 446.9,-108.8 448.6,-97.2 447.3,-85.6 443.0,-74.7 436.0,-65.3 426.9,-58.0 416.1,-53.3 404.6,-51.6 392.9,-52.9 382.0,-57.2 372.6,-64.2 365.3,-73.3 322.6,-144.5 317.9,-155.2 316.2,-166.8 317.5,-178.4 321.8,-189.3 328.8,-198.7 337.9,-206.0 348.7,-210.7 360.2,-212.4 371.9,-211.1 382.8,-206.8 392.2,-199.8 399.5,-190.7",
+ i:"433.8,-114.5 437.5,-106.1 438.8,-97.0 437.8,-87.9 434.4,-79.4 429.0,-72.1 421.8,-66.4 413.4,-62.7 404.4,-61.4 395.3,-62.4 386.8,-65.8 379.4,-71.2 373.7,-78.4 331.0,-149.5 327.3,-157.9 326.0,-167.0 327.0,-176.1 330.4,-184.6 335.8,-191.9 343.0,-197.6 351.4,-201.3 360.4,-202.6 369.5,-201.6 378.0,-198.2 385.4,-192.8 391.1,-185.6",
+ p:"384.1,-191.3 435.6,-105.6 380.7,-72.7 329.2,-158.4",l:"409.8,-148.5 355.0,-115.5",c:[382.4,-132.0]};
+var PITCH={p:"208.9,-102.6 226.5,-114.1 246.0,-84.5 228.4,-73.0",l:"218.6,-87.8 236.2,-99.3",c:[227.4,-93.5]};
+h+='<polygon class="trk" points="'+STAD.o+'"/><polygon class="pitch" points="'+STAD.i+'"/><polygon class="pitch-l" points="'+STAD.p+'"/><polyline class="pitch-l" points="'+STAD.l+'"/><circle class="pitch-l" cx="'+STAD.c[0]+'" cy="'+STAD.c[1]+'" r="9.15"/>';
+h+='<polygon class="pitch" points="'+PITCH.p+'"/><polyline class="pitch-l" points="'+PITCH.l+'"/><circle class="pitch-l" cx="'+PITCH.c[0]+'" cy="'+PITCH.c[1]+'" r="3"/>';
+/* тіні: сонце з північного заходу, тінь падає на південний схід; довжина — від висоти */
+var SUN=[.55,.66];
+function shadowOf(poly,hgt){var out="",n=4;for(var k=1;k<=n;k++){var d=hgt*.62*k/n;out+='<path class="shd" transform="translate('+(SUN[0]*d).toFixed(2)+' '+(SUN[1]*d).toFixed(2)+')" d="'+poly+'"/>'}return out}
+var ctxS="",ctxB="";CTX.trim().split("\n").forEach(function(p){var d="M"+p.trim().split(/\s+/).join("L")+"Z";ctxS+='<path class="shd" transform="translate(4.4 5.3)" d="'+d+'"/>';ctxB+='<path class="ctx" d="'+d+'"/>'});
+h+='<g class="shg ctxs">'+ctxS+'</g>'+ctxB;
+PAVE.forEach(function(p){h+='<polygon class="pave" points="'+p+'"/>'});
+SLOPES.forEach(function(sl,i){h+='<pattern id="slp'+i+'" width="2.6" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate('+sl.a+')"><path class="slp-t" d="M1.3 .5v1.3"/></pattern><polygon class="slope" fill="url(#slp'+i+')" points="'+sl.p+'"/>'});
+PAVE_E.forEach(function(p){h+='<polygon class="pave" points="'+p+'"/>'});
+var rd="",rde="",fw="",fwe="",stp="",stb="",zb="";
+WAYS.split("\n").forEach(function(line){var sp=line.indexOf(" "),c=line.charAt(0),p=line.slice(sp+1);
+  if(c==="v"){rde+='<polyline class="rd-e" points="'+p+'"/>';rd+='<polyline class="rd" points="'+p+'"/>'}
+  else if(c==="s"){stb+='<polyline class="stp-b" points="'+p+'"/>';stp+='<polyline class="stp" points="'+p+'"/>'}
+  else if(c==="z"){zb+='<polyline class="zeb-b" points="'+p+'"/><polyline class="zeb" points="'+p+'"/>'}
+  else if(c==="u"){fwe+='<polyline class="tun-e" points="'+p+'"/>';fw+='<polyline class="tun" points="'+p+'"/>'}
+  else{fwe+='<polyline class="fw-e" points="'+p+'"/>';fw+='<polyline class="fw" points="'+p+'"/>'}});
+h+=rde+fwe+rd+fw+zb+stb+stp;
+
+GAZEBO.forEach(function(g){h+='<g class="gz"><circle cx="'+g[0]+'" cy="'+g[1]+'" r="2.3"/><circle class="gz-c" cx="'+g[0]+'" cy="'+g[1]+'" r=".55"/><title>Бесідка</title></g>'});
+/* уступи й підпірні стіни: лінія з зубцями в бік спуску */
+WALLS.forEach(function(w){var p=pts(w),t="";for(var i=1;i<p.length;i++){var a=p[i-1],b=p[i],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,nx=-uy,ny=ux;for(var q=2;q<L-1;q+=3.2){var x=a[0]+ux*q,y=a[1]+uy*q;t+="M"+x.toFixed(1)+" "+y.toFixed(1)+"l"+(nx*-2.4).toFixed(1)+" "+(ny*-2.4).toFixed(1)}}
+  h+='<path class="cliff-t" d="'+t+'"/><polyline class="cliff" points="'+w+'"/>'});
+h+='<polyline class="priv-line" points="'+PRIV+'"/>';
+function LV(b){return (b.lv||1)*3.3+(ROOFS.b[B.indexOf(b)]?2.5:0)}
+var sh="",bb="";
+LMB.forEach(function(l,i){var d="M"+l.p.trim().split(/\s+/).join("L")+"Z";sh+=shadowOf(d,i===0?14:7)});
+B.forEach(function(b){sh+=shadowOf(ringsPath([b.p[0]]),LV(b))});
+h+='<g class="shg">'+sh+'</g><g id="glow"></g>';
+function roof(list){var o="";list.forEach(function(f){var a=Math.min(.42,Math.abs(f.s)*1.25);if(a<.02)a=.02;o+='<polygon class="fac" points="'+f.p+'" fill="'+(f.s>0?"rgba(255,255,255,":"rgba(0,0,0,")+a.toFixed(2)+')"/>'});return o}
+LMB.forEach(function(l,i){bb+='<polygon class="b '+l.c+'" points="'+l.p+'"/>';if(ROOFS.l[i])bb+=roof(ROOFS.l[i])});
+/* Кирилівська церква: бані з об’ємом */
+(function(){var C=[178.5,-167.2],u=[.686,.728],v=[-.759,.651];bb+='<polygon class="hib" fill="rgba(0,0,0,.06)" points="'+[[C[0]+u[0]*8+v[0]*3,C[1]+u[1]*8+v[1]*3],[C[0]+u[0]*8-v[0]*3,C[1]+u[1]*8-v[1]*3],[C[0]-u[0]*8-v[0]*3,C[1]-u[1]*8-v[1]*3],[C[0]-u[0]*8+v[0]*3,C[1]-u[1]*8+v[1]*3]].join(" ")+'"/>';
+  [[0,0,5.6],[7.4,0,2.9],[-7.4,0,2.9],[0,7.4,2.9],[0,-7.4,2.9]].forEach(function(d){var x=C[0]+u[0]*d[0]+v[0]*d[1],y=C[1]+u[1]*d[0]+v[1]*d[1];
+    bb+='<circle class="dome" cx="'+(x+1.2).toFixed(1)+'" cy="'+(y+1.5).toFixed(1)+'" r="'+d[2]+'" fill="rgba(0,0,0,.22)"/><circle class="dome" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+d[2]+'" fill="url(#dg)" stroke="rgba(0,0,0,.25)" stroke-width=".4"/><circle class="dome" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(d[2]*.18).toFixed(2)+'" fill="#e8c766"/>'})})();
+B.forEach(function(b,i){var d=ringsPath(b.p);
+  bb+='<path class="b '+b.r+(b.priv?" priv":"")+'" data-b="'+i+'" d="'+d+'"/>';
+  if(ROOFS.b[i])bb+=roof(ROOFS.b[i]);
+  /* каскад: вищі частини кидають тінь на нижчий дах і світліші згори */
+  (b.hi||[]).forEach(function(q,k){var dl=((b.hl&&b.hl[k])||2)-(b.lv||1),pd="M"+q.trim().split(/\s+/).join("L")+"Z";
+    bb+='<g class="shg" style="opacity:.2">'+shadowOf(pd,dl*3.3)+'</g><path class="b hib '+b.r+'" d="'+pd+'"/><path d="'+pd+'" fill="rgba(255,255,255,'+Math.min(.28,dl*.045).toFixed(2)+')" class="hib"/>'});
+  if(b.ring)bb+='<polygon class="ring" points="'+b.ring+'"/>';});
+h+=bb;
+h+='<g id="darea"></g>';
+GAL.forEach(function(g){var p=pts(g),a=p[0],b=p[1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),nx=-dy/L*2.6,ny=dx/L*2.6,ex=dx/L*1.2,ey=dy/L*1.2;
+  var A=[a[0]-ex,a[1]-ey],Z=[b[0]+ex,b[1]+ey];
+  h+='<polyline class="gal-b" points="'+A+" "+Z+'"/>';
+  h+='<polyline class="gal-d" points="'+[A[0]+nx,A[1]+ny]+" "+[Z[0]+nx,Z[1]+ny]+'"/><polyline class="gal-d" points="'+[A[0]-nx,A[1]-ny]+" "+[Z[0]-nx,Z[1]-ny]+'"/>'});
+GALF.forEach(function(g){var dx=g.b[0]-g.a[0],dy=g.b[1]-g.a[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,ix=-uy,iy=ux,w=g.w,A=[g.a[0]+ux*1.2,g.a[1]+uy*1.2],Z=[g.b[0]-ux*1.2,g.b[1]-uy*1.2];
+  function off(p,o){return (p[0]+ix*o).toFixed(1)+","+(p[1]+iy*o).toFixed(1)}
+  h+='<polyline class="gal-b" style="stroke-width:'+(w+.6)+'" points="'+off(A,w/2-.3)+" "+off(Z,w/2-.3)+'"/>';
+  h+='<polyline class="gal-d" points="'+off(A,0)+" "+off(Z,0)+'"/><polyline class="gal-d" points="'+off(A,w)+" "+off(Z,w)+'"/>'});
+STEPS_IN.forEach(function(p){h+='<polyline class="stp-b" points="'+p+'"/><polyline class="stp" points="'+p+'"/>'});
+h+='<g id="route"></g>';
+STREETS.forEach(function(s){h+=lbl("stn sec",s[1],s[2],s[3],'<text text-anchor="middle">'+esc(s[0])+'</text>')});
+GATES.forEach(function(g){var best=null;WAYS.split("\n").forEach(function(line){var sp=line.indexOf(" "),c=line.charAt(0),p=pts(line.slice(sp+1));
+    for(var i=1;i<p.length;i++){var a=p[i-1],b=p[i],dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((g[0]-a[0])*dx+(g[1]-a[1])*dy)/L2)),d=Math.hypot(a[0]+dx*t-g[0],a[1]+dy*t-g[1]);
+      if(!best||d<best.d)best={d:d,u:[dx/Math.sqrt(L2),dy/Math.sqrt(L2)],road:c==="v"}}});
+  var u=best&&best.d<12?best.u:[1,0],n=[-u[1],u[0]],L=best&&best.road?5.4:2.9,A=[g[0]-n[0]*L,g[1]-n[1]*L],Z=[g[0]+n[0]*L,g[1]+n[1]*L];
+  h+='<g class="gate"><line class="gate-b" x1="'+A[0].toFixed(1)+'" y1="'+A[1].toFixed(1)+'" x2="'+Z[0].toFixed(1)+'" y2="'+Z[1].toFixed(1)+'"/><circle class="gate-p" cx="'+A[0].toFixed(1)+'" cy="'+A[1].toFixed(1)+'" r="1.15"/><circle class="gate-p" cx="'+Z[0].toFixed(1)+'" cy="'+Z[1].toFixed(1)+'" r="1.15"/></g>'});
+SCULPT.concat(LAND).forEach(function(p,i){var lm=i>=SCULPT.length;
+  h+=lbl("poi"+(lm?" lm":"")+(p.show?"":" sec"),p.x,p.y,0,'<circle class="dot" r="7"/><g>'+IC[p.ic]+'</g><text x="10" y="4">'+esc(p.n)+'</text><circle class="hit" r="15" data-poi="'+i+'"/>')});
+BENCH.forEach(function(b){h+=lbl("poi amen",b[0],b[1],0,'<circle class="dot" r="7"/><g>'+IC.bn+'</g><title>Лавка</title>')});
+GAZEBO.forEach(function(g){h+=lbl("poi amen",g[0],g[1],0,'<circle class="dot" r="7.5"/><g>'+IC.gz+'</g><title>Бесідка</title>')});
+/* входи: «шпилька» — кружечок зі значком «вхід» стоїть зовні, гострий кінчик торкається дверей.
+   Напрямок — усередину до найближчої стіни свого корпусу; dir — ручний напрямок у градусах (0 — на схід, 90 — на південь); ta — бік підпису (l, r, t, b) */
+function inRings(rs,x,y){var c=false;rs.forEach(function(r){for(var i=0,j=r.length-1;i<r.length;j=i++){var a=r[i],b=r[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}});return c}
+function entDir(e){if(e.dir!==undefined)return e.dir;var b=null;B.forEach(function(q){if(!b&&q.k===e.k)b=q});if(!b)return 0;
+  var rs=b.p.map(pts),best=null,P=e.p;
+  rs.forEach(function(r){for(var i=0;i<r.length;i++){var a=r[i],c=r[(i+1)%r.length],dx=c[0]-a[0],dy=c[1]-a[1],L2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((P[0]-a[0])*dx+(P[1]-a[1])*dy)/L2)),d=Math.hypot(a[0]+dx*t-P[0],a[1]+dy*t-P[1]);
+    if(!best||d<best.d){var L=Math.sqrt(L2);best={d:d,n:[-dy/L,dx/L]}}}});
+  var n=best.n;if(!inRings(rs,P[0]+n[0]*1.5,P[1]+n[1]*1.5))n=[-n[0],-n[1]];return Math.round(Math.atan2(n[1],n[0])*180/Math.PI)}
+var PINR=7.2,PINC=12.4;
+/* значок усередині кружечка не крутиться (повернутий навскіс, він не читається), лише дзеркалиться, коли двері ліворуч;
+   спершу входи інших корпусів, щоб підписи входів корпусу 1 лягали поверх них */
+Object.keys(ENT).sort(function(p,q){return (/^b\d/.test(p)?0:1)-(/^b\d/.test(q)?0:1)}).forEach(function(id){var e=ENT[id],a=entDir(e),r=a*Math.PI/180,ux=Math.cos(r),uy=Math.sin(r),cx=-ux*PINC,cy=-uy*PINC,
+    side=e.ta||(Math.abs(ux)>=.5?(ux<0?"r":"l"):(uy<0?"b":"t")),
+    tx=side==="r"?cx+PINR+3:side==="l"?cx-PINR-3:cx,ty=side==="t"?cy-PINR-4:side==="b"?cy+PINR+11:cy+3.7,an=side==="r"?"start":side==="l"?"end":"middle";
+  h+=lbl("door sec",e.p[0],e.p[1],0,'<path class="dr" transform="rotate('+a+')" d="M0 0-6.2-3.6A7.2 7.2 0 1 0-6.2 3.6Z"/><path class="dg" transform="translate('+cx.toFixed(2)+' '+cy.toFixed(2)+')'+(ux<-.3?' scale(-1 1)':'')+'" d="M.6-3.7h2.9v7.4H.6M-3.9 0h4.6M-.9-2.3 1.4 0l-2.3 2.3"/>'+
+    (e.t?'<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="'+an+'">'+esc(e.t)+'</text>':'')+'<circle class="hit" cx="'+(cx/2).toFixed(1)+'" cy="'+(cy/2).toFixed(1)+'" r="13" data-ent="'+id+'"/>','data-en="'+id+'"')});
+B.forEach(function(b,i){if(!b.k||!b.lab)return;h+=lbl("badge"+(b.key?" key":" sec"),b.lab[0],b.lab[1],0,'<circle class="pulse" r="13"/><circle r="'+(b.key?12:10)+'"/><text>'+b.k+'</text>','data-bb="'+i+'"')});
+var STOP_BUS='<path fill-rule="evenodd" d="M-4.9-3.5c0-1.4 1.1-2.2 2.6-2.2h4.6c1.5 0 2.6.8 2.6 2.2V3.3h-9.8zM-3.7-3.6h7.4v3.7h-7.4zM-3.4 1.7a.85.85 0 1 0 1.7 0a.85.85 0 1 0-1.7 0zM1.7 1.7a.85.85 0 1 0 1.7 0a.85.85 0 1 0-1.7 0z"/><path d="M-4.3 3.3h1.9v1.5a.5.5 0 0 1-.5.5h-.9a.5.5 0 0 1-.5-.5zM2.4 3.3h1.9v1.5a.5.5 0 0 1-.5.5h-.9a.5.5 0 0 1-.5-.5zM-6.1-3.2h.8v2h-.8zM5.3-3.2h.8v2h-.8z"/>',STOP_TRAM='<path fill-rule="evenodd" d="M-4.4-2.1c0-.9.6-1.5 1.5-1.5h5.8c.9 0 1.5.6 1.5 1.5V3.7h-8.8zM-3.2-2.4h6.4v3h-6.4zM-3 2.2a.75.75 0 1 0 1.5 0a.75.75 0 1 0-1.5 0zM1.5 2.2a.75.75 0 1 0 1.5 0a.75.75 0 1 0-1.5 0z"/><path d="M-.4-5.3h.8v1.7h-.8zM-2.8-6.3h5.6v1h-5.6zM-3.7 3.7h1.7v1.3h-1.7zM2 3.7h1.7v1.3H2z"/>';
+Object.keys(STARTS).forEach(function(e){var s=STARTS[e];
+  h+=lbl("stop"+(s.here?" here":""),s.stop[0],s.stop[1],0,'<rect x="-9" y="-9" width="18" height="18" rx="5"/>'+(s.here?'<circle r="3.4" fill="#fff"/>':(s.vt==="tram"?STOP_TRAM:STOP_BUS))+'<text x="13" y="4">'+esc(s.ln||s.name)+'</text><circle class="hit" r="17" data-stop="'+e+'"/>','data-e="'+e+'"'+(s.here?' data-here="1"':''))});
+h+='<g id="me"></g><g id="pin"></g>';
+svg.innerHTML=h;
+var POIS=SCULPT.concat(LAND);
+
+/* ---------- камера: плавна, з межами (карта ніколи не тікає з екрана) ---------- */
+var vb={x:-430,y:-380,w:960,h:700};
+var BOUND={x0:-360,y0:-345,x1:540,y1:300}, WMIN=73, WFIT=110, WMAX=1250;
+function size(){var r=svg.getBoundingClientRect();return {w:r.width||360,h:r.height||640,l:r.left,t:r.top}}
+function insets(){
+  var s=size(),dr={top:dockTop()};
+  var hb=document.getElementById("mast").getBoundingClientRect();
+  return {t:Math.max(14,hb.bottom-s.t+10),b:Math.max(14,s.h-(dr.top-s.t)+10),l:14,r:70};
+}
+function clamp(v){
+  var s=size();v.w=Math.min(WMAX,WMAX*s.w/s.h,Math.max(WMIN,v.w));v.h=v.w*s.h/s.w;
+  var cx=v.x+v.w/2,cy=v.y+v.h/2;
+  cx=Math.min(BOUND.x1,Math.max(BOUND.x0,cx));cy=Math.min(BOUND.y1,Math.max(BOUND.y0,cy));
+  v.x=cx-v.w/2;v.y=cy-v.h/2;return v;
+}
+function apply(){
+  clamp(vb);
+  svg.setAttribute("viewBox",vb.x.toFixed(2)+" "+vb.y.toFixed(2)+" "+vb.w.toFixed(2)+" "+vb.h.toFixed(2));
+  var s=size(),k=vb.w/s.w;[["halo",11],["case",5],["main",2.8],["flow",1],["last",1.8]].forEach(function(r){svg.style.setProperty("--rw-"+r[0],(r[1]*k).toFixed(3))});svg.classList.toggle("far",k>1.5);svg.classList.toggle("mid",k>.75);
+  var ls=svg.querySelectorAll(".lb");for(var i=0;i<ls.length;i++){var g=ls[i];g.setAttribute("transform","translate("+g.dataset.x+" "+g.dataset.y+") rotate("+g.dataset.r+") scale("+k.toFixed(4)+")")}
+}
+function boxView(x0,y0,x1,y1,pad){
+  var s=size(),ins=insets();pad=pad||0;
+  var aw=Math.max(80,s.w-ins.l-ins.r),ah=Math.max(80,s.h-ins.t-ins.b);
+  var k=Math.max((x1-x0+2*pad)/aw,(y1-y0+2*pad)/ah,WFIT/s.w);
+  var cx=(x0+x1)/2,cy=(y0+y1)/2;
+  return {w:s.w*k,h:s.h*k,x:cx-(ins.l+aw/2)*k,y:cy-(ins.t+ah/2)*k};
+}
+var anim=0;
+function fly(t,ms){
+  cancelAnimationFrame(anim);
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduce||!ms){vb.x=t.x;vb.y=t.y;vb.w=t.w;apply();return}
+  var a={x:vb.x+vb.w/2,y:vb.y+vb.h/2,w:vb.w},s=size(),b={x:t.x+t.w/2,y:t.y+t.w*s.h/s.w/2,w:t.w},t0=performance.now();
+  (function step(now){var p=Math.min(1,(now-t0)/ms),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+    var w=Math.exp(Math.log(a.w)+(Math.log(b.w)-Math.log(a.w))*e),cx=a.x+(b.x-a.x)*e,cy=a.y+(b.y-a.y)*e,hh=w*s.h/s.w;
+    vb.w=w;vb.x=cx-w/2;vb.y=cy-hh/2;apply();if(p<1)anim=requestAnimationFrame(step)})(t0);
+}
+function fitBox(x0,y0,x1,y1,pad,ms){fly(boxView(x0,y0,x1,y1,pad),ms===undefined?750:ms)}
+function fitAll(ms){fitBox(-300,-290,350,250,0,ms)}
+function zoomAt(f,cx,cy){
+  var s=size(),px=(cx-s.l)/s.w,py=(cy-s.t)/s.h,wx=vb.x+px*vb.w,wy=vb.y+py*vb.h;
+  var nw=Math.min(WMAX,WMAX*s.w/s.h,Math.max(WMIN,vb.w*f));vb.w=nw;vb.h=nw*s.h/s.w;vb.x=wx-px*vb.w;vb.y=wy-py*vb.h;apply();
+}
+/* жести: тягнути, щипок, інерція, подвійне торкання — наблизити */
+var ptrs={},moved=0,pinch=0,vel={x:0,y:0,t:0},inert=0;
+svg.addEventListener("pointerdown",function(e){cancelAnimationFrame(anim);cancelAnimationFrame(inert);try{svg.setPointerCapture(e.pointerId)}catch(_){ }ptrs[e.pointerId]={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY};moved=0;pinch=0;vel={x:0,y:0,t:performance.now()};svg.classList.add("drag")});
+svg.addEventListener("pointermove",function(e){
+  var p=ptrs[e.pointerId];if(!p)return;var ids=Object.keys(ptrs),s=size(),k=vb.w/s.w;
+  if(ids.length===1){var dx=e.clientX-p.x,dy=e.clientY-p.y,now=performance.now(),dt=Math.max(1,now-vel.t);moved+=Math.abs(dx)+Math.abs(dy);
+    vb.x-=dx*k;vb.y-=dy*k;vel={x:.75*vel.x+.25*dx/dt,y:.75*vel.y+.25*dy/dt,t:now};p.x=e.clientX;p.y=e.clientY;apply()}
+  else if(ids.length===2){p.x=e.clientX;p.y=e.clientY;var a=ptrs[ids[0]],b=ptrs[ids[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch&&d>0)zoomAt(pinch/d,(a.x+b.x)/2,(a.y+b.y)/2);pinch=d;moved+=10;vel={x:0,y:0,t:performance.now()}}
+});
+function up(e){
+  var had=ptrs[e.pointerId],many=Object.keys(ptrs).length>1;delete ptrs[e.pointerId];pinch=0;
+  if(!Object.keys(ptrs).length)svg.classList.remove("drag");
+  if(!had)return;
+  if(moved<8&&e.type==="pointerup"&&!many){tapOrDouble(e.clientX,e.clientY);return}
+  if(!Object.keys(ptrs).length&&!many&&performance.now()-vel.t<80&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
+    var vx=vel.x,vy=vel.y,last=performance.now();
+    (function glide(now){var dt=now-last;last=now;var k=vb.w/size().w;vb.x-=vx*dt*k;vb.y-=vy*dt*k;apply();var f=Math.pow(.94,dt/16);vx*=f;vy*=f;if(Math.hypot(vx,vy)>.02)inert=requestAnimationFrame(glide)})(last);
+  }
+}
+svg.addEventListener("pointerup",up);svg.addEventListener("pointercancel",up);
+svg.addEventListener("wheel",function(e){e.preventDefault();cancelAnimationFrame(anim);zoomAt(Math.exp(Math.max(-60,Math.min(60,e.deltaY))*.004),e.clientX,e.clientY)},{passive:false});
+/* сторінка не масштабується ні щипком, ні подвійним торканням */
+["gesturestart","gesturechange"].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});
+document.addEventListener("dblclick",function(e){e.preventDefault()},{passive:false});
+var lastTouch=0;document.addEventListener("touchend",function(e){var n=Date.now();if(n-lastTouch<350&&e.target.closest&&!e.target.closest("input"))e.preventDefault();lastTouch=n},{passive:false});
+function zc(f){var s=size(),ins=insets();fly((function(){var cx=s.l+(ins.l+(s.w-ins.r))/2,cy=s.t+(ins.t+(s.h-ins.b))/2,px=(cx-s.l)/s.w,py=(cy-s.t)/s.h,wx=vb.x+px*vb.w,wy=vb.y+py*vb.h,nw=Math.min(WMAX,Math.max(WMIN,vb.w*f)),nh=nw*s.h/s.w;return {x:wx-px*nw,y:wy-py*nh,w:nw}})(),280)}
+document.getElementById("zin").onclick=function(){zc(1/1.6)};
+document.getElementById("zout").onclick=function(){zc(1.6)};
+document.getElementById("loc").onclick=function(){
+  if(GEO.pos&&!geoFar()){fitBox(GEO.pos[0]-90,GEO.pos[1]-90,GEO.pos[0]+90,GEO.pos[1]+90,0,600);if(st.start!=="geo"){st.start="geo";render(false)}return}
+  if(GEO.pos&&geoFar()){say("Ви за ≈ "+fmtKm(geoFar())+" від лікарні",st.b>=0?"шлях від вас прокладе Google Карти — кнопка «Вести»":"оберіть, куди вам потрібно");return}
+  geoStart();st.start="geo";render(false);if(!GEO.err)say("Визначаю, де ви…","дозвольте доступ до геопозиції")};
+document.getElementById("zfit").onclick=function(){if(lastBox)fitBox.apply(null,lastBox.concat([600]));else fitAll(600)};
+addEventListener("resize",function(){dockH();apply()});
+if(window.ResizeObserver)new ResizeObserver(function(){dockH();apply()}).observe(svg);
+
+/* ---------- стан ---------- */
+var Q=new URLSearchParams(location.search);
+/* «Звідки» не запам’ятовується (19.11.2026): щоразу — від того місця, де ви є. Поки місце невідоме, ви далеко чи точність погана,
+   нитку не малюємо: ні зупинку, ні в’їзд для авто сторінка сама не обирає — без винятків (20.11.2026, Андрій). «Вести» відкриває «Звідки».
+   Далеко від лікарні (> 650 м) теж: спершу «Звідки», а вже від обраної зупинки чи в’їзду — «Як дістатися» (Google Карти).
+   Пам’ятаємо лише «Маршрут без сходів»: це потреба людини, а не місце. */
+var st={dept:null,b:-1,start:navigator.geolocation?"geo":null,auto:!navigator.geolocation,noSteps:false,car:false,carIn:null},lastCar=null,lastCarK=null;
+try{var sv=JSON.parse(localStorage.getItem("ariadna")||"{}");st.noSteps=!!sv.noSteps}catch(_){}
+if(STARTS[Q.get("from")]){st.start=Q.get("from");st.auto=false}
+STARTS.geo={geo:1,name:"Моя геопозиція",cap:"Звідки",short:"Від мене",street:"",tr:"",at:null,stop:null,hint:"Синя точка — це ви. Лінія оновлюється, коли ви рухаєтеся."};
+function startKeys(){var k=Object.keys(STARTS).filter(function(k){return !STARTS[k].geo});if(navigator.geolocation)k.unshift("geo");return k}
+function bIndex(k){for(var i=0;i<B.length;i++)if(B[i].k===k)return i;return -1}
+function dById(id){for(var i=0;i<D.length;i++)if(D[i].id===id)return D[i];return null}
+function dTitle(d){return d.q||d.x?(d.full||d.t):"Відділення № "+d.id}
+function dShort(d){return d.q||d.x?(d.short||d.t):"Відділення "+d.id}
+function inK(k){return D.filter(function(x){return k&&x.k===k&&!x.x})}
+function dName(x){return x.q?x.t.toLowerCase():"№ "+x.id}
+function save(){try{localStorage.setItem("ariadna",JSON.stringify({noSteps:st.noSteps}))}catch(_){}}
+function syncUrl(){try{var p=new URLSearchParams(location.search);if(st.dept)p.set("to",st.dept);else if(st.b>=0&&B[st.b].k)p.set("to","k"+B[st.b].k);else p.delete("to");var s=p.toString();history.replaceState(history.state,"",location.pathname+(s?"?"+s:""))}catch(_){}}
+
+/* ---------- геопозиція: синя точка, маршрут від вас, оновлення в русі ---------- */
+var GEO={pos:null,acc:0,err:"",watch:null,first:true,last:null,t:0,boost:false,bt:0,good:false};
+/* «Вести»: маршрут від того місця, де ви зараз; карта йде за вами, екран не гасне. Далеко від лікарні — Google Карти */
+var FOLLOW=false,WL=null,lastDoor=null,HERE=false;
+function awake(on){try{if(on&&!WL&&navigator.wakeLock)navigator.wakeLock.request("screen").then(function(l){WL=l;l.addEventListener("release",function(){WL=null})},function(){});else if(!on&&WL){WL.release();WL=null}}catch(_){}}
+/* сторінку сховали — стеження вимикаємо; повернулися — дивимося ще раз, де ви (рідні повертаються сюди з Google Карт уже біля лікарні) */
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="hidden"){if(GEO.watch!==null){geoStop();GEO.paused=true}return}
+  if(GEO.paused||(st.start==="geo"&&GEO.watch===null&&GEO.pos&&geoFar())){GEO.paused=false;geoStart()}
+  if(FOLLOW)awake(true)});
+function ll(p){return (LAT0-p[1]/KY).toFixed(6)+","+(LON0+p[0]/KX).toFixed(6)}
+function gmapsTo(p,mode){return "https://www.google.com/maps/dir/?api=1&destination="+ll(p)+(mode?"&travelmode="+mode:"")}
+function stopNm(S){return S.ln||S.short.split(" · ")[0]}
+function myStop(){var S=st.start&&STARTS[st.start];return S&&!S.geo?S:null}
+function myGate(){return st.carIn&&CAR_IN[st.carIn]?st.carIn:null}
+/* Google Карти, коли людина далеко: до обраної нею зупинки чи в’їзду, а як нічого не обрано — до самого місця призначення.
+   Вид транспорту не нав’язуємо (Google візьме звичний для людини), лише на авто — «машиною», а до зупинки — «транспортом» */
+function gmFar(){var S=myStop(),g=myGate();return st.car?gmapsTo(g?CAR_IN[g]:(lastDoor||[20,-20]),"driving"):gmapsTo(S?S.stop:(lastDoor||[20,-20]),S?"transit":"")}
+function gmaps(){return gmFar()}
+function gmWhere(){var S=myStop(),g=myGate();return st.car&&g?"до в’їзду "+CARN[g].sh:!st.car&&S?"до зупинки «"+stopNm(S)+"»":"сюди"}
+/* Далеко від лікарні (20.11.2026, Андрій): дуже прозоре віконце «Ви за N км від лікарні» з кнопкою Google Карт.
+   Дотик будь-де поза ним — віконце повільно й плавно стискається в кнопку «Google Карти» на банері внизу; там вона й лишається.
+   Показуємо раз для кожного місця призначення (farKey). */
+var farBox=document.createElement("div"),farScr=document.createElement("div"),farKey=null,farOpen=false,farT=0,
+    FRM=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)");
+farBox.className="farbox glass";farBox.setAttribute("role","dialog");farBox.setAttribute("aria-label","Ви далеко від лікарні");farBox.hidden=true;
+farScr.className="farscr";farScr.hidden=true;document.body.appendChild(farScr);document.body.appendChild(farBox);
+/* усі анімації віконця (й того, що всередині) — геть: завершене згортання з fill:forwards інакше тримає віконце біля кнопки (баг 20.11.2026) */
+function farReset(){if(farBox.getAnimations)farBox.getAnimations({subtree:true}).forEach(function(x){try{x.cancel()}catch(_){}})}
+function showFar(){clearTimeout(farT);var m=geoFar();if(!m||resRow.hidden){document.body.classList.remove("far-on");return}farReset();
+  farBox.innerHTML='<div class="fb-in"><b class="fb-t">Ви за '+fmtKm(m)+' від лікарні</b><p>Дорогу '+esc(gmWhere())+' прокладуть Google&nbsp;Карти.<br>А&nbsp;на&nbsp;місці повертайтеся — далі поведе&nbsp;нитка.</p>'
+    +'<a class="gbtn thread fb-go" href="'+esc(gmFar())+'" target="_blank" rel="noopener">'+GMAP+'Відкрити Google Карти</a></div><i class="fb-tint" aria-hidden="true"></i>';
+  farBox.style.cssText="";farBox.hidden=false;farBox.style.visibility="hidden";
+  var W=Math.min(360,innerWidth-40),H;farBox.style.width=W+"px";H=farBox.offsetHeight;
+  var top=Math.max(80,Math.min(innerHeight-H-170,(innerHeight-H)/2-30));
+  farBox.style.left=Math.round((innerWidth-W)/2)+"px";farBox.style.top=Math.round(top)+"px";farBox.style.visibility="";
+  farOpen=true;farScr.hidden=false;document.body.classList.add("far-on");
+  if(farBox.animate&&!(FRM&&FRM.matches))farBox.animate([{opacity:0,transform:"translateY(16px) scale(.96)"},{opacity:1,transform:"none"}],{duration:560,easing:"cubic-bezier(.32,.72,0,1)"});
+  farBox.querySelector(".fb-go").onclick=function(){setTimeout(foldFar,250)}}
+/* віконце → кнопка на банері: рамка віконця пливе й стискається до розмірів кнопки, текст тане, скло набуває кольору кнопки */
+function foldFar(){if(!farOpen)return;farOpen=false;farScr.hidden=true;
+  var go=document.getElementById("go"),r0=farBox.getBoundingClientRect();
+  function done(){farReset();farBox.hidden=true;farBox.style.cssText="";farBox.innerHTML="";document.body.classList.remove("far-on");
+    var g=document.getElementById("go");if(g&&g.animate&&!(FRM&&FRM.matches))g.animate([{transform:"scale(1.07)",boxShadow:"0 0 0 0 rgba(205,170,98,.55)"},{transform:"scale(1)",boxShadow:"0 0 0 16px rgba(205,170,98,0)"}],{duration:800,easing:"cubic-bezier(.32,.72,0,1)"})}
+  if(!go||resRow.hidden||!farBox.animate||(FRM&&FRM.matches)){if(farBox.animate)farBox.animate([{opacity:1},{opacity:0}],{duration:260,fill:"forwards"}).onfinish=done;else done();return}
+  /* панель ще може доїжджати на місце — ціль беремо там, де кнопка опиниться */
+  var g1=go.getBoundingClientRect(),sh=dockTop()-res.getBoundingClientRect().top,r1={left:g1.left,top:g1.top+sh,width:g1.width,height:g1.height},cs=getComputedStyle(go),rad=Math.min(parseFloat(cs.borderTopLeftRadius)||14,r1.height/2),Dm=1250,E="cubic-bezier(.6,0,.3,1)";
+  var tint=farBox.querySelector(".fb-tint");tint.style.background=cs.backgroundColor;
+  farBox.style.left=r0.left+"px";farBox.style.top=r0.top+"px";farBox.style.width=r0.width+"px";farBox.style.height=r0.height+"px";
+  var a=farBox.animate([{left:r0.left+"px",top:r0.top+"px",width:r0.width+"px",height:r0.height+"px",borderRadius:"30px",padding:"22px"},
+                        {left:r1.left+"px",top:r1.top+"px",width:r1.width+"px",height:r1.height+"px",borderRadius:rad+"px",padding:"0px"}],{duration:Dm,easing:E,fill:"forwards"});
+  farBox.querySelector(".fb-in").animate([{opacity:1,filter:"blur(0px)"},{opacity:0,filter:"blur(8px)"}],{duration:480,easing:"ease-out",fill:"forwards"});
+  tint.animate([{opacity:0},{opacity:0,offset:.4},{opacity:1}],{duration:Dm,easing:"ease-in",fill:"forwards"});
+  a.onfinish=done}
+farScr.addEventListener("pointerdown",function(e){e.preventDefault();foldFar()});
+addEventListener("keydown",function(e){if(e.key==="Escape"&&farOpen)foldFar()});
+function followCam(first){if(!FOLLOW||!GEO.pos)return;var p=meAt();
+  if(!first){var cx=(p[0]-vb.x)/vb.w,cy=(p[1]-vb.y)/vb.h;if(cx>.25&&cx<.75&&cy>.25&&cy<.7)return}   /* ви ще в середині екрана — карту не рухаємо */
+  var R=first?60:Math.max(45,Math.min(160,vb.w*.32));fitBox(p[0]-R,p[1]-R,p[0]+R,p[1]+R,0,first?700:450)}
+function lead(){
+  if(FOLLOW){stopLead();return}
+  if(!navigator.geolocation){if(st.start&&STARTS[st.start])say("Браузер не визначає, де ви","йдіть за ниткою від зупинки «"+stopNm(STARTS[st.start])+"»");else askFrom("Браузер не визначає, де ви");return}
+  if(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000){showFar();return}
+  st.prevStart=st.start&&st.start!=="geo"?st.start:null;
+  FOLLOW=true;awake(true);st.start="geo";st.auto=false;st.carIn=null;GEO.err="";
+  var had=geoNear();if(GEO.pos&&geoFar())GEO.pos=null;geoStart();geoMode();render(false);
+  if(had){followCam(true);say("Ведемо від вас","карта рухатиметься разом з вами")}
+  else say("Визначаю, де ви…","дозвольте доступ до геопозиції")}
+/* звідки йти — питаємо людину, а не обираємо зупинку самі */
+function askFrom(){pop("from")}
+/* ---------- де відкрито сторінку (20.11.2026): у вбудованому браузері месенджера геопозиція часто не працює ----------
+   Telegram, Viber, Facebook, Messenger, Instagram тощо часто підписуються в userAgent; Telegram ще й додає TelegramWebviewProxy.
+   Загальні ознаки: Android WebView — «; wv)», iOS WKWebView — без «Safari/». Розпізнається не завжди — тому ще й порада, коли геопозиція відмовила. */
+var ENV=(function(){var u=navigator.userAgent||"",ios=/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1),and=/Android/i.test(u),app=null;
+  if(window.TelegramWebviewProxy||window.TelegramWebview||/Telegram/i.test(u))app="Telegram";else if(/Viber/i.test(u))app="Viber";
+  else if(/FB_IAB\/MESSENGER|Messenger/i.test(u))app="Messenger";else if(/FBAN|FBAV|FB_IAB|FBIOS/i.test(u))app="Facebook";else if(/Instagram/i.test(u))app="Instagram";
+  else if(/\bLine\//.test(u))app="LINE";else if(/MicroMessenger/i.test(u))app="WeChat";else if(/musical_ly|BytedanceWebview|TikTok/i.test(u))app="TikTok";else if(/Snapchat/i.test(u))app="Snapchat";
+  var wv=!!app||(and&&/; wv\)/.test(u))||(ios&&/AppleWebKit/.test(u)&&!/Safari\//.test(u));
+  return {ios:ios,and:and,app:app,wv:wv,br:/CriOS/.test(u)?"Chrome":/FxiOS/.test(u)?"Firefox":/EdgiOS|EdgA/.test(u)?"Edge":/SamsungBrowser/.test(u)?"Samsung Internet":ios?"Safari":/Chrome\//.test(u)?"Chrome":""}})();
+/* віконце-підказка «чому не видно, де ви, і що зробити» — того ж скла, що й «Ви за N км»; дотик поза ним закриває */
+var hBox=document.createElement("div"),hScr=document.createElement("div"),hOpen=false,hShown={};
+hBox.className="farbox glass hbox";hBox.setAttribute("role","dialog");hBox.setAttribute("aria-label","Геопозиція");hBox.hidden=true;hScr.className="farscr";hScr.hidden=true;
+document.body.appendChild(hScr);document.body.appendChild(hBox);
+function geoKind(){return ENV.wv?"app":GEO.code===1?"denied":"none"}
+function intentUrl(){return "intent://"+location.host+location.pathname+location.search+location.hash+"#Intent;scheme=https;end"}
+function copyLink(){var u=location.href,ok=function(){say("Посилання скопійовано","вставте його в адресний рядок "+(ENV.ios?"Safari":"браузера"))};
+  function fb(){var t=document.createElement("textarea");t.value=u;t.setAttribute("readonly","");t.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(t);t.select();try{t.setSelectionRange(0,u.length)}catch(_){}
+    var r=false;try{r=document.execCommand("copy")}catch(_){}document.body.removeChild(t);if(r)ok();else say("Скопіюйте посилання вручну",u,null,"",15000)}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,fb);else fb()}
+function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;var T,P,S,B="";
+  if(kind==="app"){T="Відкрийте карту в браузері";P=(ENV.app?"Ви відкрили карту всередині "+ENV.app:"Ви відкрили карту у вбудованому браузері застосунку")+" — звідси вона, найімовірніше, не побачить, де ви.";
+    S=ENV.ios?"Натисніть <b>⋯</b> або <b>⤴</b> і оберіть «Відкрити в Safari» (чи «у браузері»).":"Натисніть <b>⋮</b> і оберіть «Відкрити в браузері» чи «Відкрити в Chrome».";
+    if(ENV.and)B+='<a class="gbtn thread" href="'+esc(intentUrl())+'">Відкрити в браузері</a>';
+    B+='<button type="button" class="gbtn'+(ENV.and?"":" thread")+'" data-h="copy">Скопіювати посилання</button>'}
+  else if(kind==="denied"){T="Дозвольте бачити, де ви";P="Для цієї сторінки геопозицію вимкнено, тому нитку від вас не провести.";
+    S=ENV.ios?(ENV.br==="Chrome"?"Параметри iPhone → Chrome → Місцезнаходження → «Коли використовується». Потім оновіть сторінку.":"Параметри iPhone → Конфіденційність та безпека → Служби визначення місцеперебування: увімкніть їх і для «Сайти Safari» оберіть «Коли використовується». Потім оновіть сторінку й дозвольте.")
+      :ENV.and?"Торкніться значка ліворуч від адреси сторінки → Дозволи → Геодані → «Дозволити». Перевірте, що геодані ввімкнено й у телефоні.":"Дозвольте геопозицію для цієї сторінки в налаштуваннях браузера й оновіть її.";
+    B+='<button type="button" class="gbtn thread" data-h="reload">Оновити сторінку</button>'}
+  else{T="Не вдається визначити, де ви";P="Телефон так і не сказав, де ви.";S="Перевірте, що геолокацію в телефоні ввімкнено, і вийдіть на відкрите місце.";
+    B+='<button type="button" class="gbtn thread" data-h="retry">Спробувати ще раз</button>'}
+  B+='<button type="button" class="gbtn" data-h="from">Обрати зупинку чи в’їзд</button>';
+  hBox.innerHTML='<div class="fb-in"><b class="fb-t">'+T+'</b><p>'+esc(P)+'</p><p class="hb-s">'+S+'</p><div class="hb-b">'+B+'</div></div>';
+  if(hBox.getAnimations)hBox.getAnimations().forEach(function(x){x.cancel()});
+  hBox.style.cssText="";hBox.hidden=false;hBox.style.visibility="hidden";var W=Math.min(370,innerWidth-32);hBox.style.width=W+"px";var H=hBox.offsetHeight;
+  hBox.style.left=Math.round((innerWidth-W)/2)+"px";hBox.style.top=Math.round(Math.max(70,(innerHeight-H)/2-20))+"px";hBox.style.visibility="";
+  hOpen=true;hScr.hidden=false;pop(null);
+  if(hBox.animate&&!(FRM&&FRM.matches))hBox.animate([{opacity:0,transform:"translateY(16px) scale(.96)"},{opacity:1,transform:"none"}],{duration:520,easing:"cubic-bezier(.32,.72,0,1)"});
+  hBox.querySelectorAll("[data-h]").forEach(function(b){b.onclick=function(){var k=b.dataset.h;
+    if(k==="copy"){copyLink();return}hClose();
+    if(k==="reload")location.reload();else if(k==="retry")setStart("geo");else if(k==="from")setTimeout(function(){pop("from")},200)}})}
+function hClose(){if(!hOpen)return;hOpen=false;hScr.hidden=true;
+  var fin=function(){hBox.hidden=true;hBox.innerHTML="";hBox.style.cssText=""};
+  if(hBox.animate&&!(FRM&&FRM.matches))hBox.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(10px) scale(.97)"}],{duration:320,easing:"ease-in",fill:"forwards"}).onfinish=fin;else fin()}
+hScr.addEventListener("pointerdown",function(e){e.preventDefault();hClose()});
+addEventListener("keydown",function(e){if(e.key==="Escape"&&hOpen)hClose()});   /* чому немає «Від мене» — видно в самому списку, у рядку «Моя геопозиція» */
+function stopLead(quiet){if(!FOLLOW)return;FOLLOW=false;awake(false);geoMode();render(false);if(!quiet)say("Ведення зупинено","нитка лишається на карті")}
+function arrived(){if(!lastDoor||!GEO.pos)return;var m=meAt(),rem=LOCK&&st.start==="geo"?LOCK.L-LOCK.s+LOCK.tail:Math.hypot(m[0]-lastDoor[0],m[1]-lastDoor[1]);if(rem<(LOCK?12:Math.max(12,Math.min(GEO.acc,25)))){stopLead(true);var dv=st.dept&&dById(st.dept);say("Ви на місці",curTitle+(dv&&dv.vis?" · "+visNow(dv.vis).t:""))}}
+/* довжина в банері: до кілометра — метри (з точністю до 10), далі — «1,2 км», щоб рядок влазив поруч із «×» і «Вести» */
+function fmtLen(m){return m<1000?Math.round(m/10)*10+" м":(m/1000).toFixed(1).replace(".",",")+" км"}
+function fmtKm(m){return m<1000?Math.round(m/50)*50+" м":(m/1000).toFixed(m<10000?1:0).replace(".",",")+" км"}
+function geoFar(){if(!GEO.pos)return 0;var d=Math.hypot(GEO.pos[0]-20,GEO.pos[1]+20);return d>650?d:0}
+/* точці можна вірити: ви на території чи поруч і точність не гірша за 100 м (якщо вже було точно — терпимо до 300 м, щоб нитка не стрибала) */
+function geoNear(){return !!GEO.pos&&!geoFar()&&GEO.acc<=(GEO.good?300:100)}
+/* ---------- точка на нитці (19.11.2026) ----------
+   GPS у дворах між корпусами помиляється на 20–60 м і «стрибає». Тому:
+   1) згладжуємо точки (простий фільтр Калмана): різкий стрибок, швидший за біг, майже не зсуває точку;
+   2) коли маршрут від вас прокладено, він «замикається» (LOCK): синя точка рухається лише по нитці, нитка не перебудовується з кожною точкою;
+   3) з маршруту сходимо, лише якщо GPS довго (≥ 3 точки і ≥ 12 с) показує місце далі ніж 20–35 м від нитки — тоді нитка будується заново від вас. */
+var LOCK=null,REROUTES=0;
+function geoFilter(x,y,a,t){var v=st.car?12:3;
+  var j=GEO.f?Math.hypot(x-GEO.f[0],y-GEO.f[1]):0;
+  if(!GEO.f||t-GEO.ft>30000||j>300+2*a){GEO.f=[x,y];GEO.P=a*a;GEO.ft=t;return}   /* давно не було точок або ви «переїхали» (з дому до лікарні) — починаємо наново */
+  var dt=Math.max(.3,(t-GEO.ft)/1000),P=GEO.P+(v*dt)*(v*dt),R=a*a;
+  if(j>3*v*dt+2*a)R=Math.max(R,j*j);
+  var K=P/(P+R);GEO.f=[GEO.f[0]+K*(x-GEO.f[0]),GEO.f[1]+K*(y-GEO.f[1])];GEO.P=(1-K)*P;GEO.ft=t}
+/* старт — не просто найближча точка доріжки, а та, що в межах похибки дає найкоротший шлях до дверей (без петель з паралельної доріжки) */
+function geoRoute(from,door,noSteps,acc){
+  var base=findRoute(from,door,noSteps);if(!base)return null;
+  var g=graph(noSteps),e=base.path[base.path.length-1],t=g.idx[e[0].toFixed(1)+","+e[1].toFixed(1)],tail=Math.hypot(e[0]-door[0],e[1]-door[1]);
+  if(t===undefined)return {path:base.path,tail:tail};
+  var R=Math.max(15,Math.min(acc||20,35)),r=dijkstra(g,t),best=-1,bs=Infinity;
+  for(var q=0;q<g.nodes.length;q++){if(r.dist[q]===Infinity)continue;var d=Math.hypot(g.nodes[q][0]-from[0],g.nodes[q][1]-from[1]);if(d>R)continue;var sc=d*1.5+r.dist[q];if(sc<bs){bs=sc;best=q}}
+  if(best<0)return {path:base.path,tail:tail};
+  var path=[];for(var c=best;c>=0;c=r.prev[c])path.push(g.nodes[c]);
+  if(path.length<2)path.unshift(path[0]);
+  return {path:path,tail:tail}}
+function lockMake(path,key,tail){var c=[0];for(var i=1;i<path.length;i++)c.push(c[i-1]+Math.hypot(path[i][0]-path[i-1][0],path[i][1]-path[i-1][1]));
+  return {p:path,c:c,L:c[c.length-1],s:0,key:key,tail:tail,off:0,offT:0,back:0,tOn:Date.now(),drawn:false}}
+function lockAt(L,s){for(var i=1;i<L.p.length;i++)if(L.c[i]>=s){var t=(s-L.c[i-1])/((L.c[i]-L.c[i-1])||1);return [L.p[i-1][0]+t*(L.p[i][0]-L.p[i-1][0]),L.p[i-1][1]+t*(L.p[i][1]-L.p[i-1][1])]}return L.p[L.p.length-1].slice()}
+/* найближча точка нитки до q, але лише на відрізку нитки [s0, s1] — щоб точка не перескакувала вперед через двір */
+function lockProj(L,q,s0,s1){var best=null;
+  for(var i=1;i<L.p.length;i++){var c0=L.c[i-1],c1=L.c[i];if(c1<s0||c0>s1)continue;var a=L.p[i-1],b=L.p[i],dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy,
+    t=l2?((q[0]-a[0])*dx+(q[1]-a[1])*dy)/l2:0,lo=c1>c0?(s0-c0)/(c1-c0):0,hi=c1>c0?(s1-c0)/(c1-c0):1;t=Math.max(Math.max(0,lo),Math.min(Math.min(1,hi),t));
+    var x=a[0]+t*dx,y=a[1]+t*dy,d=Math.hypot(q[0]-x,q[1]-y);if(!best||d<best.d)best={d:d,s:c0+t*(c1-c0)}}
+  return best}
+function lockStep(){
+  if(!LOCK||!GEO.pos)return "none";
+  if(GEO.acc>60)return "hold";   /* точка надто груба — синя точка лишається, де була */
+  var now=Date.now(),dt=Math.max(1,(now-LOCK.tOn)/1000),vmax=st.car?15:3,T=Math.max(15,Math.min(GEO.acc,30))+5,
+      pr=lockProj(LOCK,GEO.pos,Math.max(0,LOCK.s-25),LOCK.s+20+vmax*dt);
+  if(pr&&pr.d<=T){LOCK.off=0;LOCK.tOn=now;
+    if(pr.s>LOCK.s){LOCK.s+=Math.min(pr.s-LOCK.s,vmax*dt+3)*.6;LOCK.back=0}   /* уперед — плавно і не швидше, ніж можна йти */
+    else if(LOCK.s-pr.s>15){if(++LOCK.back>=3){LOCK.s=pr.s;LOCK.back=0}}   /* назад — лише коли повторюється: людина розвернулася */
+    else LOCK.back=0;
+    return "on"}
+  if(!LOCK.off)LOCK.offT=now;LOCK.off++;
+  /* нитку будували з грубої точки, а тепер GPS набагато точніший і показує інше місце — перебудовуємо швидше */
+  if(LOCK.off>=2&&GEO.acc*2<=LOCK.acc)return "reroute";
+  return LOCK.off>=3&&now-LOCK.offT>=12000?"reroute":"hold"}
+/* маршрут від вас для малювання: решта замкненої нитки від синьої точки до дверей */
+function lockRoute(door,key){
+  if(!GEO.f)return null;
+  if(!LOCK||LOCK.key!==key){var gr=geoRoute(GEO.f,door,st.noSteps,GEO.acc);if(!gr){LOCK=null;return null}LOCK=lockMake(gr.path,key,gr.tail);LOCK.acc=GEO.acc;var pr=lockProj(LOCK,GEO.f,0,40);if(pr)LOCK.s=pr.s}
+  GEO.show=lockAt(LOCK,LOCK.s);
+  var out=[GEO.show];for(var i=1;i<LOCK.p.length;i++)if(LOCK.c[i]>LOCK.s)out.push(LOCK.p[i]);
+  return {path:out,len:LOCK.L-LOCK.s+LOCK.tail,locked:1}}
+function meAt(){return GEO.show||GEO.f||GEO.pos}
+
+function geoText(){return GEO.err||(GEO.pos?(geoFar()?"ви за ≈ "+fmtKm(geoFar())+" від лікарні":"точність ±"+GEO.acc+" м"):(GEO.watch!==null?"визначаю…":"торкніться, щоб визначити"))}
+function drawMe(){var g=document.getElementById("me");if(!GEO.pos||geoFar()){g.innerHTML="";return}var m=meAt();
+  g.innerHTML='<circle class="acc" cx="'+m[0].toFixed(1)+'" cy="'+m[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",m[0].toFixed(1),m[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/><circle class="hit" r="16" data-me="1"/>');apply()}
+/* перші 30 с — точно (GPS), щоб перша точка була правильною; далі — економно, щоб телефон не грівся. Під час «Вести» — точно весь час */
+function geoStart(){
+  if(!navigator.geolocation){GEO.err="цей браузер не підтримує геопозицію";return false}
+  if(GEO.watch!==null)return true;GEO.err="";GEO.first=true;
+  GEO.boost=true;clearTimeout(GEO.bt);GEO.bt=setTimeout(function(){GEO.boost=false;geoMode()},30000);
+  var hi=FOLLOW||GEO.boost;GEO.hi=hi;GEO.watch=navigator.geolocation.watchPosition(geoOk,geoFail,hi?{enableHighAccuracy:true,maximumAge:3000,timeout:20000}:{enableHighAccuracy:false,maximumAge:15000,timeout:20000});
+  /* деякі вбудовані браузери не відповідають узагалі — за 15 с без жодної точки вважаємо, що геопозиції немає */
+  clearTimeout(GEO.wd);GEO.wd=setTimeout(function(){if(GEO.watch!==null&&!GEO.pos)geoFail({code:2,stall:1})},15000);
+  if(ENV.wv&&!hShown.app&&!GEO.pos)geoHelp("app");
+  return true}
+function geoStop(){clearTimeout(GEO.bt);clearTimeout(GEO.wd);GEO.boost=false;if(GEO.watch!==null){try{navigator.geolocation.clearWatch(GEO.watch)}catch(_){}}GEO.watch=null}
+/* перезапустити стеження з іншою точністю */
+function geoMode(){var hi=FOLLOW||GEO.boost;if(GEO.watch===null||GEO.hi===hi)return;try{navigator.geolocation.clearWatch(GEO.watch)}catch(_){}GEO.watch=null;GEO.hi=hi;var f=GEO.first;
+  GEO.watch=navigator.geolocation.watchPosition(geoOk,geoFail,hi?{enableHighAccuracy:true,maximumAge:3000,timeout:20000}:{enableHighAccuracy:false,maximumAge:15000,timeout:20000});GEO.first=f}
+/* питаємо геопозицію, коли людина обрала, куди їй, — тоді зрозуміло, навіщо */
+function geoAsk(){if(st.start==="geo"&&GEO.watch===null&&!GEO.err&&!(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000))geoStart()}
+function geoOk(p){
+  var x=(p.coords.longitude-LON0)*KX,y=(LAT0-p.coords.latitude)*KY,first=GEO.first,was=geoNear(),gap=Date.now()-GEO.t;
+  GEO.pos=[x,y];GEO.acc=Math.round(p.coords.accuracy);GEO.t=Date.now();GEO.first=false;clearTimeout(GEO.wd);GEO.code=0;
+  if(hOpen&&first)hClose();   /* геопозиція таки працює — підказка більше не потрібна */
+  if(first&&gap>60000)LOCK=null;   /* довго не було точок (сторінка була схована) — нитку будуємо заново */
+  geoFilter(x,y,GEO.acc,GEO.t);
+  if(GEO.boost&&GEO.acc<=20){GEO.boost=false;clearTimeout(GEO.bt);geoMode()}   /* точка вже точна — GPS більше не тримаємо */
+  /* далеко від лікарні: стеження вимикаємо (не гріємо телефон), нитку лишаємо від зупинки, Google Карти — на кнопці */
+  if(geoFar()){var fl=FOLLOW;geoStop();GEO.last=null;if(fl){FOLLOW=false;awake(false)}drawMe();
+    var dst=st.b>=0||!!st.dept;if(st.start==="geo"||dst)render(first&&dst);
+    if((first||fl)&&!dst)say("Ви за ≈ "+fmtKm(geoFar())+" від лікарні","оберіть, куди вам потрібно, — підкажемо, як дістатися")
+    return}
+  var now=geoNear();if(now&&GEO.acc<=100)GEO.good=true;
+  var ls=st.start==="geo"&&now?lockStep():"none";if(ls==="reroute"){LOCK=null;REROUTES++}
+  GEO.show=LOCK&&st.start==="geo"&&now?lockAt(LOCK,LOCK.s):GEO.f.slice();drawMe();
+  var m=meAt(),moved=!GEO.last||Math.hypot(m[0]-GEO.last[0],m[1]-GEO.last[1])>(LOCK?3:12);
+  if(st.start==="geo"&&(first||moved||was!==now||ls==="reroute")){render(first&&st.b>=0&&!FOLLOW);drawMe();GEO.last=meAt().slice()}
+  if(FOLLOW){followCam(first);arrived();if(first)say("Ведемо від вас","карта рухатиметься разом з вами");else if(ls==="reroute")say("Нитку перебудовано","ви пішли іншим шляхом — ведемо звідси");return}
+  if(!first&&was===now)return;GEO.last=meAt().slice();
+  var dest=st.b>=0||!!st.dept;
+  if(st.start!=="geo"){if(first)say("Ви тут","точність ±"+GEO.acc+" м");return}
+  if(!now){if(dest)say("Поки не бачу, де ви точно","±"+GEO.acc+" м — вийдіть з будівлі на відкрите місце або оберіть «Звідки»");return}
+  if(dest)say(HERE?"Ви вже тут":"Маршрут від вас",HERE?"надішліть рідним, як сюди дійти, — кнопка «Надіслати»":"точність ±"+GEO.acc+" м");
+  else{say("Ви тут","точність ±"+GEO.acc+" м");fitBox(m[0]-90,m[1]-90,m[0]+90,m[1]+90,0)}
+}
+function geoFail(e){
+  if(e&&e.code!==1&&GEO.pos)return;   /* сигнал тимчасово зник (у будівлі, між корпусами) — лишаємо останню точку, стеження триває */
+  var byLead=FOLLOW;if(FOLLOW){FOLLOW=false;awake(false)}geoStop();
+  GEO.code=e?e.code:2;GEO.err=ENV.wv?"не працює у вбудованому браузері "+(ENV.app||"застосунку"):e&&e.code===1?"доступ заборонено — дозвольте його в налаштуваннях браузера":"не вдалося визначити";
+  if(st.start==="geo"){st.start=st.prevStart||null;st.auto=!st.start}st.prevStart=null;render(false);
+  var S=st.start?STARTS[st.start]:null,dest=st.b>=0||!!st.dept,T=e&&e.code===1?"Геопозиція вимкнена":"Не вдалося визначити, де ви";
+  if(hOpen)return;var hk=geoKind();if(!hShown[hk]){geoHelp(hk);return}
+  if(!S&&dest&&byLead){askFrom(T);return}
+  say(T,S?"маршрут від зупинки «"+stopNm(S)+"» — іншу можна обрати у «Звідки»":dest?"оберіть, звідки йдете, — кнопка «Звідки»":GEO.err)}
+
+/* ---------- значки ---------- */
+function ico(p,w){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
+/* автобус спереду, як у Google: лобове вікно, фари, колеса (19.11.2026) */
+var BUS=ico('<path d="M5 17V6.6C5 4.4 7.5 3 12 3s7 1.4 7 3.6V17z"/><rect x="7.4" y="6.2" width="9.2" height="5.6" rx="1"/><path d="M7.5 17v2.5M16.5 17v2.5M3.5 8v2.5M20.5 8v2.5"/><circle cx="8.6" cy="14.4" r=".9" fill="currentColor" stroke="none"/><circle cx="15.4" cy="14.4" r=".9" fill="currentColor" stroke="none"/>');
+var TRAM=ico('<rect x="6" y="8" width="12" height="11" rx="2.5"/><rect x="8.2" y="10.2" width="7.6" height="4.2" rx=".8"/><path d="M12 8V5M8.5 4h7M8.5 19l-1.5 2M15.5 19l1.5 2"/><circle cx="9.2" cy="16.6" r=".8" fill="currentColor" stroke="none"/><circle cx="14.8" cy="16.6" r=".8" fill="currentColor" stroke="none"/>');
+function VEH(S){return S&&S.vt==="tram"?TRAM:BUS}
+var CARI=ico('<path d="M4 16.5v-3.2l1.7-4.3A2 2 0 0 1 7.6 7.6h8.8a2 2 0 0 1 1.9 1.4l1.7 4.3v3.2zM6.6 16.5v2.2M17.4 16.5v2.2M4.6 12.6h14.8"/><circle cx="8" cy="14.6" r=".6" fill="currentColor"/><circle cx="16" cy="14.6" r=".6" fill="currentColor"/>');
+var DOT=ico('<circle cx="12" cy="12" r="4" fill="currentColor"/><circle cx="12" cy="12" r="8.5"/>',2.2);
+var NAV=ico('<path d="m3 11 18-8-8 18-2-8z"/>',2.2);
+var STOPI=ico('<rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="currentColor"/>');
+var GMAP=ico('<path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5zM9 4v13.5M15 6.5V20"/>');
+var SHARE=ico('<path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>');
+var PIN=ico('<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>');
+var UP=ico('<path d="m6 15 6-6 6 6"/>',2.4);
+var ICONS={
+ cross:'<path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5z"/>',
+ steth:'<path d="M6 3v6a5 5 0 0 0 10 0V3M11 14v2a4 4 0 0 0 8 0v-2"/><circle cx="19" cy="12" r="2"/>',
+ door:'<path d="M5 21V4a1 1 0 0 1 1-1h9l4 2v16M3 21h18M12 12v.01"/>',
+ chair:'<path d="M7 21v-6h10v6M6 15V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6M9 7V4h6v3"/>',
+ build:'<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6M3 21h18"/>',
+ cart:'<path d="M3 4h2.4l2.2 10.3a1.6 1.6 0 0 0 1.6 1.2h7.6a1.6 1.6 0 0 0 1.6-1.2L20.5 8H6.3"/><circle cx="9.6" cy="19.6" r="1.3"/><circle cx="17" cy="19.6" r="1.3"/>',
+ fuel:'<path d="M5 21V5.2A2.2 2.2 0 0 1 7.2 3h5.6A2.2 2.2 0 0 1 15 5.2V21M3.5 21h13M7.5 7.5h5M15 10h1.6a1.9 1.9 0 0 1 1.9 1.9v4.4a1.5 1.5 0 0 0 3 0V8.2l-2.6-2.7"/>',
+ box:'<path d="M12 3 4 7.2v9.6L12 21l8-4.2V7.2z"/><path d="M4 7.2 12 11.4l8-4.2M12 11.4V21M8 5.1l8 4.2"/>'
+};
+/* ---------- відвідування (поки лише 16 відділення): розклад і що зараз, за київським часом ---------- */
+function kyivMin(){var d=new Date();
+  for(var z=["Europe/Kyiv","Europe/Kiev"],i=0;i<z.length;i++)try{var p=new Intl.DateTimeFormat("en-GB",{timeZone:z[i],hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(d),h=0,m=0;
+    p.forEach(function(x){if(x.type==="hour")h=+x.value;if(x.type==="minute")m=+x.value});return h%24*60+m}catch(_){}
+  return d.getHours()*60+d.getMinutes()}
+function hm(m){return Math.floor(m/60)+":"+("0"+m%60).slice(-2)}
+function visText(v){return "щоденно "+v.o.map(function(o){return hm(o[0])+"–"+hm(o[1])}).join(" і ")}
+function visNow(v){var m=kyivMin(),i,o;
+  for(i=0;i<v.o.length;i++){o=v.o[i];if(m>=o[0]&&m<o[1])return {ok:1,t:"Зараз можна — до "+hm(o[1])+(o[1]-m<=30?" (ще "+(o[1]-m)+" хв)":"")}}
+  if(v.q&&m>=v.q[0]&&m<v.q[1])return {t:"Зараз тиха година — приходьте з "+hm(v.q[1])};
+  for(i=0;i<v.o.length;i++)if(m<v.o[i][0])return {t:"Зараз зачинено — відкриється о "+hm(v.o[i][0])};
+  return {t:"На сьогодні вже все — завтра з "+hm(v.o[0][0])}}
+function visBlock(v){var n=visNow(v);
+  return '<div class="vis"><b>Передачі й відвідування</b><span class="vs '+(n.ok?"ok":"no")+'">'+esc(n.t)+'</span><p>Прийом передач та відвідування пацієнтів '+esc(visText(v))+'.'+(v.q?'<br>Тиха година '+hm(v.q[0])+'–'+hm(v.q[1])+'.':'')+'</p></div>'}
+function tels(list){return '<div class="tels">'+list.map(function(t){return '<a class="gbtn" href="tel:+38'+t.replace(/\D/g,"")+'">'+ico('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>')+t+'</a>'}).join("")+'</div>'}
+function mins(m){return Math.max(1,Math.ceil(m/70))}
+
+/* ---------- підказка ---------- */
+/* віконце вгорі. Дотик до нього не проходить на карту під ним: закриває віконце або виконує кнопку в ньому */
+var toastT=0,toast=document.getElementById("toast"),TA=null;
+function hideToast(){toast.classList.remove("on");document.body.classList.remove("toasting");TA=null}
+function say(t,s,acts,cap,ms){TA=acts&&acts.length?acts:null;
+  toast.innerHTML='<b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+(TA?'<div class="ta">'+(cap?'<small>'+esc(cap)+'</small>':'')+TA.map(function(a,i){return a.href?'<a class="gbtn" data-a="'+i+'" href="'+a.href.replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+esc(a.t)+'</a>':'<button type="button" class="gbtn" data-a="'+i+'">'+esc(a.t)+'</button>'}).join("")+'</div>':'');
+  toast.classList.add("on");document.body.classList.add("toasting");clearTimeout(toastT);toastT=setTimeout(hideToast,ms||(TA?8000:2800))}
+document.addEventListener("pointerdown",function(e){if(toast.classList.contains("on")&&!toast.contains(e.target))hideToast()},true);
+toast.addEventListener("click",function(e){var b=e.target.closest("[data-a]"),a=b&&TA?TA[+b.dataset.a]:null;clearTimeout(toastT);if(a&&a.href){if(a.go)a.go();setTimeout(hideToast,300);return}hideToast();if(a&&a.go)a.go()});
+
+["pTo","pFrom"].forEach(function(id){document.getElementById(id).addEventListener("click",function(e){
+  if(e.target.closest("button,a,input,textarea,select,label,[role=button],[data-d]"))return;pop(null)})});
+/* ---------- шапка: назву лікарні видно кілька секунд, потім вона згортається до знака «А»; дотик до «А» розгортає ---------- */
+var mast=document.getElementById("mast"),osm=document.getElementById("osm"),mastA=document.getElementById("mastA"),mastT=0,mastArmed=false;
+function mastFold(v){mast.classList.toggle("mini",v);osm.classList.toggle("on",!v);mastA.setAttribute("aria-expanded",!v)}
+function mastOpen(ms){mastFold(false);clearTimeout(mastT);mastT=setTimeout(function(){mastFold(true)},ms)}
+function mastArm(){if(mastArmed||cur)return;mastArmed=true;mastOpen(5000)}
+mastA.onclick=function(){if(mast.classList.contains("mini"))mastOpen(6000);else{clearTimeout(mastT);mastFold(true)}};
+
+/* ---------- легенда ---------- */
+var lg=document.getElementById("legend"),ib=document.getElementById("info");
+function legend(v){lg.classList.toggle("on",v);ib.setAttribute("aria-expanded",v);if(v){var r=ib.getBoundingClientRect();lg.style.bottom=Math.min(innerHeight-r.top+10,innerHeight-lg.offsetHeight-12)+"px"}}
+ib.onclick=function(e){e.stopPropagation();pop(null);legend(!lg.classList.contains("on"))};
+lg.onclick=function(e){if(!e.target.closest("a"))legend(false)};
+
+/* ---------- тема: світла / темна (19.11.2026). Без вибору — як у телефоні; вибір пам’ятаємо.
+   Якщо обрана тема збігається з телефоном — вибір скидаємо, і карта знову йде за налаштуваннями телефона ---------- */
+var MQD=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null,thB=document.getElementById("thm");
+function isDark(){var c=document.documentElement.classList;return c.contains("dark")||(!c.contains("light")&&!!(MQD&&MQD.matches))}
+function themeSync(){var d=isDark(),c=document.documentElement.classList,man=c.contains("dark")||c.contains("light");
+  /* логотип-картинки й колір рядка браузера теж слухають вибір, а не лише телефон */
+  document.querySelectorAll('source[media*="prefers-color-scheme"],source[data-m]').forEach(function(x){if(!x.dataset.m)x.dataset.m=x.media;x.media=man?(d?"all":"not all"):x.dataset.m});
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function(x){if(!x.dataset.m)x.dataset.m=x.getAttribute("media")||"";x.setAttribute("media",man?(/dark/.test(x.dataset.m)===d?"all":"not all"):x.dataset.m)});
+  if(thB){thB.setAttribute("aria-label",d?"Світла тема":"Темна тема");thB.setAttribute("aria-pressed",d?"true":"false")}}
+function themeFlip(){var c=document.documentElement.classList,want=isDark()?"light":"dark",sys=MQD&&MQD.matches?"dark":"light";
+  var go=function(){c.remove("dark","light");if(want!==sys)c.add(want);try{if(want!==sys)localStorage.setItem("ariadna-theme",want);else localStorage.removeItem("ariadna-theme")}catch(_){}themeSync()};
+  if(document.startViewTransition&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))document.startViewTransition(go);else go()}
+if(thB)thB.onclick=function(e){e.stopPropagation();themeFlip()};
+if(MQD){if(MQD.addEventListener)MQD.addEventListener("change",themeSync);else if(MQD.addListener)MQD.addListener(themeSync)}
+themeSync();
+
+/* ---------- віконця: «Куди», «Звідки», «Докладніше». Зникають після вибору або дотику будь-де поза ними ---------- */
+var bTo=document.getElementById("bTo"),bFrom=document.getElementById("bFrom"),res=document.getElementById("res");
+var POP={to:document.getElementById("pTo"),from:document.getElementById("pFrom"),det:document.getElementById("pDet")},cur=null;
+var sIn=document.getElementById("q"),sBox=document.getElementById("srch"),found=document.getElementById("found"),pkMain=document.getElementById("pkMain");
+function pop(name,quiet){
+  if(cur===name)return;lpHide();
+  if(cur){POP[cur].classList.remove("on");if(cur==="to"){sIn.blur();setTimeout(function(){if(cur!=="to"){POP.to.classList.remove("top");sIn.value="";filter()}},260)}}
+  cur=name;document.body.classList.toggle("popping",!!name);
+  bTo.setAttribute("aria-expanded",name==="to");bFrom.setAttribute("aria-expanded",name==="from");res.setAttribute("aria-expanded",name==="det");
+  if(!name){mastArm();if(dockOpen)foldSoon(1500);return}
+  legend(false);if(name==="from")drawFrom();
+  POP[name].classList.add("on");POP[name].querySelector(".pk-body").scrollTop=0;
+  if(!quiet)try{if(!(history.state&&history.state.ar))history.pushState({ar:1},"")}catch(_){}
+  setTimeout(function(){if(cur!==name)return;POP[name].focus({preventScroll:true});var c=POP[name].querySelector('[aria-pressed="true"]');if(c&&c.scrollIntoView)c.scrollIntoView({block:"nearest"})},60);
+}
+bTo.onclick=function(){pop(cur==="to"?null:"to")};
+bFrom.onclick=function(){pop(cur==="from"?null:"from")};
+res.onclick=function(e){if(e.target.closest("#rx")){cancelAll();return}var g=e.target.closest("#go");if(g){if(g.dataset.k==="share")share();else if(g.dataset.k!=="gm")lead();return}if(e.target.closest("a"))return;pop(cur==="det"?null:"det")};
+res.onkeydown=function(e){if((e.key==="Enter"||e.key===" ")&&!e.target.closest("a,#go,#rx")){e.preventDefault();pop(cur==="det"?null:"det")}};
+document.getElementById("scrim").onclick=function(){pop(null)};
+document.getElementById("pToX").onclick=function(){pop(null)};
+addEventListener("keydown",function(e){if(e.key==="Escape"){pop(null);legend(false)}});
+addEventListener("popstate",function(){if(cur)pop(null)});
+/* клавіатура телефона: віконце пошуку перестрибує вгору, щоб його не закрило */
+if(window.visualViewport){var vvf=function(){var r=document.documentElement.style;r.setProperty("--vvh",visualViewport.height+"px");r.setProperty("--vvt",visualViewport.offsetTop+"px")};visualViewport.addEventListener("resize",vvf);visualViewport.addEventListener("scroll",vvf);vvf()}
+sIn.addEventListener("focus",function(){if(innerWidth<900)POP.to.classList.add("top")});
+
+/* плитки й номери */
+var tiles=document.getElementById("tiles"),nums=document.getElementById("nums");
+D.forEach(function(d){
+  if(d.x)return;
+  var b=document.createElement("button");b.type="button";b.dataset.d=d.id;
+  if(d.q){b.className="tile"+(d.id==="kab"?" wide":"");b.innerHTML='<span class="ic">'+ico(ICONS[d.ic])+'</span><span><b>'+esc(d.t)+'</b><small>'+esc(d.sub)+'</small></span>';tiles.appendChild(b)}
+  else{b.className="num";b.textContent=d.id;b.setAttribute("aria-label","Відділення номер "+d.id);nums.appendChild(b)}
+  b.onclick=function(){choose(d.id)};
+});
+/* поруч з лікарнею (19.11.2026): магазини й пошта — пункти з LAND, у яких є near */
+var nearT=document.getElementById("near");
+SCULPT.concat(LAND).forEach(function(p,i){if(!p.near||!nearT)return;var b=document.createElement("button");b.type="button";b.className="tile";
+  b.innerHTML='<span class="ic">'+ico(ICONS[p.near.ic])+'</span><span><b>'+esc(p.near.t)+'</b><small>'+esc(p.near.sub)+'</small></span>';
+  b.onclick=function(){choose("poi"+i)};nearT.appendChild(b)});
+function flT(f){return f+(typeof f==="string"&&/^\d/.test(f)?" поверхи":" поверх")}   /* 3 поверх · 1–2 поверхи · цокольний поверх */
+function choose(id){var d=dById(id);LOCK=null;st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);geoAsk();render(true);syncUrl()}
+
+/* пошук: номер, назва, корпус, скульптура */
+function norm(s){return String(s).toLowerCase().replace(/[’'`ʼ"«»№#.,()—–-]/g," ").replace(/\s+/g," ").trim()}
+var IDX=[];
+D.forEach(function(d){
+  IDX.push({t:dTitle(d),s:[(d.k?"корпус "+d.k:"корпус не вказано"),d.fl?flT(d.fl):"",d.q||d.x?(d.note||""):(d.d||"")].filter(Boolean).join(" · "),num:d.q||d.x?null:d.id,q:d.q,x:d.x,ck:d.k||null,
+    h:norm([d.t||"",d.full||"",d.d||"",d.kw||"",d.q||d.x?"":"відділення відділ "+d.id,d.k?"корпус "+d.k:""].join(" ")),to:d.id,go:function(){choose(d.id)}})});
+B.forEach(function(b,i){if(!b.k&&!b.n)return;var inside=inK(b.k).map(dName);
+  IDX.push({t:b.k?"Корпус "+b.k:b.n,s:b.k?(b.n||(inside.length?"тут: "+inside.join(", "):"")):"",bk:b.k||null,
+    h:norm([b.k?"корпус "+b.k+" будівля":"",b.n||"",b.kw||""].join(" ")),to:b.k?"k"+b.k:null,go:function(){pop(null);pickBuilding(i)}})});
+POIS.forEach(function(p,i){D.push({id:"poi"+i,x:1,poi:1,t:p.n,short:p.sh||p.n,k:null,door:p.door||[p.x,p.y],fl:p.fl,note:p.d});
+  IDX.push({t:p.n,s:p.d,poi:1,h:norm(p.n+" "+p.d+" "+(p.kw||"")),to:"poi"+i,go:function(){choose("poi"+i)}})});
+IDX.forEach(function(e){e.ht=e.h.split(" ")});
+function tokOk(e,t){if(/^\d+$/.test(t))return e.ht.indexOf(t)>=0;if(e.h.indexOf(t)>=0)return true;var c=t.length>=8?3:t.length>=6?2:t.length>=5?1:0;return c>0&&e.h.indexOf(t.slice(0,t.length-c))>=0}
+var hits=[];
+function filter(){
+  var q=norm(sIn.value).replace(/(^| )к(орп)? ?(\d+)/g,"$1корпус $3");sBox.classList.toggle("has",!!sIn.value);
+  if(!q){found.hidden=true;pkMain.hidden=false;found.innerHTML="";hits=[];return}
+  var tk=q.split(" "),nums=tk.filter(function(t){return /^\d+$/.test(t)}),byK=/(^| )корп/.test(q)&&nums.length>0;
+  hits=IDX.filter(function(e){if(byK)return nums.indexOf(e.bk)>=0||nums.indexOf(e.ck)>=0;return tk.every(function(t){return tokOk(e,t)})}).map(function(e){
+    var sc=e.poi?5:3;if(byK)sc=e.bk?0:e.q?1:e.x?4:2;else if(e.num&&nums.indexOf(e.num)>=0)sc=0;else if(e.bk&&nums.indexOf(e.bk)>=0)sc=1;else if(e.q&&norm(e.t).indexOf(tk[0])===0)sc=2;return {e:e,sc:sc}})
+    .sort(function(a,b){return a.sc-b.sc}).slice(0,12).map(function(x){return x.e});
+  pkMain.hidden=true;found.hidden=false;
+  found.innerHTML=hits.length?hits.map(function(e,i){return '<button type="button" data-i="'+i+'"><span class="n'+(e.num||e.bk?"":" g")+'">'+(e.num?e.num:e.bk?"к"+e.bk:PIN)+'</span><span><b>'+esc(e.t)+'</b>'+(e.s?'<small>'+esc(e.s)+'</small>':'')+'</span></button>'}).join("")
+    :'<p class="pk-note">Нічого не знайдено. Спробуйте номер відділення або номер корпусу. Якщо не знаєте, куди вам, — у приймальному відділенні підкажуть.</p><button type="button" data-pr="1"><span class="n g">'+ico(ICONS.cross)+'</span><span><b>Приймальне відділення</b><small>корпус 1 · працює цілодобово</small></span></button>';
+}
+sIn.addEventListener("input",filter);
+sIn.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();if(hits[0])hits[0].go()}});
+found.onclick=function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.pr)choose("pr");else if(hits[+b.dataset.i])hits[+b.dataset.i].go()};
+/* ---------- утримання пункту в «Куди» (0,48 с) — над ним спливає «Поділитися»: посилання саме на цей пункт ---------- */
+var lpB=document.createElement("div"),LP={t:0,el:null,x:0,y:0,fired:false,h:0};lpB.className="lp";lpB.setAttribute("role","dialog");document.body.appendChild(lpB);
+function lpHide(){if(lpB){lpB.classList.remove("on");clearTimeout(LP.h)}}
+function lpTarget(el){
+  if(el.dataset.d){var d=dById(el.dataset.d);return d?{to:d.id,t:dTitle(d),sh:dShort(d)}:null}
+  if(el.dataset.pr){var p=dById("pr");return {to:"pr",t:dTitle(p),sh:dShort(p)}}
+  var e=hits[+el.dataset.i];return e&&e.to?{to:e.to,t:e.t,sh:e.num?"№ "+e.num:e.t}:null}
+function lpShow(el,tg){var r=el.getBoundingClientRect(),below=r.top<96;
+  lpB.innerHTML='<button type="button" class="lp-b">'+SHARE+'<span>Поділитися</span><small>'+esc(tg.sh)+'</small></button>';
+  lpB.classList.remove("on");lpB.classList.toggle("below",below);
+  var tx=r.left+r.width/2,hw=lpB.offsetWidth/2+8,cx=Math.max(hw,Math.min(innerWidth-hw,tx));
+  lpB.style.left=cx+"px";lpB.style.top=(below?r.bottom:r.top)+"px";lpB.style.setProperty("--ax",Math.max(-hw+22,Math.min(hw-22,tx-cx))+"px");
+  void lpB.offsetWidth;lpB.classList.add("on");
+  lpB.firstChild.onclick=function(e){e.stopPropagation();lpHide();shareTo(tg.to,tg.t)};
+  try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
+  clearTimeout(LP.h);LP.h=setTimeout(lpHide,6000)}
+function lpCancel(){clearTimeout(LP.t);if(LP.el)LP.el.classList.remove("lp-hold");LP.el=null}
+POP.to.addEventListener("pointerdown",function(e){LP.fired=false;lpHide();var el=e.target.closest("[data-d],[data-i],[data-pr]");if(!el||e.button>0)return;
+  lpCancel();LP.el=el;LP.x=e.clientX;LP.y=e.clientY;el.classList.add("lp-hold");
+  LP.t=setTimeout(function(){var tg=lpTarget(el);lpCancel();if(!tg)return;LP.fired=true;lpShow(el,tg)},480)});
+POP.to.addEventListener("pointermove",function(e){if(LP.el&&Math.hypot(e.clientX-LP.x,e.clientY-LP.y)>10)lpCancel()});
+["pointerup","pointercancel"].forEach(function(n){POP.to.addEventListener(n,lpCancel)});
+POP.to.addEventListener("scroll",lpCancel,true);
+/* після утримання пункт не обирається */
+POP.to.addEventListener("click",function(e){if(LP.fired&&!lpB.contains(e.target)){LP.fired=false;e.stopPropagation();e.preventDefault()}},true);
+/* права кнопка миші чи системне утримання — те саме віконце, без меню браузера */
+POP.to.addEventListener("contextmenu",function(e){var el=e.target.closest("[data-d],[data-i],[data-pr]");if(!el)return;e.preventDefault();if(LP.fired)return;var tg=lpTarget(el);lpCancel();if(tg){LP.fired=true;lpShow(el,tg)}});
+document.addEventListener("pointerdown",function(e){if(lpB.classList.contains("on")&&!lpB.contains(e.target)&&!POP.to.contains(e.target))lpHide()},true);
+document.getElementById("qx").onclick=function(e){e.preventDefault();sIn.value="";filter();sIn.focus()};
+
+/* ---------- торкання карти: обрати; повторний дотик до обраного знімає вибір ---------- */
+/* подвійний дотик — наблизити вдвічі в цьому місці; одиночний спрацьовує, якщо за 0,26 с не було другого */
+var tapW=null;
+function tapOrDouble(x,y){var now=performance.now();
+  if(tapW&&now-tapW.t<300&&Math.hypot(x-tapW.x,y-tapW.y)<32){clearTimeout(tapW.id);tapW=null;zoomFly(.5,x,y);return}
+  if(tapW){clearTimeout(tapW.id);var o=tapW;tapW=null;tapAt(o.x,o.y)}
+  tapW={t:now,x:x,y:y,id:setTimeout(function(){tapW=null;tapAt(x,y)},260)}}
+function zoomFly(f,cx,cy){var s=size(),px=(cx-s.l)/s.w,py=(cy-s.t)/s.h,wx=vb.x+px*vb.w,wy=vb.y+py*vb.h,nw=Math.min(WMAX,WMAX*s.w/s.h,Math.max(WMIN,vb.w*f));fly({x:wx-px*nw,y:wy-py*nw*s.h/s.w,w:nw},320)}
+/* потягнули карту під час «Вести» — карта більше не йде за вами */
+svg.addEventListener("pointermove",function(){if(FOLLOW&&moved>14&&Object.keys(ptrs).length){FOLLOW=false;awake(false);geoMode();render(false);say("Карта більше не йде за вами","щоб продовжити, натисніть «Вести»")}});
+/* вхід на карті: що за ним і кнопки, щоб прокласти маршрут */
+function entCard(id){var e=ENT[id],own=D.filter(function(d){return d.ent===id}),list=own.length?own:D.filter(function(d){return (d.ents||[]).indexOf(id)>=0});
+  var acts=list.map(function(d){return {t:d.q||d.x?(d.short||d.t):"№ "+d.id,go:function(){choose(d.id)}}});
+  if(!acts.length&&e.k&&bIndex(e.k)>=0)acts=[{t:"Корпус "+e.k,go:function(){pickBuilding(bIndex(e.k))}}];
+  say(e.n,e.d,acts,"Прокласти маршрут:")}
+function tapAt(x,y){
+  legend(false);
+  var el=document.elementFromPoint(x,y);if(!el||!el.dataset)return;var ds=el.dataset,dg=el.closest&&el.closest(".door");
+  if(ds.ent===undefined&&dg&&dg.dataset.en)ds={ent:dg.dataset.en};
+  if(ds.pin!==undefined){clearDest();return}
+  if(ds.me!==undefined){if(st.start==="geo")clearStart();else setStart("geo");return}
+  if(ds.stop!==undefined&&STARTS[ds.stop]){if(st.start===ds.stop)clearStart();else setStart(ds.stop);return}
+  if(ds.poi!==undefined){var pi=+ds.poi,p=POIS[pi];say(p.n,p.d,[{t:"Сюди",go:function(){choose("poi"+pi)}}],"Прокласти маршрут:");return}
+  if(ds.ent!==undefined&&ENT[ds.ent]){entCard(ds.ent);return}
+  if(ds.b!==undefined){bCard(+ds.b);return}
+}
+/* корпус на карті: віконце з кнопками — весь корпус або конкретне відділення в ньому */
+function bCard(i){var b=B[i];
+  if(!b.k&&!b.n){say("Допоміжна будівля","відділень тут немає");return}
+  var list=b.k?D.filter(function(x){return x.k===b.k&&["lift","prm","prw"].indexOf(x.id)<0}):[],acts=[{t:b.k?"Корпус "+b.k:"Сюди",go:function(){pickBuilding(i)}}].concat(list.map(function(d){return {t:d.q||d.x?(d.short||d.t):"№ "+d.id,go:function(){choose(d.id)}}}));
+  say(b.k?"Корпус "+b.k:b.n,b.k?(b.n||b.nt||(list.length?"":"відділень тут немає")):(b.nt||""),acts,"Прокласти маршрут:")}
+function pickBuilding(i){
+  var b=B[i];
+  if(!b.k&&!b.n){say("Допоміжна будівля","відділень тут немає");return}
+  LOCK=null;st.b=i;st.dept=null;dockOpen=false;st.carIn=null;geoAsk();render(true);syncUrl();
+}
+function setStart(k){st.start=k;st.auto=false;LOCK=null;dockOpen=false;if(k==="geo"){st.carIn=null;GEO.err="";if(!(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000))geoStart()}render(st.b>=0);if(st.b<0&&k!=="geo")say(STARTS[k].here?STARTS[k].name:"Зупинка «"+STARTS[k].name+"»","початок маршруту обрано")}
+function clearDest(){if(st.b<0&&!st.dept)return;if(FOLLOW){FOLLOW=false;awake(false);geoMode()}st.dept=null;st.b=-1;if(cur==="det")pop(null);render(false);syncUrl();say("Пункт призначення знято","оберіть «Куди» або торкніться будівлі")}
+function clearStart(){st.start=null;st.auto=false;render(false);say("Початок маршруту знято","оберіть «Звідки» або торкніться зупинки")}
+
+/* ---------- нижні кнопки, смужка з відповіддю, маршрут ---------- */
+var dock=document.getElementById("dock"),resRow=document.getElementById("resRow"),bMini=document.getElementById("bMini"),lastBox=null,lastRoutes=null,curTitle="",dockOpen=false,animT=0;
+/* на телефоні, коли маршрут прокладено, «Куди» і «Звідки» згортаються в одну кнопку ліворуч, а банер маршруту стає з нею в один рядок */
+function wantMin(){return innerWidth<900&&!resRow.hidden&&(!!st.start||st.car)&&(!!st.dept||st.b>=0)&&!dockOpen}
+function syncDock(){var m=wantMin();if(m===dock.classList.contains("min"))return;
+  dock.classList.add("anim");dock.classList.toggle("min",m);clearTimeout(animT);animT=setTimeout(function(){dock.classList.remove("anim")},1700)}
+/* де буде верх панелі, коли вона закінчить згортатися чи розгортатися */
+function dockTop(){var r=dock.getBoundingClientRect(),rh=resRow.hidden?0:res.offsetHeight,h=dock.classList.contains("min")?rh:(rh?rh+8:0)+(bTo.offsetHeight||58);return r.bottom-h}
+/* правий стовпчик кнопок має власну анімацію, синхронну з нижньою панеллю (20.11.2026, Андрій):
+   стовпчик одразу ставимо на кінцеве місце (на 10 пкс над панеллю, якою вона стане), а зсув від старого місця «відпускаємо»
+   анімаціями з тими самими тривалістю, затримкою й плавністю, що й у панелі:
+   — банер з’являється чи зникає: 0,45 с, як його поява (rise);
+   — ряд «Куди/Звідки» згортається чи розгортається: 0,95 с, при згортанні — ще 0,15 с затримки, як у .dk-row.
+   Дві частини руху — на різних властивостях (margin-bottom і bottom), тому складаються. Так банер і кнопки не заходять на стовпчик, а він — на них. */
+var ctlEl=document.getElementById("ctl"),ctlA=[],ctlS=null,ctlB=null;
+var RISE="cubic-bezier(.32,.72,0,1)",ROWE="cubic-bezier(.45,0,.2,1)",RM=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)");
+function dockH(){var t=dockTop();document.documentElement.style.setProperty("--dockh",(dock.getBoundingClientRect().bottom-t)+"px");
+  var now={res:!resRow.hidden,min:dock.classList.contains("min"),bh:resRow.hidden?(ctlS?ctlS.bh:68):resRow.offsetHeight+8},prev=ctlS;ctlS=now;
+  var B=innerWidth>=900?16:Math.round(innerHeight-t+10);
+  if(prev&&prev.res===now.res&&prev.min===now.min&&ctlB!==null&&Math.abs(B-ctlB)<1)return;   /* нічого не змінилося — анімацію, що йде, не чіпаємо */
+  var vis=innerHeight-ctlEl.getBoundingClientRect().bottom;ctlA.forEach(function(a){try{a.cancel()}catch(_){}});ctlA=[];
+  ctlEl.style.bottom=B+"px";ctlB=B;var D=Math.round(B-vis),still=!prev||innerWidth>=900||!ctlEl.animate||(RM&&RM.matches);
+  /* банер з’являється — він не спалахує над кнопками, а виростає з-над них (висота 0 → повна за 0,45 с), і стовпчик піднімається тим самим рухом */
+  var grow=prev&&!prev.res&&now.res&&!still;
+  if(grow){var H=resRow.offsetHeight;resRow.style.overflow="hidden";
+    try{var ga=resRow.animate([{height:"0px",marginBottom:"-8px"},{height:H+"px",marginBottom:"0px"}],{duration:450,easing:RISE});ga.onfinish=ga.oncancel=function(){resRow.style.overflow=""}}catch(_){resRow.style.overflow=""}}
+  if(still||Math.abs(D)<1)return;
+  var an=dock.classList.contains("anim"),rowT={duration:an?950:250,delay:an&&now.min&&!prev.min?150:0,easing:an?ROWE:"ease-out"},
+      riseT={duration:450,delay:0,easing:RISE},bp=0,jump=0;
+  if(grow&&!prev.min)bp=now.bh;                               /* частина руху — разом із банером, що виростає */
+  else if(prev.res&&!now.res&&!prev.min)bp=-prev.bh;          /* банер зник — стовпчик спускається так само плавно */
+  else if(prev.res&&now.res)jump=now.bh-prev.bh;              /* банер миттєво став вищим чи нижчим (рядок «звідки → куди») — стрибає разом з ним */
+  /* дві частини руху — на bottom і margin-bottom: обидві рахуються в тому ж кадрі, що й висота банера та відступ ряду кнопок,
+     тож навіть коли телефон зайнятий (малює маршрут), стовпчик не забігає вперед панелі й не відстає від неї */
+  var rest=D-bp-jump;
+  function go(prop,d,T){var a=prop==="bottom"?[{bottom:(B-d)+"px"},{bottom:B+"px"}]:[{marginBottom:(-d)+"px"},{marginBottom:"0px"}];
+    try{ctlA.push(ctlEl.animate(a,{duration:T.duration,delay:T.delay,easing:T.easing,fill:"backwards"}))}catch(_){}}
+  if(bp)go("marginBottom",bp,riseT);
+  if(Math.abs(rest)>=1)go("bottom",rest,rowT)}
+var foldT=0;
+function foldDock(){clearTimeout(foldT);if(!dockOpen)return;dockOpen=false;syncDock();dockH()}
+function foldSoon(ms){clearTimeout(foldT);foldT=setTimeout(function(){if(!cur)foldDock()},ms)}
+bMini.onclick=function(){dockOpen=true;syncDock();dockH();foldSoon(5000)};
+document.addEventListener("pointerdown",function(e){if(!dockOpen||cur||(e.target.closest&&e.target.closest("#dock")))return;foldDock()},true);
+addEventListener("resize",function(){syncDock();dockH()});
+var CARN={e1:{t:"В’їзд з вул. Олени Теліги",s:"дорогою вглиб гаю, біля зупинки «Лікарня ім. Павлова»",sh:"з Теліги",h:"Заїжджайте з вул. Олени Теліги дорогою, що відходить від вулиці вглиб гаю, біля зупинки «Лікарня ім. Павлова»."},
+  e3:{t:"В’їзд з вул. Кирилівської",s:"Врубелівським узвозом, біля зупинки «вул. Кирилівська»",sh:"з Кирилівської",h:"Заїжджайте з вул. Кирилівської Врубелівським узвозом до в’їзду на територію."}};
+function carHint(k){return (k==="geo"?"Маршрут від вас дорогами лікарні.":CARN[k].h)+" Пунктир — машиною, суцільна нитка — пішки. Окремих місць для паркування поки немає: ставте машину так, щоб не перекрити проїзд швидкій. На шлагбаум біля адміністрації не розраховуйте — маршрут його оминає."}
+function drawFrom(){
+  if(st.car){drawFromCar();return}
+  var keys=startKeys(),h='<div class="pk-h">Звідки ви йдете?</div><div class="from">';STARTS.geo.street=GEO.err&&!GEO.pos?"не працює — торкніться, щоб дізнатися, що зробити":geoText();
+  keys.forEach(function(k){var S=STARTS[k],R=lastRoutes?lastRoutes[k]:null;
+    h+='<button type="button" data-e="'+k+'" class="'+(S.here?"here":S.geo?"geo":"")+'" aria-pressed="'+(k===st.start)+'"><span class="bus">'+(S.here||S.geo?DOT:VEH(S))+'</span><span class="ft"><b>'+esc(S.here||S.geo?S.name:"Зупинка «"+S.name+"»")+'</b><small>'+esc(S.street+(S.tr?" · "+S.tr:""))+'</small></span>'+(st.b>=0?'<span class="m">'+(R?mins(R.len)+" хв":"—")+'</span>':'')+'</button>'});
+  h+='</div>'+switches();
+  var bd=document.getElementById("fromBody");bd.innerHTML=h;
+  bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);if(x.dataset.e==="geo"&&GEO.err&&!GEO.pos){geoHelp();return}if(x.dataset.e!==st.start)setStart(x.dataset.e);else if(lastBox)fitBox.apply(null,lastBox)}});
+  bindSwitches();
+}
+function switches(px){px=px||"";return '<label class="sw"><input type="checkbox" id="'+px+'car"'+(st.car?" checked":"")+'><span class="k"></span><span>На авто</span></label><label class="sw"><input type="checkbox" id="'+px+'ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>'}
+function bindSwitches(px){px=px||"";
+  document.getElementById(px+"ns").onchange=function(e){st.noSteps=e.target.checked;save();render(true)};
+  document.getElementById(px+"car").onchange=function(e){st.car=e.target.checked;st.carIn=null;render(true)}}
+/* «Звідки» на авто: два в’їзди на територію і «Від мене» */
+function drawFromCar(){
+  var h='<div class="pk-h">Звідки заїжджаєте?</div><div class="from">',ks=Object.keys(CAR_IN);if(navigator.geolocation)ks.unshift("geo");
+  ks.forEach(function(k){var geo=k==="geo",R=geo?null:(lastCar?lastCar[k]:null),on=k===lastCarK;
+    h+='<button type="button" data-c="'+k+'" class="'+(geo?"geo":"")+'" aria-pressed="'+on+'"><span class="bus">'+(geo?DOT:CARI)+'</span><span class="ft"><b>'+esc(geo?"Від мене":CARN[k].t)+'</b><small>'+esc(geo?"якщо ви вже на території":CARN[k].s)+'</small></span>'+(st.b>=0&&!geo?'<span class="m">'+(R?R.min+" хв":"—")+'</span>':'')+'</button>'});
+  h+='</div>'+switches()+'<p class="pk-note">Оберіть, з якого боку заїжджаєте, — біля кожного в’їзду видно, скільки хвилин до місця.</p>';
+  var bd=document.getElementById("fromBody");bd.innerHTML=h;
+  bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);var k=x.dataset.c;dockOpen=false;if(k==="geo"){if(GEO.err&&!GEO.pos){geoHelp();return}setStart("geo");return}st.carIn=k;render(true)}});
+  bindSwitches();
+}
+function setFrom(){
+  if(st.car){bFrom.classList.remove("empty");document.getElementById("fromC").textContent="На авто";document.getElementById("fromV").textContent=lastCarK==="geo"?"Від мене":lastCarK?CARN[lastCarK].sh:"В’їзд";
+    var ci=document.getElementById("fromI");ci.className="ic sm "+(lastCarK==="geo"?"me":"bus");ci.innerHTML=lastCarK==="geo"?DOT:CARI;return}
+  var S=st.start?STARTS[st.start]:null;bFrom.classList.toggle("empty",!S);
+  document.getElementById("fromC").textContent=S?S.cap:"";document.getElementById("fromV").textContent=S?S.short:"Звідки?";
+  var i=document.getElementById("fromI");i.className="ic sm "+(S?(S.geo||S.here?"me":"bus"):"");i.innerHTML=S?(S.geo||S.here?DOT:VEH(S)):PIN;
+}
+var XB='<button type="button" class="gbtn rx" id="rx" aria-label="Скасувати маршрут">'+ico('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',2.3)+'</button>';
+function setRes(main,sub,go,more){resRow.hidden=false;document.getElementById("resB").textContent=main;document.getElementById("resS").innerHTML='<span>'+esc(sub)+(more===false?"":" · докладніше")+'</span>'+UP;document.getElementById("resGo").innerHTML=XB+(go||"")}
+/* «×»: скасувати маршрут і всі виділення (20.11.2026). «Від мене» лишається — це не виділення, а звичайний початок */
+function cancelAll(){if(st.b<0&&!st.dept)return;farKey=null;var was={dept:st.dept,b:st.b,start:st.start,auto:st.auto,carIn:st.carIn};
+  if(FOLLOW){FOLLOW=false;awake(false);geoMode()}LOCK=null;st.dept=null;st.b=-1;st.carIn=null;
+  if(st.start!=="geo"||GEO.err){st.start=navigator.geolocation&&!GEO.err?"geo":null;st.auto=false}
+  pop(null);render(false);syncUrl();
+  say("Маршрут скасовано","",[{t:"Повернути",go:function(){st.dept=was.dept;st.b=was.b;st.start=was.start;st.auto=was.auto;st.carIn=was.carIn;LOCK=null;render(true);syncUrl()}}],"",6000)}
+
+function render(zoom){
+  document.querySelectorAll("#pTo [data-d]").forEach(function(c){c.setAttribute("aria-pressed",c.dataset.d===st.dept?"true":"false")});
+  var ARo=st.dept?areaOf(st.dept):null;svg.querySelectorAll(".b").forEach(function(p){p.classList.toggle("on",!ARo&&+p.dataset.b===st.b)});
+  svg.querySelectorAll(".badge").forEach(function(p){p.classList.toggle("on",+p.dataset.bb===st.b);p.classList.toggle("pl",!st.dept)});
+  var d0=dById(st.dept),onE=d0?(d0.ents||(d0.ent?[d0.ent]:[])).concat(d0.lift?["lift"]:[]):(st.b>=0&&B[st.b].k?Object.keys(ENT).filter(function(k){return ENT[k].k===B[st.b].k}):[]);
+  svg.querySelectorAll(".door").forEach(function(p){p.classList.toggle("on",onE.indexOf(p.dataset.en)>=0)});
+  var rg=document.getElementById("route"),pin=document.getElementById("pin"),glow=document.getElementById("glow"),darea=document.getElementById("darea");darea.innerHTML="";rg.innerHTML="";pin.innerHTML="";glow.innerHTML="";
+  var d=dById(st.dept),det=document.getElementById("detBody"),toC=document.getElementById("toC"),toV=document.getElementById("toV");
+  STARTS.geo.at=GEO.f||GEO.pos;STARTS.geo.stop=meAt();STARTS.geo.street=geoText();var SK=st.start;HERE=false;
+  function done(){svg.querySelectorAll(".stop").forEach(function(p){p.classList.toggle("on",p.dataset.e===SK)});setFrom();bFrom.classList.toggle("ask",!st.start&&(st.b>=0||!!d));syncDock();dockH();if(cur==="from")drawFrom()}
+  if(!d&&st.b<0){farKey=null;bTo.classList.add("empty");toC.textContent="";toV.textContent="Куди вам?";resRow.hidden=true;lastDoor=null;if(st.auto)SK=st.start=null;if(FOLLOW){FOLLOW=false;awake(false);geoMode()}det.innerHTML="";lastBox=null;lastRoutes=null;curTitle="";done();apply();return}
+  bTo.classList.remove("empty");
+  var html="";
+  if(st.b<0&&!(d&&d.door)){ /* відділення № 9 */
+    curTitle="Відділення № 9";toC.textContent="Куди · без корпусу";toV.textContent="Відділення 9";lastRoutes=null;
+    setRes("Корпус не вказано","уточніть телефоном");
+    html='<div class="head"><div class="kb none">?</div><div class="tx"><div class="t">Відділення № 9</div><div class="d">Корпус на сайті лікарні не вказаний — лише «Врубелівський узвіз».</div></div></div>';
+    html+='<p class="note">Перед візитом уточніть місце телефоном — приймальне працює цілодобово.</p>'+tels([EM]);
+    html+='<p class="note">Врубелівський узвіз проходить уздовж південно-східного краю території — на карті він підписаний.</p>';
+    det.innerHTML=html;lastBox=[150,-20,470,230,10];done();if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();return;
+  }
+  var en=d&&d.ent?ENT[d.ent]:null,viaLift=!!(d&&d.lift&&st.noSteps);
+  var b=st.b>=0?B[st.b]:{k:null,door:d.door,lab:d.door},door=viaLift?ENT.lift.p:en?en.p:(d&&d.door)||b.door||b.lab,same=inK(b.k);
+  var title=d?dTitle(d):(b.k?"Корпус "+b.k:(b.n||"Будівля")),sub="";
+  if(d){sub=(d.d||d.note||"");if(d.d&&d.note)sub=d.d+" · "+d.note}
+  else if(b.n)sub=b.n;
+  else if(b.nt)sub=b.nt;
+  else if(same.length)sub="Тут: "+same.map(dName).join(", ");
+  else sub="На сайті лікарні для цієї будівлі нічого не вказано";
+  curTitle=d?(d.q||d.x?d.t:"Відділення № "+d.id):title;
+  toC.textContent="Куди"+(b.k?" · корпус "+b.k:"");toV.textContent=d?dShort(d):(b.k?"Корпус "+b.k:b.n);
+  html+='<div class="head"><div class="kb">'+(b.k?'<span><small>корп.</small>'+b.k+'</span>':'•')+'</div><div class="tx"><div class="t">'+esc(title)+'</div><div class="d">'+esc(sub)+'</div></div></div>';
+  var keys=startKeys(),routes={},near=geoNear();lastDoor=door;
+  var lkey=door[0].toFixed(1)+","+door[1].toFixed(1)+(st.noSteps?"n":"");
+  keys.forEach(function(k){routes[k]=k==="geo"?(near?(st.start==="geo"&&!st.car?lockRoute(door,lkey):findRoute(STARTS.geo.at,door,st.noSteps)):null):STARTS[k].at?findRoute(STARTS[k].at,door,st.noSteps):null});lastRoutes=routes;STARTS.geo.stop=meAt();
+  if(st.start&&st.start!=="geo"&&!routes[st.start]&&st.noSteps){var best=null;keys.forEach(function(k){if(routes[k]&&(!best||routes[k].len<routes[best].len))best=k});if(best)st.start=best}
+  /* «від мене», але де ви — ще невідомо, ви далеко чи точка неточна: нитка від найзручнішої зупинки (fk) */
+  var wantGeo=st.start==="geo",far=wantGeo&&!!GEO.pos&&!!geoFar(),fk=null,farMe=!!GEO.pos&&!!geoFar()&&Date.now()-GEO.t<120000;SK=st.start;
+  var s=SK?STARTS[SK]:null,r=s?routes[SK]:null,cr=null;
+  /* ви вже біля дверей або в цьому корпусі — маршрут не потрібен, потрібна кнопка «Надіслати» */
+  var me0=GEO.f||GEO.pos;if(wantGeo&&near&&(Math.hypot(me0[0]-door[0],me0[1]-door[1])<25||(b.p&&inRings(me0,b.p.map(pts)))))HERE=true;
+  document.getElementById("resF").innerHTML=s?esc(s.geo?s.short:stopNm(s))+'<i>→</i>'+esc(toV.textContent):"";
+  lastCar=null;lastCarK=null;
+  if(st.car&&!b.priv){
+    lastCar={};Object.keys(CAR_IN).forEach(function(k){lastCar[k]=carRoute(CAR_IN[k],door,st.noSteps)});
+    if(wantGeo&&near&&!st.carIn){cr=carRoute(GEO.f||GEO.pos,door,st.noSteps);if(cr)lastCarK="geo"}
+    if(!cr){lastCarK=st.carIn&&lastCar[st.carIn]?st.carIn:null;cr=lastCarK?lastCar[lastCarK]:null}
+    r=null}
+  if(st.car){var tv=d?dShort(d):(b.k?"Корпус "+b.k:b.n);document.getElementById("resF").innerHTML='Авто '+esc(lastCarK==="geo"?"від вас":lastCarK?CARN[lastCarK].sh:"")+'<i>→</i>'+esc(tv)}
+  var GL=FOLLOW?'<button type="button" class="gbtn thread on" id="go">'+STOPI+'Стоп</button>':'<button type="button" class="gbtn thread" id="go">'+NAV+'Вести</button>';
+  var FL=d&&d.fl?flT(d.fl)+(viaLift?", ліфтом":"")+" · ":"";
+  var GM='<a class="gbtn thread" id="go" data-k="gm" href="'+esc(gmFar())+'" target="_blank" rel="noopener" aria-label="Відкрити Google Карти">'+GMAP+'Google Карти</a>',isFar=false;
+      SB='<button type="button" class="gbtn thread" id="go" data-k="share">'+SHARE+'Надіслати</button>',wait=GEO.watch!==null&&!GEO.pos?"визначаю, де ви":GEO.pos&&!far?"±"+GEO.acc+" м":"";
+  if(b.priv)setRes("Закрита територія","вхід лише за дозволом");
+  else if(HERE&&!FOLLOW)setRes(b.p&&Math.hypot(me0[0]-door[0],me0[1]-door[1])>=25&&b.k?"Ви в корпусі "+b.k:"Ви вже тут","надішліть рідним, як сюди дійти",SB);
+  else if(cr&&far){isFar=true;setRes("≈ "+fmtKm(geoFar()),"до в’їзду "+CARN[lastCarK].sh+" · далі ≈ "+cr.min+" хв",GM)}
+  else if(cr)setRes("≈ "+cr.min+" хв · "+fmtLen(cr.len),FL+"авто "+Math.round(cr.dlen/10)*10+" м, пішки "+Math.max(5,Math.round(cr.wlen/5)*5)+" м",GL);
+  else if(st.car&&far){isFar=true;setRes("≈ "+fmtKm(geoFar()),"до лікарні · дорогу прокладуть Google Карти",GM,false)}
+  else if(st.car&&!myGate()&&!(wantGeo&&near))setRes(b.k?"Корпус "+b.k:title,"оберіть, звідки заїжджаєте",GL,false);
+  else if(st.car)setRes("Машиною не під’їхати","вимкніть «На авто» у «Звідки»",GL);
+  else if(far){isFar=true;setRes("≈ "+fmtKm(geoFar()),"до лікарні · дорогу прокладуть Google Карти",GM,false)}
+  else if(r&&farMe&&!s.geo){isFar=true;setRes("≈ "+fmtKm(geoFar()),"до зупинки «"+stopNm(s)+"» · далі ≈ "+mins(r.len)+" хв пішки",GM)}
+  else if(r)setRes("≈ "+mins(r.len)+" хв · "+fmtLen(r.len),FL+(s.geo?"від вас"+(GEO.acc>40?" · ±"+GEO.acc+" м":""):"від зупинки"),GL);
+  else if(!s)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
+  else if(s.geo&&GEO.err&&!GEO.pos)setRes(b.k?"Корпус "+b.k:title,FL+"оберіть, звідки йдете",GL,false);
+  else if(s.geo&&!near)setRes(GEO.pos?"Уточнюю, де ви":"Визначаю, де ви…",(GEO.pos?"±"+GEO.acc+" м · ":"")+"або оберіть «Звідки»",GL,false);
+  else if(s.geo)setRes("Доріжки від вас немає","оберіть «Звідки»",GL);
+  else if(st.noSteps)setRes("Без сходів не пройти","оберіть інше «Звідки»",GL);
+  else setRes("Доріжки на карті немає","орієнтуйтеся за номером корпусу",GL);
+  var fkey=st.dept||("b"+st.b);
+  if(isFar&&!farOpen&&farKey!==fkey){farKey=fkey;document.body.classList.add("far-on");clearTimeout(farT);farT=setTimeout(showFar,600)}
+  else if(!isFar&&farOpen){farOpen=false;farScr.hidden=true;farReset();farBox.hidden=true;farBox.innerHTML="";document.body.classList.remove("far-on")}
+  if(!isFar){clearTimeout(farT);if(!farOpen)document.body.classList.remove("far-on")}
+  if(d&&(d.fl||d.way||en)){var wy=[];if(d.fl)wy.push("<b>"+flT(d.fl)+".</b>");if(d&&areaOf(d.id))wy.push("Частину корпусу, яку займає відділення, обведено на карті.");if(d.way)wy.push(esc(d.way));else if(en&&en.w)wy.push(esc(en.w));
+    if(d.lift)wy.push(viaLift?"Маршрут веде до дверей ліфта — вони в дворі між крилами корпусу.":"Є ліфт: окремі двері з двору, на карті підписані «Ліфт». Щоб маршрут вів до них, увімкніть «Маршрут без сходів» у віконці «Звідки».");
+    if(wy.length)html+='<p class="note way">'+wy.join(" ")+'</p>'}
+  if(d&&d.vis)html+=visBlock(d.vis);
+  if(d&&d.tel)html+=tels(d.tel);
+  if(cr)html+='<p class="hint">'+esc(carHint(lastCarK))+'</p>';
+  else if(r)html+='<p class="hint">'+esc((fk?(far?"Ви далеко від лікарні, тому нитка йде від зупинки «"+stopNm(s)+"». ":"Поки ми не знаємо точно, де ви, нитка йде від зупинки «"+stopNm(s)+"». "):"")+s.hint)+'</p>';
+  var others=same.filter(function(x){return !d||x.id!==d.id});
+  if(d&&others.length)html+='<p class="note">У цьому ж корпусі: '+others.map(dName).join(", ")+'.</p>';
+  if(b.priv)html+='<p class="note">Закрита територія: вхід лише за дозволом, маршрут не прокладається.</p>';
+  html+='<p class="note">Заблукали? Приймальне відділення цілодобово: <a href="tel:+380442938539">'+EM+'</a></p>';
+  html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+'Як доїхати — Google Карти</a><button type="button" class="gbtn" id="shr">'+SHARE+'Надіслати рідним, як дійти</button></div>';
+  det.innerHTML=html+switches("d");document.getElementById("shr").onclick=share;bindSwitches("d");
+  /* якщо відомо, яку частину корпусу займає відділення, обводимо тільки її, а не весь корпус */
+  var AR=d?areaOf(d.id):null;
+  glow.innerHTML=AR||!b.p?"":'<path class="glow" d="'+ringsPath([b.p[0]])+'"/>';
+  if(AR)darea.innerHTML='<polygon class="dar-g" points="'+AR.p+'"/><polygon class="dar" points="'+AR.p+'"/>';
+  var nm=d&&!d.q&&!d.x?d.id:null,eid=viaLift?"lift":(d&&d.ent)||null,pill="";
+  if(nm){var ea=eid&&ENT[eid]?entDir(ENT[eid]):90,ra=ea*Math.PI/180,qx=-Math.cos(ra)*PINC,qy=-Math.sin(ra)*PINC,qw=Math.max(20,8+7.3*nm.length);
+    pill='<g transform="translate('+qx.toFixed(1)+' '+qy.toFixed(1)+')"><rect class="dn-w" x="'+(-qw/2)+'" y="-10" width="'+qw+'" height="20" rx="10"/><g class="dnum"><rect class="dn-b" x="'+(-qw/2)+'" y="-10" width="'+qw+'" height="20" rx="10" data-pin="1"/><text y=".6">'+esc(nm)+'</text></g></g>'}
+  svg.querySelectorAll(".door").forEach(function(p){p.classList.toggle("np",!!pill&&p.dataset.en===eid)});
+  var PINH=lbl("pin",door[0],door[1],0,(pill?'<circle class="core" r="3.4"/>':'<circle class="wave" r="7"/><circle class="core" r="7"/>')+'<circle class="hit" r="16" data-pin="1"/>'+pill);
+  if(cr){
+    var f1=function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)},dl=cr.drive.map(f1).join(" "),wl2=cr.walk.map(f1).join(" "),we=cr.walk[cr.walk.length-1];
+    rg.innerHTML='<polyline class="route drive-b" points="'+dl+'"/><polyline class="route drive" points="'+dl+'"/>'+
+      '<polyline class="route halo" points="'+wl2+'"/><polyline class="route case" points="'+wl2+'"/><polyline class="route main draw" points="'+wl2+'"/><polyline class="route flow" points="'+wl2+'"/><polyline class="route last" points="'+f1(we)+" "+door[0]+","+door[1]+'"/>';
+    var m2=rg.querySelector(".main"),L2=cr.wlen+20;m2.style.strokeDasharray=L2;m2.style.setProperty("--len",L2);
+    var c0=cr.drive[0];
+    pin.innerHTML=PINH+(cr.dlen>15?lbl("carin",c0[0],c0[1],0,'<circle class="ci" r="8.5"/><path class="cc" d="M-4.4 2.4V.6l1-2.6a1.2 1.2 0 0 1 1.1-.8h4.6a1.2 1.2 0 0 1 1.1.8l1 2.6v1.8zM-4.4.4h8.8M-3 2.4v1.2M3 2.4v1.2"/><title>Звідси машиною</title>'):"")+
+      lbl("park",cr.park[0],cr.park[1],0,'<circle class="pk" r="8.5"/><text class="pk-t" y=".5">P</text><title>Тут лишіть авто — далі пішки</title>');
+    var all=cr.drive.concat(cr.walk,[door]);
+    lastBox=[Math.min.apply(null,all.map(function(p){return p[0]})),Math.min.apply(null,all.map(function(p){return p[1]})),Math.max.apply(null,all.map(function(p){return p[0]})),Math.max.apply(null,all.map(function(p){return p[1]})),28];
+  } else if(r){
+    var line=r.path.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join(" "),end=r.path[r.path.length-1];
+    rg.innerHTML='<polyline class="route halo" points="'+line+'"/><polyline class="route case" points="'+line+'"/><polyline class="route main'+(r.locked&&LOCK&&LOCK.drawn?"":" draw")+'" points="'+line+'"/><polyline class="route flow" points="'+line+'"/><polyline class="route last" points="'+end[0]+","+end[1]+" "+door[0]+","+door[1]+'"/>';
+    var m=rg.querySelector(".main"),L=r.len+20;m.style.strokeDasharray=L;m.style.setProperty("--len",L);
+    pin.innerHTML=PINH;if(r.locked&&LOCK)LOCK.drawn=true;
+    var xs=r.path.map(function(p){return p[0]}).concat([door[0],s.stop[0]]),ys=r.path.map(function(p){return p[1]}).concat([door[1],s.stop[1]]);
+    lastBox=[Math.min.apply(null,xs),Math.min.apply(null,ys),Math.max.apply(null,xs),Math.max.apply(null,ys),28];
+  } else {
+    pin.innerHTML=PINH;
+    lastBox=[door[0]-110,door[1]-110,door[0]+110,door[1]+110,0];
+  }
+  if(AR)pts(AR.p).forEach(function(q){lastBox[0]=Math.min(lastBox[0],q[0]);lastBox[1]=Math.min(lastBox[1],q[1]);lastBox[2]=Math.max(lastBox[2],q[0]);lastBox[3]=Math.max(lastBox[3],q[1])});
+  done();
+  if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();
+}
+/* рідним іде лише «Куди». Звідки — визначить їхній телефон: на території — від них, далеко — Google Карти до потрібної зупинки */
+function share(){shareTo(st.dept||(st.b>=0&&B[st.b].k?"k"+B[st.b].k:""),curTitle)}
+function shareTo(to,name){var dv=to&&dById(to),vt=dv&&dv.vis?" Передачі й відвідування "+visText(dv.vis)+(dv.vis.q?", тиха година "+hm(dv.vis.q[0])+"–"+hm(dv.vis.q[1]):"")+".":"";
+  var url=location.origin+location.pathname+(to?"?to="+encodeURIComponent(to):""),title="Ariadna — "+name,text=name+" — Кирилівська, 103."+vt+" Відкрийте посилання: карта сама прокладе шлях від того місця, де ви будете.";
+  if(navigator.share){navigator.share({title:title,text:text,url:url}).catch(function(){})}
+  else if(navigator.clipboard){navigator.clipboard.writeText(text+" "+url).then(function(){say("Посилання скопійовано","вставте його в повідомлення рідним")},function(){say("Не вдалося скопіювати",url)})}
+  else say("Надішліть рідним це посилання",url,null,"",15000)
+}
+
+/* ---------- старт ---------- */
+dockH();apply();fitAll(0);
+var to=Q.get("to");
+/* посилання «Куди» (його надсилають рідним): одразу питаємо, де людина, і ведемо від неї. Без «Куди» — спитаємо, коли оберуть */
+if(to&&dById(to)){var dd=dById(to);st.dept=to;st.b=dd.k===null?-1:bIndex(dd.k);geoAsk();render(true)}
+else if(to&&/^k\d+$/.test(to)&&bIndex(to.slice(1))>=0){st.b=bIndex(to.slice(1));geoAsk();render(true)}
+else{render(false);setTimeout(function(){if(!cur&&st.b<0&&!st.dept)pop("to",true)},450)}
+try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(function(p){if(p.state==="granted")geoAsk()})}catch(_){}
+setTimeout(mastArm,900);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
+}
+</script>
+</body>
+</html>
