@@ -602,6 +602,17 @@ body.mykolai .me .bow{fill:#e3bd62;stroke:#fff;stroke-width:1.1;stroke-linejoin:
 .north .hub{fill:#fff;stroke:rgba(0,0,0,.3);stroke-width:.6}
 .north .nl{fill:#e5484d;font-size:8.6px;font-weight:800;text-anchor:middle;paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:2.2px}
 @media (prefers-color-scheme:dark){html:not(.light) .north .ns{fill:rgba(220,228,232,.38);stroke:rgba(255,255,255,.25);filter:drop-shadow(0 0 3px rgba(150,185,210,.5))}html:not(.light) .north .nl{stroke:rgba(20,24,28,.85)}}html.dark .north .ns{fill:rgba(220,228,232,.38);stroke:rgba(255,255,255,.25);filter:drop-shadow(0 0 3px rgba(150,185,210,.5))}html.dark .north .nl{stroke:rgba(20,24,28,.85)}
+/* ---------- v33 ---------- */
+.farbox.rbox{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.rbox .cats{display:grid;gap:8px;margin:4px 0 10px}
+.rbox .cats .gbtn{width:100%;min-height:46px;border-radius:15px;justify-content:flex-start;padding:0 16px;text-align:left}
+.rbox .cats .gbtn[aria-pressed="true"]{background:var(--thread);color:#fff;box-shadow:none}
+.rbox>.fb-in>.gbtn{width:100%;min-height:46px;border-radius:15px;margin-bottom:10px}
+.rbox .rt{width:100%;box-sizing:border-box;font:inherit;font-size:16px;color:inherit;background:rgba(255,255,255,.45);border:1px solid rgba(22,24,26,.12);border-radius:14px;padding:10px 12px;margin:0 0 12px;resize:vertical}
+.rbox .gbtn:disabled{opacity:.45}
+.rbox .rs{margin:12px 0 0;font-size:12.5px;opacity:.75}
+.legend .lg-err{width:100%;margin-top:12px;min-height:42px;border-radius:13px}
+@media (prefers-color-scheme:dark){html:not(.light) .rbox .rt{background:rgba(20,24,28,.4);border-color:rgba(255,255,255,.14)}}html.dark .rbox .rt{background:rgba(20,24,28,.4);border-color:rgba(255,255,255,.14)}
 </style>
 <script src="data/edits.js"></script>
 </head>
@@ -864,25 +875,25 @@ var GAL=["-84.7,38.7 -80.9,50.6","-100.8,80.6 -88.4,76.8","-70.6,83.3 -69.2,87.4
 var GALF=[{a:[21.2,38.2],b:[41.6,106.6],w:4}];
 /* входи: p — двері, k — корпус, t — підпис на карті, a — бік підпису (r, l, t, b), n і d — назва й пояснення, w — як знайти */
 var ENT={
- n:{k:"1",dir:55,ta:"t",p:[-81.4,43.4],t:"7 · 15 · ЕКОПФО",a:"r",n:"Вхід до відділень 7, 15 і ЕКОПФО",d:"двері в проході крізь корпус · 15 — 3 поверх, 7 — 2 поверх, ЕКОПФО — 1 поверх",w:"Двері — у наскрізному проході крізь північне крило корпусу; на карті це пунктирний канал."},
+ n:{k:"1",dir:55,ta:"t",p:[-81.4,43.4],t:"7 · 15 · ЕКОПФО",a:"r",n:"Вхід до відділень 7, 15 і ЕКОПФО",d:"двері в проході крізь корпус · 15 — 3 поверх, 7 — 2 поверх, ЕКОПФО — 1 поверх",w:"Двері — у наскрізному проході крізь крило корпусу, за кілька кроків від статуї у дворі; на карті це пунктирний канал."},
  v4:{k:"1",p:[-42.8,81.6],t:"4",a:"l",n:"Вхід до відділення 4",d:"двері з двору корпусу 1",w:"Двері — у дворі між крилами корпусу, у куті біля галереї."},
  lift:{k:"1",p:[-39.9,91.4],t:"Ліфт",a:"l",n:"Ліфт",d:"до відділень 7, 15 і 16 · двері з двору корпусу 1",w:"Двері ліфта — у дворі між крилами корпусу."},
- s:{k:"1",dir:-121,p:[4.3,109.6],t:"3 · 16 · 23 · 24",a:"l",n:"Вхід до відділень 3, 16, 23 і 24",d:"двері в проході крізь корпус · 16 і 24 — 3 поверх, 3 і 23 — 2 поверх",w:"Двері — у наскрізному проході крізь південне крило корпусу; на карті це пунктирний канал."},
- pnd:{k:"1",p:[-22.5,125.7],t:"Амбулаторія № 1",a:"b",n:"Правобережна психіатрична амбулаторія № 1",d:"двері з південного боку корпусу 1 · 1 поверх · реєстратура Пн–Пт 09:00–16:12",w:"Двері — з південного боку корпусу, з дороги."},
- w19:{k:"1",p:[-145.1,99.3],t:"19 · 18 · 20",a:"t",n:"Вхід до відділень 19, 18 і 20",d:"двері із західного краю корпусу 1 · 19 — 1–2 поверхи, 18 і 20 — 3 поверх",w:"Двері — із західного краю корпусу."},
+ s:{k:"1",dir:-121,p:[4.3,109.6],t:"3 · 16 · 23 · 24",a:"l",n:"Вхід до відділень 3, 16, 23 і 24",d:"двері в проході крізь корпус · 16 і 24 — 3 поверх, 3 і 23 — 2 поверх",w:"Двері — у наскрізному проході крізь крило корпусу між двором з укриттям і гаражем (корпус 17); на карті це пунктирний канал."},
+ pnd:{k:"1",p:[-22.5,125.7],t:"Амбулаторія № 1",a:"b",n:"Правобережна психіатрична амбулаторія № 1",d:"двері в корпусі 1 з боку дороги до гаража (корпус 17) · 1 поверх · реєстратура Пн–Пт 09:00–16:12",w:"Двері — у корпусі з боку дороги, а не з двору; гараж (корпус 17) — далі по цій дорозі."},
+ w19:{k:"1",p:[-145.1,99.3],t:"19 · 18 · 20",a:"t",n:"Вхід до відділень 19, 18 і 20",d:"двері в торці корпусу 1 біля скульптури «Лаокоон і його сини» · 19 — 1–2 поверхи, 18 і 20 — 3 поверх",w:"Двері — у торці корпусу, за кілька кроків від скульптури «Лаокоон і його сини»."},
  arh:{k:"1",p:[21.7,53.8],t:"Архів",a:"r",n:"Архів",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
  prm:{k:"1",p:[25.3,65.7],t:"Приймальне · чол.",a:"r",n:"Приймальне — чоловічий блок",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
  prw:{k:"1",p:[29.7,80.6],t:"Приймальне · жін.",a:"r",n:"Приймальне — жіночий блок",d:"двері в галереї під навісом",w:"Двері — у галереї під навісом уздовж корпусу."},
  g4:{k:"1",p:[34.4,96.5],t:"",n:"Двері в галереї",d:"корпус 1"},
- k2:{k:"2",p:[69.3,-38],t:"6 · 9",a:"r",n:"Вхід до відділень 6 і 9",d:"двері зі східного торця корпусу 2",w:"Двері — зі східного торця корпусу; від дороги до них ведуть сходинки."},
+ k2:{k:"2",p:[69.3,-38],t:"6 · 9",a:"r",n:"Вхід до відділень 6 і 9",d:"двері в торці корпусу 2 з боку адміністрації",w:"Двері — у торці корпусу з боку адміністрації; від дороги до них ведуть сходинки."},
  k8:{k:"8",p:[220.5,-225.3],t:"8 · 10",a:"l",n:"Вхід до відділень 8 і 10",d:"єдиний вхід у корпус 8",w:"Це єдині двері корпусу 8: через них і до 8-го, і до 10-го відділення."},
  k5:{k:"5",p:[73.8,-114.1],t:"1 · 2",a:"l",n:"Вхід до відділень 1 і 2",d:"один вхід для обох відділень",w:"Через ці двері — і до 1-го, і до 2-го відділення."},
- pl:{k:"11",p:[80,71.3],t:"Поліклініка · 5 · 22",a:"l",n:"Вхід до поліклініки, відділень 5 і 22 та аптеки",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його східного боку."},
- vkz:{k:"11",p:[58.5,76.5],t:"Конференц-зала · Музей",a:"r",n:"Вхід до великої конференц-зали й музею",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, з його західного боку."},
+ pl:{k:"11",p:[80,71.3],t:"Поліклініка · 5 · 22",a:"l",n:"Вхід до поліклініки, відділень 5 і 22 та аптеки",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, поруч з аптекою."},
+ vkz:{k:"11",p:[58.5,76.5],t:"Конференц-зала · Музей",a:"r",n:"Вхід до великої конференц-зали й музею",d:"з внутрішнього двору корпусу 11",w:"Двері — у внутрішньому дворі корпусу 11, ближче до приймального відділення; двері поліклініки — з протилежного боку двору, біля аптеки."},
  st11:{k:"11",p:[86.3,57],t:"Укриття",a:"l",n:"Вхід до укриття",d:"корпус 11, зі сходинками, з боку пішохідної доріжки",w:"Вхід до укриття — зі сходинками, з боку пішохідної доріжки."},
- cafe:{k:"11",p:[112.4,70.7],t:"Кафе",a:"r",n:"Кафе",d:"вхід зі східного боку корпусу 11",w:"Вхід — зі східного боку корпусу 11."},
+ cafe:{k:"11",p:[112.4,70.7],t:"Кафе",a:"r",n:"Кафе",d:"вхід у корпусі 11 з боку стели «Фахівцям лікарні»",w:"Вхід — у корпусі 11 з боку стели «Фахівцям лікарні», не з внутрішнього двору."},
  adm:{k:"12",p:[100.6,-34.1],t:"Адміністрація",a:"l",n:"Вхід до адміністрації",d:"корпус 12"},
- mkz:{k:"12",p:[127,-12],t:"Мала конференц-зала",a:"r",n:"Мала конференц-зала",d:"вхід зі східного боку корпусу 12",w:"Вхід — зі східного боку корпусу."}
+ mkz:{k:"12",p:[127,-12],t:"Мала конференц-зала",a:"r",n:"Мала конференц-зала",d:"вхід у корпусі 12 поруч із банкоматом Укргазбанку",w:"Вхід — поруч із банкоматом Укргазбанку, недалеко від скульптури Дон Кіхота."}
 };
 B.forEach(function(b){if(!b.k||b.k==="1"||!b.door)return;
   if(Object.keys(ENT).some(function(id){var p=ENT[id].p;return Math.hypot(p[0]-b.door[0],p[1]-b.door[1])<4}))return;
@@ -1010,9 +1021,9 @@ var STARTS={
  e1:{at:[-322,-99],stop:[-344,-96],name:"Лікарня ім. Павлова",cap:"Від зупинки",short:"Павлова",street:"вул. Олени Теліги",tr:"тролейбуси 27, 30, 31 · автобус 50",
      hint:"Від зупинки йдіть асфальтовою дорогою, що відходить від вулиці вглиб гаю. Цією ж дорогою заїжджають автомобілі."},
  e2:{at:[100.5,-321],stop:[100.5,-324.3],name:"Музей «Кирилівська церква»",cap:"Від зупинки",short:"Музей · через дорогу",street:"вул. Олени Теліги, протилежний від церкви бік",tr:"тролейбуси 27, 30, 31 · автобус 50",
-     hint:"Ця зупинка — на протилежному від церкви боці вул. Олени Теліги. Перейдіть вулицю підземним переходом, далі сходами до дороги, обійдіть нею корпус 10 з північного боку й вийдіть на дорогу зі східного боку Кирилівської церкви; нею — на південь до лікарні. Повз церкву із західного боку проходу немає. На цьому шляху є сходи."},
+     hint:"Ця зупинка — на протилежному від церкви боці вул. Олени Теліги. Перейдіть вулицю підземним переходом, далі сходами до дороги, обійдіть нею корпус 10 з боку вулиці й спустіться між корпусами 10 і 8 до Кирилівської церкви. Повз церкву йдіть дорогою, що веде від корпусу 8 до дзвіниці (з іншого боку церкви проходу немає), далі повз статую Ісуса Христа й скульптуру Дон Кіхота — до шлагбаума лікарні. На цьому шляху є сходи."},
  e4:{at:[110,-270],stop:[101,-260],name:"Музей «Кирилівська церква»",ln:"Музей",cap:"Від зупинки",short:"Музей · бік церкви",street:"вул. Олени Теліги, бік церкви",tr:"тролейбуси 27, 30, 31 · автобус 50",
-     hint:"Ця зупинка — на боці церкви. Від неї пройдіть сходами до дороги, обійдіть нею корпус 10 з північного боку й вийдіть на дорогу зі східного боку Кирилівської церкви; нею — на південь до лікарні. Повз церкву із західного боку проходу немає. На цьому шляху є сходи."},
+     hint:"Ця зупинка — на боці церкви. Від неї пройдіть сходами до дороги, обійдіть нею корпус 10 з боку вулиці й спустіться між корпусами 10 і 8 до Кирилівської церкви. Повз церкву йдіть дорогою, що веде від корпусу 8 до дзвіниці (з іншого боку церкви проходу немає), далі повз статую Ісуса Христа й скульптуру Дон Кіхота — до шлагбаума лікарні. На цьому шляху є сходи."},
  e3:{at:[444,9],stop:[455,24],name:"вул. Кирилівська",cap:"Від зупинки",short:"Кирилівська",street:"ріг Подільського узвозу",tr:"тролейбуси 6, 18, 28, 33 · поруч трамваї 11, 12, 16, 19",
      hint:"Від зупинки зверніть на Врубелівський узвіз. Пішки коротше стежкою зі сходами; без сходів — узвозом до в’їзду."},
  e5:{at:[410.8,-194],stop:[416.5,-198],vt:"bus",name:"Стадіон «Спартак»",cap:"Від зупинки",short:"Спартак · маршрутки",street:"вул. Кирилівська, бік стадіону",tr:"маршрутки",
@@ -1057,14 +1068,14 @@ var LAND=[
  {n:"Сад відновлення",d:"терапевтичний сад (Nordic Therapy Garden)",x:-182,y:42,ic:"gd",show:1},
  {n:"Наріжна вежа XVIII ст.",d:"залишок мурів Кирилівського монастиря",x:207.7,y:-51.5,ic:"tw"},
  {n:"Шлагбаум",d:"на дорозі біля адміністрації",x:86.7,y:16.9,ic:"br"},
- {n:"Укриття",d:"у східному дворі корпусу 1",x:-8.6,y:89.8,ic:"sh",show:1,kw:"сховище бомбосховище тривога"},
+ {n:"Укриття",d:"у дворі корпусу 1, з боку приймального відділення",x:-8.6,y:89.8,ic:"sh",show:1,kw:"сховище бомбосховище тривога"},
  {n:"Дзвіниця",d:"біля Кирилівської церкви",x:177.7,y:-93.4,ic:"bl"},
  {n:"Банкомат Укргазбанку",d:"ліворуч від входу до малої конференц-зали, корпус 12",x:129.5,y:-7.5,ic:"atm",show:1,sh:"Банкомат",kw:"гроші готівка картка укргазбанк"},
  {n:"Аптека",d:"корпус 11, цокольний поверх; вхід — як до поліклініки та відділень 5 і 22",x:88,y:66,door:[80,71.3],fl:"цокольний",ic:"ph",show:1,kw:"ліки медикаменти фармація препарати"},
  {n:"Нова Пошта № 146",d:"вул. Кирилівська, через дорогу від стадіону «Спартак»; перейти — переходом біля вул. Олени Теліги",x:420.2,y:-273.9,ic:"np",show:1,sh:"Нова Пошта",kw:"пошта посилка відправлення отримати нп",near:{t:"Нова Пошта № 146",sub:"вул. Кирилівська",ic:"box"}},
  {n:"Супермаркет «Фора»",d:"вул. Кирилівська, через дорогу від стадіону «Спартак»; перейти — переходом біля вул. Олени Теліги",x:519.2,y:-132.8,ic:"shop",show:1,sh:"Фора",kw:"магазин супермаркет продукти їжа вода фора",near:{t:"Супермаркет «Фора»",sub:"через Кирилівську",ic:"cart"}},
- {n:"АЗС «БРСМ-Нафта»",d:"заправка з магазином: продукти, кава, хот-доги й бургери (не супермаркет); вул. Олени Теліги, на північ від корпусу 5",x:53.9,y:-168,door:[71.5,-179],ic:"fuel",show:1,sh:"АЗС",kw:"магазин заправка азс бензин кава перекус продукти їжа хот-дог хотдог бургер брсм нафта",near:{t:"Магазин на АЗС",sub:"продукти, хот-доги, бургери",ic:"fuel"}},
- {n:"Футбольне поле",d:"на північ від корпусу 7",x:233,y:-100,door:[218.6,-87.8],ic:"ball",kw:"футбол спорт стадіон майданчик м’яч"}
+ {n:"АЗС «БРСМ-Нафта»",d:"заправка з магазином: продукти, кава, хот-доги й бургери (не супермаркет); вул. Олени Теліги, поруч із корпусом 5",x:53.9,y:-168,door:[71.5,-179],ic:"fuel",show:1,sh:"АЗС",kw:"магазин заправка азс бензин кава перекус продукти їжа хот-дог хотдог бургер брсм нафта",near:{t:"Магазин на АЗС",sub:"продукти, хот-доги, бургери",ic:"fuel"}},
+ {n:"Футбольне поле",d:"поруч зі статуєю Ісуса Христа й дзвіницею",x:233,y:-100,door:[218.6,-87.8],ic:"ball",kw:"футбол спорт стадіон майданчик м’яч"}
 ];
 /* підпірні стіни й уступи (OSM barrier=retaining_wall): нижчий бік — праворуч від напрямку лінії */
 var WALLS=["44,119 4,131","15.8,33.5 13.8,27.6 -30.7,12.5 -32.2,8.8 -151.2,41.6","-152.4,151.5 -148.5,148.3 -161,102.7 -162.2,76.6 -166,48.3","172.5,193.8 184.4,168.2 221.7,57.2","437.9,18 400.4,49.1 385.7,52.6","272.9,-226.4 267.4,-234.7 265.3,-291.5 256,-314.6 256.7,-329.9 238.1,-375.4","238.1,-375.4 231.6,-373 196.1,-334.6","-169.6,-335.7 -210.1,-295.4"];
@@ -1104,8 +1115,8 @@ var D=[
  {id:"vkz",x:1,t:"Велика конференц-зала",short:"Велика конф.-зала",k:"11",ent:"vkz",kw:"конференція зал актова",note:"вхід з внутрішнього двору корпусу 11"},
  {id:"muz",x:1,t:"Музей",short:"Музей",k:"11",ent:"vkz",kw:"музей історії лікарні",note:"вхід з внутрішнього двору корпусу 11"},
  {id:"ukr11",x:1,t:"Укриття в корпусі 11",short:"Укриття",k:"11",ent:"st11",kw:"сховище бомбосховище тривога",note:"вхід зі сходинками"},
- {id:"cafe",x:1,t:"Кафе",k:"11",ent:"cafe",kw:"їжа кава буфет",note:"вхід зі східного боку корпусу 11"},
- {id:"mkz",x:1,t:"Мала конференц-зала",short:"Мала конф.-зала",k:"12",ent:"mkz",kw:"конференція зал",note:"вхід зі східного боку корпусу"}
+ {id:"cafe",x:1,t:"Кафе",k:"11",ent:"cafe",kw:"їжа кава буфет",note:"вхід у корпусі 11 з боку стели «Фахівцям лікарні»"},
+ {id:"mkz",x:1,t:"Мала конференц-зала",short:"Мала конф.-зала",k:"12",ent:"mkz",kw:"конференція зал",note:"вхід поруч із банкоматом Укргазбанку"}
 ];
 
 /* ---------- маршрути (чиста логіка) ---------- */
@@ -1518,11 +1529,12 @@ function lead(){
 function askFrom(){pop("from")}
 /* «Покажіть на карті, де ви» (20.11.2026): геопозиція не працює чи бреше (стара, приблизна) — людина торкається карти там, де стоїть,
    і нитка йде звідти. Не потребує ні GPS, ні дозволів, ні налаштувань */
-var PICK=false;
-function pickStart(){PICK=true;pop(null);if(hOpen)hClose();document.body.classList.add("picking");
-  say("Торкніться карти там, де ви стоїте","поруч із яким корпусом чи брамою ви зараз — нитка поведе звідти",[{t:"Скасувати",go:pickEnd}],"",60000)}
-function pickEnd(){PICK=false;document.body.classList.remove("picking")}
-function pickAt(x,y){cnt("pokazaty-na-karti");var s=size(),wx=vb.x+(x-s.l)/s.w*vb.w,wy=vb.y+(y-s.t)/s.h*vb.h;pickEnd();hideToast();
+var PICK=false,PICKCB=null;
+function pickStart(cb,t1,t2){PICK=true;PICKCB=typeof cb==="function"?cb:null;pop(null);if(hOpen)hClose();document.body.classList.add("picking");
+  say(PICKCB?t1:"Торкніться карти там, де ви стоїте",PICKCB?t2:"поруч із яким корпусом чи брамою ви зараз — нитка поведе звідти",[{t:"Скасувати",go:function(){var c=PICKCB;pickEnd();if(c)c(null)}}],"",60000)}
+function pickEnd(){PICK=false;PICKCB=null;document.body.classList.remove("picking")}
+function pickAt(x,y){var s=size(),wx=vb.x+(x-s.l)/s.w*vb.w,wy=vb.y+(y-s.t)/s.h*vb.h,cb=PICKCB;pickEnd();hideToast();
+  if(cb){cb([wx,wy]);return}cnt("pokazaty-na-karti");
   STARTS.pin={here:1,pin:1,name:"Місце, яке ви показали",cap:"Звідки",short:"Обране місце",street:"ви показали його на карті",tr:"",at:[wx,wy],stop:[wx,wy],
     hint:"Нитка йде від місця, яке ви показали на карті."};
   setStart("pin");if(st.b<0&&!st.dept)setTimeout(function(){pop("to")},350)}
@@ -2092,7 +2104,7 @@ function render(zoom){drawPick();
     setRes("Корпус не вказано","уточніть телефоном");
     html='<div class="head"><div class="kb none">?</div><div class="tx"><div class="t">Відділення № 9</div><div class="d">Корпус на сайті лікарні не вказаний — лише «Врубелівський узвіз».</div></div></div>';
     html+='<p class="note">Перед візитом уточніть місце телефоном — приймальне працює цілодобово.</p>'+tels([EM]);
-    html+='<p class="note">Врубелівський узвіз проходить уздовж південно-східного краю території — на карті він підписаний.</p>';
+    html+='<p class="note">Врубелівський узвіз іде від вул. Кирилівської вздовж краю території — на карті він підписаний.</p>';
     det.innerHTML=html;lastBox=[150,-20,470,230,10];done();if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();return;
   }
   var en=d&&d.ent?ENT[d.ent]:null,viaLift=!!(d&&d.lift&&st.noSteps);
@@ -2159,7 +2171,7 @@ function render(zoom){drawPick();
   if(d&&others.length)html+='<p class="note">У цьому ж корпусі: '+others.map(dName).join(", ")+'.</p>';
   if(b.priv)html+='<p class="note">Закрита територія: вхід лише за дозволом, маршрут не прокладається.</p>';
   html+='<p class="note">Заблукали? Приймальне відділення цілодобово: <a href="tel:+380442938539">'+EM+'</a></p>';
-  html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+(geoNear()?"Google Карти":"Ще їдете? Google Карти")+'</a><button type="button" class="gbtn" id="shr">'+SHARE+'Надіслати рідним, як дійти</button></div>';
+  html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+(geoNear()?"Google Карти":"Ще їдете? Google Карти")+'</a><button type="button" class="gbtn" id="shr">'+SHARE+'Надіслати рідним, як дійти</button><button type="button" class="gbtn" data-err="1">Тут помилка</button></div>';
   det.innerHTML=html+switches("d");document.getElementById("shr").onclick=share;bindSwitches("d");
   /* якщо відомо, яку частину корпусу займає відділення, обводимо тільки її, а не весь корпус */
   var AR=d?areaOf(d.id):null;
@@ -2254,6 +2266,44 @@ document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&
 (function(){var A=EDITS&&EDITS.ann;if(!A||!A.text)return;if(A.until&&new Date()>new Date(A.until+"T23:59:59"))return;
   setTimeout(function(){say("Оголошення",A.text,[{t:"Зрозуміло",go:hideToast}],"",25000)},1400)})();
 if(Q.get("preview"))setTimeout(function(){say("Попередній перегляд",Q.get("preview")==="pending"?"зміни, що чекають схвалення, — люди їх ще не бачать":"це чернетка з редактора — люди ще бачать стару версію",null,"",8000)},400);
+/* ---------- «Тут помилка» (21.11.2026): відвідувач повідомляє, що на карті не так ----------
+   Що не так (4 варіанти) + місце (обране відділення чи точка, яку людина показала) + коментар → лист на ERR_MAIL (відкривається поштова програма
+   з готовим текстом) і подія в лічильнику tut-pomylka-<що>-<де> (рахується, навіть якщо лист не надіслали). Персональних даних не збираємо */
+var ERR_MAIL="andr.dorof@gmail.com",ERRC=[["vkhid","Вхід не там або зачинений"],["prokhid","Тут немає проходу"],["dani","Неправильні назва, поверх чи години"],["inshe","Інше"]];
+var rBox=document.createElement("div"),rScr=document.createElement("div"),rOpen=false,rSt={c:null,pt:null,txt:""};
+rBox.className="farbox glass hbox rbox";rBox.setAttribute("role","dialog");rBox.setAttribute("aria-label","Повідомити про помилку");rBox.hidden=true;rScr.className="farscr";rScr.hidden=true;
+document.body.appendChild(rScr);document.body.appendChild(rBox);
+function errPlace(){var d=st.dept&&dById(st.dept),b=st.b>=0?B[st.b]:null;if(d)return {t:d.q||d.x?d.t:"Відділення № "+d.id,to:d.id};if(b&&b.k)return {t:"Корпус "+b.k,to:"k"+b.k};return null}
+function errOpen(){pop(null);legend(false);rRender(true)}
+function rRender(anim){var P=errPlace(),h='<div class="fb-in"><b class="fb-t">Що тут не так?</b><p>'+(P?"Місце: "+esc(P.t)+(rSt.pt?" · і точка на карті":""):rSt.pt?"Місце: точка, яку ви показали на карті":"Оберіть, що не так, і за можливості покажіть місце на карті.")+'</p><div class="cats">';
+  ERRC.forEach(function(c){h+='<button type="button" class="gbtn" data-c="'+c[0]+'" aria-pressed="'+(rSt.c===c[0])+'">'+c[1]+'</button>'});
+  h+='</div><button type="button" class="gbtn" data-r="pick">'+PIN+(rSt.pt?"Місце позначено ✓ — змінити":"Показати місце на карті")+'</button>'
+    +'<textarea class="rt" rows="3" placeholder="Що саме не так (необов’язково)">'+esc(rSt.txt)+'</textarea>'
+    +'<div class="hb-b"><button type="button" class="gbtn thread" data-r="send"'+(rSt.c?"":" disabled")+'>Надіслати</button><button type="button" class="gbtn" data-r="no">Скасувати</button></div>'
+    +'<p class="hb-s rs">Відкриється пошта з готовим листом на '+ERR_MAIL+'. Ваших даних карта не збирає.</p></div>';
+  rBox.innerHTML=h;rBox.style.cssText="";rBox.hidden=false;rBox.style.visibility="hidden";var W=Math.min(380,innerWidth-28);rBox.style.width=W+"px";var H=rBox.offsetHeight;
+  rBox.style.left=Math.round((innerWidth-W)/2)+"px";rBox.style.top=Math.round(Math.max(56,(innerHeight-H)/2-10))+"px";rBox.style.visibility="";rOpen=true;rScr.hidden=false;
+  if(anim&&rBox.animate&&!(FRM&&FRM.matches))rBox.animate([{opacity:0,transform:"translateY(14px) scale(.97)"},{opacity:1,transform:"none"}],{duration:420,easing:"cubic-bezier(.32,.72,0,1)"});
+  var ta=rBox.querySelector(".rt");ta.oninput=function(){rSt.txt=ta.value};
+  rBox.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){rSt.c=b.dataset.c;rRender(false)}});
+  rBox.querySelector('[data-r="pick"]').onclick=function(){rClose(true);pickStart(function(pt){if(pt)rSt.pt=pt;rRender(true)},"Торкніться місця, де помилка","двері, прохід чи будівля — і повернемося до повідомлення")};
+  rBox.querySelector('[data-r="no"]').onclick=function(){rClose(false)};
+  rBox.querySelector('[data-r="send"]').onclick=errSend}
+function rClose(keep){rOpen=false;rScr.hidden=true;rBox.hidden=true;rBox.innerHTML="";if(!keep)rSt={c:null,pt:null,txt:""}}
+rScr.addEventListener("pointerdown",function(e){e.preventDefault();rClose(true)});
+function errSend(){var P=errPlace(),C=ERRC.filter(function(c){return c[0]===rSt.c})[0],sl=P&&SLUGS[P.to],pt=rSt.pt||(P?(function(){var d=dById(P.to);return d&&(d.ent&&ENT[d.ent]?ENT[d.ent].p:d.door)})():null);
+  var L=[];L.push("Що не так: "+C[1]);if(P)L.push("Місце: "+P.t+(sl?" — https://ariadna-map.github.io/"+sl:""));
+  if(pt){var la=(LAT0-pt[1]/KY).toFixed(6),lo=(LON0+pt[0]/KX).toFixed(6);L.push((rSt.pt?"Точка, яку показали":"Двері")+": https://maps.google.com/?q="+la+","+lo+" (x="+pt[0].toFixed(1)+", y="+pt[1].toFixed(1)+")")}
+  if(rSt.txt.trim())L.push("Коментар: "+rSt.txt.trim());
+  L.push("","—","Ariadna, "+new Date().toLocaleString("uk-UA")+", "+(ENV.ios?"iPhone":ENV.and?"Android":"комп’ютер")+(ENV.app?" / "+ENV.app:ENV.br?" / "+ENV.br:""));
+  cnt("tut-pomylka-"+C[0]+"-"+(sl||(rSt.pt?"tochka":"bez-mistsia")));
+  var u="mailto:"+ERR_MAIL+"?subject="+encodeURIComponent("Ariadna: "+C[1]+(P?" — "+P.t:""))+"&body="+encodeURIComponent(L.join("\n"));
+  rClose(false);location.href=u;
+  setTimeout(function(){say("Дякуємо!","якщо пошта не відкрилася — напишіть на "+ERR_MAIL,null,"",12000)},700)}
+document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("[data-err]");if(b){e.preventDefault();errOpen()}});
+/* кнопка в легенді */
+(function(){var lgb=document.getElementById("legend");if(!lgb)return;var x=document.createElement("button");x.type="button";x.className="gbtn lg-err";x.setAttribute("data-err","1");x.textContent="Помітили помилку на карті?";lgb.appendChild(x)})();
+addEventListener("keydown",function(e){if(e.key==="Escape"&&rOpen)rClose(true)});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
 }
 </script>

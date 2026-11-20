@@ -116,11 +116,12 @@ function lead(){
 function askFrom(){pop("from")}
 /* «Покажіть на карті, де ви» (20.11.2026): геопозиція не працює чи бреше (стара, приблизна) — людина торкається карти там, де стоїть,
    і нитка йде звідти. Не потребує ні GPS, ні дозволів, ні налаштувань */
-var PICK=false;
-function pickStart(){PICK=true;pop(null);if(hOpen)hClose();document.body.classList.add("picking");
-  say("Торкніться карти там, де ви стоїте","поруч із яким корпусом чи брамою ви зараз — нитка поведе звідти",[{t:"Скасувати",go:pickEnd}],"",60000)}
-function pickEnd(){PICK=false;document.body.classList.remove("picking")}
-function pickAt(x,y){cnt("pokazaty-na-karti");var s=size(),wx=vb.x+(x-s.l)/s.w*vb.w,wy=vb.y+(y-s.t)/s.h*vb.h;pickEnd();hideToast();
+var PICK=false,PICKCB=null;
+function pickStart(cb,t1,t2){PICK=true;PICKCB=typeof cb==="function"?cb:null;pop(null);if(hOpen)hClose();document.body.classList.add("picking");
+  say(PICKCB?t1:"Торкніться карти там, де ви стоїте",PICKCB?t2:"поруч із яким корпусом чи брамою ви зараз — нитка поведе звідти",[{t:"Скасувати",go:function(){var c=PICKCB;pickEnd();if(c)c(null)}}],"",60000)}
+function pickEnd(){PICK=false;PICKCB=null;document.body.classList.remove("picking")}
+function pickAt(x,y){var s=size(),wx=vb.x+(x-s.l)/s.w*vb.w,wy=vb.y+(y-s.t)/s.h*vb.h,cb=PICKCB;pickEnd();hideToast();
+  if(cb){cb([wx,wy]);return}cnt("pokazaty-na-karti");
   STARTS.pin={here:1,pin:1,name:"Місце, яке ви показали",cap:"Звідки",short:"Обране місце",street:"ви показали його на карті",tr:"",at:[wx,wy],stop:[wx,wy],
     hint:"Нитка йде від місця, яке ви показали на карті."};
   setStart("pin");if(st.b<0&&!st.dept)setTimeout(function(){pop("to")},350)}
@@ -690,7 +691,7 @@ function render(zoom){drawPick();
     setRes("Корпус не вказано","уточніть телефоном");
     html='<div class="head"><div class="kb none">?</div><div class="tx"><div class="t">Відділення № 9</div><div class="d">Корпус на сайті лікарні не вказаний — лише «Врубелівський узвіз».</div></div></div>';
     html+='<p class="note">Перед візитом уточніть місце телефоном — приймальне працює цілодобово.</p>'+tels([EM]);
-    html+='<p class="note">Врубелівський узвіз проходить уздовж південно-східного краю території — на карті він підписаний.</p>';
+    html+='<p class="note">Врубелівський узвіз іде від вул. Кирилівської вздовж краю території — на карті він підписаний.</p>';
     det.innerHTML=html;lastBox=[150,-20,470,230,10];done();if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();return;
   }
   var en=d&&d.ent?ENT[d.ent]:null,viaLift=!!(d&&d.lift&&st.noSteps);
@@ -757,7 +758,7 @@ function render(zoom){drawPick();
   if(d&&others.length)html+='<p class="note">У цьому ж корпусі: '+others.map(dName).join(", ")+'.</p>';
   if(b.priv)html+='<p class="note">Закрита територія: вхід лише за дозволом, маршрут не прокладається.</p>';
   html+='<p class="note">Заблукали? Приймальне відділення цілодобово: <a href="tel:+380442938539">'+EM+'</a></p>';
-  html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+(geoNear()?"Google Карти":"Ще їдете? Google Карти")+'</a><button type="button" class="gbtn" id="shr">'+SHARE+'Надіслати рідним, як дійти</button></div>';
+  html+='<div class="acts"><a class="gbtn" href="'+gmaps().replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">'+GMAP+(geoNear()?"Google Карти":"Ще їдете? Google Карти")+'</a><button type="button" class="gbtn" id="shr">'+SHARE+'Надіслати рідним, як дійти</button><button type="button" class="gbtn" data-err="1">Тут помилка</button></div>';
   det.innerHTML=html+switches("d");document.getElementById("shr").onclick=share;bindSwitches("d");
   /* якщо відомо, яку частину корпусу займає відділення, обводимо тільки її, а не весь корпус */
   var AR=d?areaOf(d.id):null;
@@ -852,6 +853,44 @@ document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&
 (function(){var A=EDITS&&EDITS.ann;if(!A||!A.text)return;if(A.until&&new Date()>new Date(A.until+"T23:59:59"))return;
   setTimeout(function(){say("Оголошення",A.text,[{t:"Зрозуміло",go:hideToast}],"",25000)},1400)})();
 if(Q.get("preview"))setTimeout(function(){say("Попередній перегляд",Q.get("preview")==="pending"?"зміни, що чекають схвалення, — люди їх ще не бачать":"це чернетка з редактора — люди ще бачать стару версію",null,"",8000)},400);
+/* ---------- «Тут помилка» (21.11.2026): відвідувач повідомляє, що на карті не так ----------
+   Що не так (4 варіанти) + місце (обране відділення чи точка, яку людина показала) + коментар → лист на ERR_MAIL (відкривається поштова програма
+   з готовим текстом) і подія в лічильнику tut-pomylka-<що>-<де> (рахується, навіть якщо лист не надіслали). Персональних даних не збираємо */
+var ERR_MAIL="andr.dorof@gmail.com",ERRC=[["vkhid","Вхід не там або зачинений"],["prokhid","Тут немає проходу"],["dani","Неправильні назва, поверх чи години"],["inshe","Інше"]];
+var rBox=document.createElement("div"),rScr=document.createElement("div"),rOpen=false,rSt={c:null,pt:null,txt:""};
+rBox.className="farbox glass hbox rbox";rBox.setAttribute("role","dialog");rBox.setAttribute("aria-label","Повідомити про помилку");rBox.hidden=true;rScr.className="farscr";rScr.hidden=true;
+document.body.appendChild(rScr);document.body.appendChild(rBox);
+function errPlace(){var d=st.dept&&dById(st.dept),b=st.b>=0?B[st.b]:null;if(d)return {t:d.q||d.x?d.t:"Відділення № "+d.id,to:d.id};if(b&&b.k)return {t:"Корпус "+b.k,to:"k"+b.k};return null}
+function errOpen(){pop(null);legend(false);rRender(true)}
+function rRender(anim){var P=errPlace(),h='<div class="fb-in"><b class="fb-t">Що тут не так?</b><p>'+(P?"Місце: "+esc(P.t)+(rSt.pt?" · і точка на карті":""):rSt.pt?"Місце: точка, яку ви показали на карті":"Оберіть, що не так, і за можливості покажіть місце на карті.")+'</p><div class="cats">';
+  ERRC.forEach(function(c){h+='<button type="button" class="gbtn" data-c="'+c[0]+'" aria-pressed="'+(rSt.c===c[0])+'">'+c[1]+'</button>'});
+  h+='</div><button type="button" class="gbtn" data-r="pick">'+PIN+(rSt.pt?"Місце позначено ✓ — змінити":"Показати місце на карті")+'</button>'
+    +'<textarea class="rt" rows="3" placeholder="Що саме не так (необов’язково)">'+esc(rSt.txt)+'</textarea>'
+    +'<div class="hb-b"><button type="button" class="gbtn thread" data-r="send"'+(rSt.c?"":" disabled")+'>Надіслати</button><button type="button" class="gbtn" data-r="no">Скасувати</button></div>'
+    +'<p class="hb-s rs">Відкриється пошта з готовим листом на '+ERR_MAIL+'. Ваших даних карта не збирає.</p></div>';
+  rBox.innerHTML=h;rBox.style.cssText="";rBox.hidden=false;rBox.style.visibility="hidden";var W=Math.min(380,innerWidth-28);rBox.style.width=W+"px";var H=rBox.offsetHeight;
+  rBox.style.left=Math.round((innerWidth-W)/2)+"px";rBox.style.top=Math.round(Math.max(56,(innerHeight-H)/2-10))+"px";rBox.style.visibility="";rOpen=true;rScr.hidden=false;
+  if(anim&&rBox.animate&&!(FRM&&FRM.matches))rBox.animate([{opacity:0,transform:"translateY(14px) scale(.97)"},{opacity:1,transform:"none"}],{duration:420,easing:"cubic-bezier(.32,.72,0,1)"});
+  var ta=rBox.querySelector(".rt");ta.oninput=function(){rSt.txt=ta.value};
+  rBox.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){rSt.c=b.dataset.c;rRender(false)}});
+  rBox.querySelector('[data-r="pick"]').onclick=function(){rClose(true);pickStart(function(pt){if(pt)rSt.pt=pt;rRender(true)},"Торкніться місця, де помилка","двері, прохід чи будівля — і повернемося до повідомлення")};
+  rBox.querySelector('[data-r="no"]').onclick=function(){rClose(false)};
+  rBox.querySelector('[data-r="send"]').onclick=errSend}
+function rClose(keep){rOpen=false;rScr.hidden=true;rBox.hidden=true;rBox.innerHTML="";if(!keep)rSt={c:null,pt:null,txt:""}}
+rScr.addEventListener("pointerdown",function(e){e.preventDefault();rClose(true)});
+function errSend(){var P=errPlace(),C=ERRC.filter(function(c){return c[0]===rSt.c})[0],sl=P&&SLUGS[P.to],pt=rSt.pt||(P?(function(){var d=dById(P.to);return d&&(d.ent&&ENT[d.ent]?ENT[d.ent].p:d.door)})():null);
+  var L=[];L.push("Що не так: "+C[1]);if(P)L.push("Місце: "+P.t+(sl?" — https://ariadna-map.github.io/"+sl:""));
+  if(pt){var la=(LAT0-pt[1]/KY).toFixed(6),lo=(LON0+pt[0]/KX).toFixed(6);L.push((rSt.pt?"Точка, яку показали":"Двері")+": https://maps.google.com/?q="+la+","+lo+" (x="+pt[0].toFixed(1)+", y="+pt[1].toFixed(1)+")")}
+  if(rSt.txt.trim())L.push("Коментар: "+rSt.txt.trim());
+  L.push("","—","Ariadna, "+new Date().toLocaleString("uk-UA")+", "+(ENV.ios?"iPhone":ENV.and?"Android":"комп’ютер")+(ENV.app?" / "+ENV.app:ENV.br?" / "+ENV.br:""));
+  cnt("tut-pomylka-"+C[0]+"-"+(sl||(rSt.pt?"tochka":"bez-mistsia")));
+  var u="mailto:"+ERR_MAIL+"?subject="+encodeURIComponent("Ariadna: "+C[1]+(P?" — "+P.t:""))+"&body="+encodeURIComponent(L.join("\n"));
+  rClose(false);location.href=u;
+  setTimeout(function(){say("Дякуємо!","якщо пошта не відкрилася — напишіть на "+ERR_MAIL,null,"",12000)},700)}
+document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("[data-err]");if(b){e.preventDefault();errOpen()}});
+/* кнопка в легенді */
+(function(){var lgb=document.getElementById("legend");if(!lgb)return;var x=document.createElement("button");x.type="button";x.className="gbtn lg-err";x.setAttribute("data-err","1");x.textContent="Помітили помилку на карті?";lgb.appendChild(x)})();
+addEventListener("keydown",function(e){if(e.key==="Escape"&&rOpen)rClose(true)});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
 }
 </script>

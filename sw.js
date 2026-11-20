@@ -1,5 +1,5 @@
 /* Ariadna — офлайн-кеш. Згенеровано src/sw.py; руками не правити. */
-const V="ariadna-d7c96a4c89",PRE=["/", "/brand/apple-touch-icon.png", "/brand/ariadna-favicon-mykolai.svg", "/brand/ariadna-favicon.svg", "/brand/ariadna-wordmark-small-reverse.svg", "/brand/ariadna-wordmark-small.svg", "/data/edits.js", "/fonts/FixelText-Bold.woff2", "/fonts/FixelText-Medium.woff2", "/fonts/FixelText-Regular.woff2", "/fonts/FixelText-SemiBold.woff2"];
+const V="ariadna-e8114db5ac",PRE=["/", "/brand/apple-touch-icon.png", "/brand/ariadna-favicon-mykolai.svg", "/brand/ariadna-favicon.svg", "/brand/ariadna-wordmark-small-reverse.svg", "/brand/ariadna-wordmark-small.svg", "/data/edits.js", "/fonts/FixelText-Bold.woff2", "/fonts/FixelText-Medium.woff2", "/fonts/FixelText-Regular.woff2", "/fonts/FixelText-SemiBold.woff2"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(PRE)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith("ariadna-")&&k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 /* сторінка: спершу мережа (щоб бачити свіжі зміни), але якщо мережі немає чи вона думає довше 4 с — з кешу.
