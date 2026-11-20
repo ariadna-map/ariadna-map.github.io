@@ -893,12 +893,37 @@ rep('</style>','/* ---------- v20 ---------- */\n'
     '@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.pop.glass,.legend.glass,.toast.glass{background:color-mix(in srgb,var(--bg) 94%,transparent)}}\n'
     '@media (prefers-reduced-transparency:reduce){.pop.glass,.legend.glass,.toast.glass{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}\n'
     '</style>')
+# ================= v21 (20.11.2026): далеко від лікарні — віконце «Ви за N км», що стискається в кнопку «Google Карти» =================
+rep('</style>','/* ---------- v21: віконце «далеко від лікарні» ---------- */\n'
+    '.farscr{position:fixed;inset:0;z-index:58;background:transparent;touch-action:none}\n'
+    '.farbox{position:fixed;z-index:59;box-sizing:border-box;overflow:hidden;padding:22px;border-radius:30px}\n'
+    # дуже прозоре: фон 0,18 (інші віконця — 0,32), але сильно розмите — текст читається
+    '.farbox.glass{--glass-tint:rgba(255,255,255,.18);--glass-glow:rgba(255,255,255,.3);--glass-spec:rgba(255,255,255,.28);'
+    '--rim-hi:rgba(255,255,255,1);--rim-mid:rgba(255,255,255,.6);--rim-lo:rgba(255,255,255,.2);'
+    'background:linear-gradient(180deg,var(--glass-spec) 0%,rgba(255,255,255,0) 34%),radial-gradient(120% 60% at 10% 0%,var(--glass-glow),transparent 62%),var(--glass-tint);'
+    '-webkit-backdrop-filter:blur(34px) saturate(2.1) brightness(1.06);backdrop-filter:blur(34px) saturate(2.1) brightness(1.06);'
+    'box-shadow:0 24px 60px -18px rgba(20,26,30,.45),inset 0 1px 1px rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.22),0 0 0 .5px rgba(255,255,255,.45),0 0 40px -6px rgba(255,255,255,.5)}\n'
+    '.farbox .fb-in{position:relative;z-index:1}\n'
+    '.farbox .fb-t{display:block;font-size:21px;font-weight:700;letter-spacing:-.01em;line-height:1.2;margin:0 0 8px}\n'
+    '.farbox p{margin:0 0 16px;font-size:15.5px;line-height:1.45;opacity:.86}\n'
+    '.farbox .fb-go{width:100%;min-height:50px;border-radius:16px;font-size:16px;text-decoration:none}\n'
+    '.farbox .fb-tint{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;border-radius:inherit}\n'
+    # поки віконце відкрите, кнопка на банері прихована — віконце «стане» нею
+    'body.far-on .res #go{visibility:hidden}\n'
+    '.res a#go{text-decoration:none}\n'
+    '@media (prefers-color-scheme:dark){.farbox.glass{--glass-tint:rgba(36,44,50,.26);--glass-glow:rgba(255,255,255,.05);--glass-spec:rgba(255,255,255,.09);'
+    '--rim-hi:rgba(255,255,255,.45);--rim-mid:rgba(255,255,255,.16);--rim-lo:rgba(255,255,255,.05);'
+    '-webkit-backdrop-filter:blur(34px) saturate(1.8) brightness(.9);backdrop-filter:blur(34px) saturate(1.8) brightness(.9);'
+    'box-shadow:0 24px 60px -18px rgba(0,0,0,.6),inset 0 1px 1px rgba(255,255,255,.24),inset 0 -1px 1px rgba(255,255,255,.06),0 0 0 .5px rgba(255,255,255,.12),0 0 40px -8px rgba(150,185,210,.25)}}\n'
+    '@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.farbox.glass{background:color-mix(in srgb,var(--bg) 94%,transparent)}}\n'
+    '@media (prefers-reduced-transparency:reduce){.farbox.glass{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
-h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==9,nth;s=s[:h0]+css_+s[h1:]
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==10,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))
