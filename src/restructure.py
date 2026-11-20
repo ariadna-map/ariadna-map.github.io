@@ -1009,12 +1009,29 @@ rep('</style>','/* ---------- v28 ---------- */\n'
     '@keyframes snowf{0%{transform:translate(0,0)}50%{transform:translate(2px,20px)}100%{transform:translate(-1px,42px)}}\n'
     '@media (prefers-reduced-motion:reduce){#mastA .snow{display:none}}\n'
     '</style>')
+# ================= v29 (20.11.2026): без «Котельні»; компас; авто =================
+rep('n:"Котельня",','')   # з міркувань безпеки корпус 14 — без назви
+rep('</style>','/* ---------- v29 ---------- */\n'
+    '.north{width:46px;height:46px;padding:0;border-radius:50%;justify-content:center;flex-direction:column;gap:0;opacity:1;'
+    'top:calc(max(12px,env(safe-area-inset-top)) + 30px);--glass-tint:rgba(255,255,255,.12);--glass-spec:rgba(255,255,255,.08);--glass-glow:rgba(255,255,255,.1);'
+    '-webkit-backdrop-filter:blur(10px) saturate(1.7);backdrop-filter:blur(10px) saturate(1.7);'
+    'box-shadow:0 6px 18px -6px rgba(20,26,30,.35),inset 1.2px 1.2px 1px -.4px rgba(255,255,255,.9),inset -1.2px -1.2px 1px -.4px rgba(255,255,255,.45),0 0 18px -2px rgba(255,255,255,.55)}\n'
+    '.north svg{position:absolute;inset:3px;width:40px;height:40px;color:inherit}\n'
+    '.north .cr{fill:none;stroke:currentColor;stroke-opacity:.18;stroke-width:1}\n'
+    '.north .tk{stroke:currentColor;stroke-opacity:.45;stroke-width:1.4;stroke-linecap:round}\n'
+    '.north .nn{fill:#e5484d;filter:drop-shadow(0 0 3px rgba(229,72,77,.75))}\n'
+    '.north .ns{fill:currentColor;fill-opacity:.28}\n'
+    '.north .hub{fill:#fff;stroke:rgba(0,0,0,.25);stroke-width:.6}\n'
+    '.north .nl{fill:#e5484d;font-size:8.6px;font-weight:800;text-anchor:middle;letter-spacing:.02em}\n'
+    '@media (prefers-color-scheme:dark){.north{--glass-tint:rgba(36,44,50,.24);box-shadow:0 6px 18px -6px rgba(0,0,0,.6),inset 1.2px 1.2px 1px -.4px rgba(255,255,255,.4),'
+    'inset -1.2px -1.2px 1px -.4px rgba(255,255,255,.18),0 0 18px -4px rgba(150,185,210,.35)}.north .hub{fill:#dfe6ea}}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
-h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==13,nth;s=s[:h0]+css_+s[h1:]
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==14,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))

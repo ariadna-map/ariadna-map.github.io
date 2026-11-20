@@ -582,6 +582,16 @@ body.mykolai .me .bow{fill:#e3bd62;stroke:#fff;stroke-width:1.1;stroke-linejoin:
 #mastA .snow i:nth-child(4){left:29px;animation-duration:5.8s;animation-delay:-.9s;width:2px;height:2px}
 @keyframes snowf{0%{transform:translate(0,0)}50%{transform:translate(2px,20px)}100%{transform:translate(-1px,42px)}}
 @media (prefers-reduced-motion:reduce){#mastA .snow{display:none}}
+/* ---------- v29 ---------- */
+.north{width:46px;height:46px;padding:0;border-radius:50%;justify-content:center;flex-direction:column;gap:0;opacity:1;top:calc(max(12px,env(safe-area-inset-top)) + 30px);--glass-tint:rgba(255,255,255,.12);--glass-spec:rgba(255,255,255,.08);--glass-glow:rgba(255,255,255,.1);-webkit-backdrop-filter:blur(10px) saturate(1.7);backdrop-filter:blur(10px) saturate(1.7);box-shadow:0 6px 18px -6px rgba(20,26,30,.35),inset 1.2px 1.2px 1px -.4px rgba(255,255,255,.9),inset -1.2px -1.2px 1px -.4px rgba(255,255,255,.45),0 0 18px -2px rgba(255,255,255,.55)}
+.north svg{position:absolute;inset:3px;width:40px;height:40px;color:inherit}
+.north .cr{fill:none;stroke:currentColor;stroke-opacity:.18;stroke-width:1}
+.north .tk{stroke:currentColor;stroke-opacity:.45;stroke-width:1.4;stroke-linecap:round}
+.north .nn{fill:#e5484d;filter:drop-shadow(0 0 3px rgba(229,72,77,.75))}
+.north .ns{fill:currentColor;fill-opacity:.28}
+.north .hub{fill:#fff;stroke:rgba(0,0,0,.25);stroke-width:.6}
+.north .nl{fill:#e5484d;font-size:8.6px;font-weight:800;text-anchor:middle;letter-spacing:.02em}
+@media (prefers-color-scheme:dark){html:not(.light) .north{--glass-tint:rgba(36,44,50,.24);box-shadow:0 6px 18px -6px rgba(0,0,0,.6),inset 1.2px 1.2px 1px -.4px rgba(255,255,255,.4),inset -1.2px -1.2px 1px -.4px rgba(255,255,255,.18),0 0 18px -4px rgba(150,185,210,.35)}html:not(.light) .north .hub{fill:#dfe6ea}}html.dark .north{--glass-tint:rgba(36,44,50,.24);box-shadow:0 6px 18px -6px rgba(0,0,0,.6),inset 1.2px 1.2px 1px -.4px rgba(255,255,255,.4),inset -1.2px -1.2px 1px -.4px rgba(255,255,255,.18),0 0 18px -4px rgba(150,185,210,.35)}html.dark .north .hub{fill:#dfe6ea}
 </style>
 </head>
 <body>
@@ -823,7 +833,7 @@ var B=[
  {k:"12",lv:1,key:1,r:"r-grey",lab:[120,-24],door:[100.6,-34.1],p:["125.7,-33.1 131.6,-36.8 138.2,-26.6 132.8,-14.6 129,-16.2 127.9,-13.8 125,-7.4 129.3,-5.5 126.9,-1.9 124.1,0.7 120.6,1.7 114.6,1.7 108.6,-1 105.3,-6.1 103.7,-10 105.2,-16.3 112.7,-12.9 117.4,-23.3 111.1,-33.3 100.6,-34.1 86.5,-35.1 87.3,-47 102.3,-46 102.8,-52.7 106.2,-52.5 105.7,-45.7 118.2,-44.8"],
    hi:["112.7,-12.9 117.4,-23.3 111.1,-33.3 100.6,-34.1 86.5,-35.1 87.3,-47 102.3,-46 102.8,-52.7 106.2,-52.5 105.7,-45.7 118.2,-44.8 125.7,-33.1 130.6,-25.4 122.9,-8.3"],hl:[4]},
  {k:"13",lv:2,r:"r-grey",lab:[90,145],n:"Пральня",p:["53.9,139.1 66.5,135.8 65.8,133.2 72.5,131.4 73.3,134.5 116.6,123.3 118.2,129.2 104.3,132.8 109,151 80,158.5 80.9,161.7 74,163.5 67.6,138.9 54.7,142.2"]},
- {k:"14",lv:1,r:"r-grey",lab:[56,153],n:"Котельня",p:["53.9,139.1 53.2,136.4 45.7,138.4 52.8,165.7 57,164.6 58.1,168.7 64.3,167.1 63,161.9 60,162.7 54.7,142.2"]},
+ {k:"14",lv:1,r:"r-grey",lab:[56,153],p:["53.9,139.1 53.2,136.4 45.7,138.4 52.8,165.7 57,164.6 58.1,168.7 64.3,167.1 63,161.9 60,162.7 54.7,142.2"]},
  {k:"15",lv:4,r:"r-grey",lab:[126,110],n:"Харчоблок",kw:"їдальня кухня",p:["116.6,123.3 118.2,129.2 142.4,122.9 134.3,91.5 131.1,92.3 110,97.8"]},
  {k:"16",lv:1,r:"r-grey",lab:[138,164],n:"Овочесховище",p:["125.1,159.7 148.4,153.3 152,166.4 125.9,173.5 124.8,169.6 127.6,168.9"]},
  {k:"17",lv:1,r:"r-grey",lab:[30,137],n:"Гараж",p:["46.8,125.5 48.1,130 27.8,136 29.7,142.4 19.5,145.4 16.3,134.6"]},
@@ -1406,10 +1416,10 @@ function syncUrl(){try{var p=new URLSearchParams(location.search),to=st.dept||(s
 /* ---------- геопозиція: синя точка, маршрут від вас, оновлення в русі ---------- */
 var GEO={pos:null,acc:0,err:"",watch:null,first:true,last:null,t:0,boost:false,bt:0,good:false};
 /* «Вести»: маршрут від того місця, де ви зараз; карта йде за вами, екран не гасне. Далеко від лікарні — Google Карти */
-/* Миколайчик (6 грудня): з вечора 5-го (18:00) до кінця 6-го — логотип зі стрічкою й бантиком, сніжинки, синя точка — «подарунок» (20.11.2026).
+/* Миколайчик (6 грудня): з вечора 5-го (18:00) до 04:00 9 грудня — логотип зі стрічкою й бантиком, сніжинки, синя точка — «подарунок» (20.11.2026).
    Перевірка заздалегідь: ?holiday=1; вимкнути: ?holiday=0 */
 var HOLI=(function(){var q=new URLSearchParams(location.search).get("holiday");if(q==="1")return true;if(q==="0")return false;
-  var d=new Date();return d.getMonth()===11&&((d.getDate()===5&&d.getHours()>=18)||d.getDate()===6)})();
+  var d=new Date(),D=d.getDate(),h=d.getHours();return d.getMonth()===11&&((D===5&&h>=18)||(D>=6&&D<=8)||(D===9&&h<4))})();
 if(HOLI){document.body.classList.add("mykolai");var mi=document.querySelector("#mastA img");if(mi)mi.src="brand/ariadna-favicon-mykolai.svg";
   var ma=document.getElementById("mastA");if(ma){var sn=document.createElement("span");sn.className="snow";sn.setAttribute("aria-hidden","true");sn.innerHTML="<i></i><i></i><i></i><i></i>";ma.appendChild(sn)}}
 var FOLLOW=false,CAM=true,camT=0,camN=0,WL=null,lastDoor=null,HERE=false;
@@ -1593,7 +1603,7 @@ function geoNear(){return !!GEO.pos&&!geoFar()&&GEO.acc<=(GEO.good?300:100)}
    2) коли маршрут від вас прокладено, він «замикається» (LOCK): синя точка рухається лише по нитці, нитка не перебудовується з кожною точкою;
    3) з маршруту сходимо, лише якщо GPS довго (≥ 3 точки і ≥ 12 с) показує місце далі ніж 20–35 м від нитки — тоді нитка будується заново від вас. */
 var LOCK=null,REROUTES=0;
-function geoFilter(x,y,a,t){var v=st.car?12:3;
+function geoFilter(x,y,a,t){var v=Math.max(st.car?12:3,(GEO.sp||0)*1.4);   /* очікувана швидкість: пішки 3 м/с, авто 12; якщо GPS каже, що швидше, — беремо його */
   var j=GEO.f?Math.hypot(x-GEO.f[0],y-GEO.f[1]):0;
   if(!GEO.f||t-GEO.ft>30000||j>300+2*a){GEO.f=[x,y];GEO.P=a*a;GEO.ft=t;return}   /* давно не було точок або ви «переїхали» (з дому до лікарні) — починаємо наново */
   var dt=Math.max(.3,(t-GEO.ft)/1000),P=GEO.P+(v*dt)*(v*dt),R=a*a;
@@ -1622,7 +1632,7 @@ function lockProj(L,q,s0,s1){var best=null;
 function lockStep(){
   if(!LOCK||!GEO.pos)return "none";
   if(GEO.acc>60)return "hold";   /* точка надто груба — синя точка лишається, де була */
-  var now=Date.now(),dt=Math.max(1,(now-LOCK.tOn)/1000),vmax=st.car?15:3,T=Math.max(15,Math.min(GEO.acc,30))+5,
+  var now=Date.now(),dt=Math.max(1,(now-LOCK.tOn)/1000),vmax=Math.max(st.car?15:3,(GEO.sp||0)*1.4),T=Math.max(15,Math.min(GEO.acc,30))+5,
       pr=lockProj(LOCK,GEO.pos,Math.max(0,LOCK.s-25),LOCK.s+20+vmax*dt);
   if(pr&&pr.d<=T){LOCK.off=0;LOCK.tOn=now;
     if(pr.s>LOCK.s){LOCK.s+=Math.min(pr.s-LOCK.s,vmax*dt+3)*.6;LOCK.back=0}   /* уперед — плавно і не швидше, ніж можна йти */
@@ -1643,27 +1653,43 @@ function lockRoute(door,key){
 function meAt(){return GEO.show||GEO.f||GEO.pos}
 
 function geoText(){return GEO.err||(GEO.pos?(geoFar()?"ви за ≈ "+fmtKm(geoFar())+" від лікарні":"точність ±"+GEO.acc+" м"):(GEO.watch!==null?"визначаю…":"торкніться, щоб визначити"))}
-function drawMe(){var g=document.getElementById("me");if(!GEO.pos||geoFar()){g.innerHTML="";return}var m=meAt();
-  g.innerHTML='<circle class="acc" cx="'+m[0].toFixed(1)+'" cy="'+m[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",m[0].toFixed(1),m[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/>'+(HOLI?'<path class="rb" d="M-5.4 0H5.4M0-5.4V5.4"/><path class="bow" d="M0-8.4c-2.4-3.8-6.6-2.8-4.8.3 1.1 1.2 3.2.9 4.8-.3zM0-8.4c2.4-3.8 6.6-2.8 4.8.3-1.1 1.2-3.2.9-4.8-.3z"/>':'')+'<circle class="hit" r="16" data-me="1"/>');apply()}
+var meD=null,meRAF=0;
+function drawMe(){var g=document.getElementById("me");if(!GEO.pos||geoFar()){g.innerHTML="";meD=null;return}var m=meAt(),from=meD;meD=m.slice();cancelAnimationFrame(meRAF);
+  g.innerHTML='<circle class="acc" cx="'+m[0].toFixed(1)+'" cy="'+m[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",m[0].toFixed(1),m[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/>'+(HOLI?'<path class="rb" d="M-5.4 0H5.4M0-5.4V5.4"/><path class="bow" d="M0-8.4c-2.4-3.8-6.6-2.8-4.8.3 1.1 1.2 3.2.9 4.8-.3zM0-8.4c2.4-3.8 6.6-2.8 4.8.3-1.1 1.2-3.2.9-4.8-.3z"/>':'')+'<circle class="hit" r="16" data-me="1"/>');apply();
+  if(!from||(FRM&&FRM.matches))return;var dd=Math.hypot(m[0]-from[0],m[1]-from[1]);if(dd<.8||dd>150)return;
+  var L=g.querySelector(".lb.me"),A=g.querySelector(".acc"),t0=performance.now(),DUR=Math.min(900,280+dd*25);
+  function fr(now){var u=Math.min(1,(now-t0)/DUR),e=1-Math.pow(1-u,3),px=from[0]+(m[0]-from[0])*e,py=from[1]+(m[1]-from[1])*e,k=vb.w/size().w;
+    if(L)L.setAttribute("transform","translate("+px.toFixed(2)+" "+py.toFixed(2)+") rotate(0) scale("+k.toFixed(4)+")");if(A){A.setAttribute("cx",px.toFixed(1));A.setAttribute("cy",py.toFixed(1))}
+    if(u<1)meRAF=requestAnimationFrame(fr)}
+  meRAF=requestAnimationFrame(fr)}
 /* перші 30 с — точно (GPS), щоб перша точка була правильною; далі — економно, щоб телефон не грівся. Під час «Вести» — точно весь час */
 function geoStart(){
   if(!navigator.geolocation){GEO.err="цей браузер не підтримує геопозицію";return false}
   if(GEO.watch!==null)return true;GEO.err="";GEO.first=true;
   GEO.boost=true;clearTimeout(GEO.bt);GEO.bt=setTimeout(function(){GEO.boost=false;geoMode()},30000);
-  var hi=FOLLOW||GEO.boost;GEO.hi=hi;GEO.watch=navigator.geolocation.watchPosition(geoOk,geoFail,hi?{enableHighAccuracy:true,maximumAge:3000,timeout:20000}:{enableHighAccuracy:false,maximumAge:15000,timeout:20000});
+  var hi=wantHi();GEO.hi=hi;GEO.watch=navigator.geolocation.watchPosition(geoOk,geoFail,hi?{enableHighAccuracy:true,maximumAge:3000,timeout:20000}:{enableHighAccuracy:false,maximumAge:15000,timeout:20000});
   /* деякі вбудовані браузери не відповідають узагалі — за 15 с без жодної точки вважаємо, що геопозиції немає */
   clearTimeout(GEO.wd);GEO.wd=setTimeout(function(){if(GEO.watch!==null&&!GEO.pos)geoFail({code:2,stall:1})},15000);
   if(ENV.wv&&!hShown.app&&!GEO.pos)geoHelp("app");
   return true}
 function geoStop(){clearTimeout(GEO.bt);clearTimeout(GEO.wd);GEO.boost=false;if(GEO.watch!==null){try{navigator.geolocation.clearWatch(GEO.watch)}catch(_){}}GEO.watch=null}
 /* перезапустити стеження з іншою точністю */
-function geoMode(){var hi=FOLLOW||GEO.boost;if(GEO.watch===null||GEO.hi===hi)return;try{navigator.geolocation.clearWatch(GEO.watch)}catch(_){}GEO.watch=null;GEO.hi=hi;var f=GEO.first;
+/* точний GPS: під час «Вести», перші 30 с, у режимі «На авто» і коли телефон рухається швидше за ~15 км/год (людина в машині) */
+function wantHi(){return !!(FOLLOW||GEO.boost||st.car||GEO.fast)}
+function geoMode(){var hi=wantHi();if(GEO.watch===null||GEO.hi===hi)return;try{navigator.geolocation.clearWatch(GEO.watch)}catch(_){}GEO.watch=null;GEO.hi=hi;var f=GEO.first;
   GEO.watch=navigator.geolocation.watchPosition(geoOk,geoFail,hi?{enableHighAccuracy:true,maximumAge:3000,timeout:20000}:{enableHighAccuracy:false,maximumAge:15000,timeout:20000});GEO.first=f}
 /* питаємо геопозицію, коли людина обрала, куди їй, — тоді зрозуміло, навіщо */
 function geoAsk(){if(st.start==="geo"&&GEO.watch===null&&!GEO.err&&!(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000))geoStart()}
 function geoOk(p){
   if(p.timestamp&&Date.now()-p.timestamp>120000)return;   /* точці понад 2 хв — це «останнє відоме місце», а не де людина зараз (20.11.2026) */
   var x=(p.coords.longitude-LON0)*KX,y=(LAT0-p.coords.latitude)*KY,first=GEO.first,was=geoNear(),gap=Date.now()-GEO.t;
+  /* швидкість: з GPS, а якщо телефон її не дає — з двох послідовних точних точок */
+  var sp=p.coords.speed,tn=Date.now();
+  if(sp==null||isNaN(sp)){sp=null;if(GEO.raw&&p.coords.accuracy<=30&&GEO.raw.a<=30){var dts=(tn-GEO.raw.t)/1000;if(dts>=.8&&dts<=10)sp=Math.hypot(x-GEO.raw.x,y-GEO.raw.y)/dts}}
+  GEO.raw={x:x,y:y,t:tn,a:p.coords.accuracy};
+  if(sp!=null){GEO.sp=GEO.sp==null?sp:GEO.sp*.4+sp*.6;var wasF=GEO.fast;
+    if(GEO.sp>4)GEO.fastN=Math.max(GEO.fastN||0,0)+1;else if(GEO.sp<2)GEO.fastN=Math.min(GEO.fastN||0,0)-1;
+    GEO.fast=GEO.fastN>=2?true:GEO.fastN<=-3?false:!!GEO.fast;if(GEO.fast!==wasF)setTimeout(geoMode,0)}
   GEO.pos=[x,y];GEO.acc=Math.round(p.coords.accuracy);GEO.t=Date.now();GEO.first=false;clearTimeout(GEO.wd);GEO.code=0;
   if(hOpen)hClose();   /* геопозиція таки працює — підказка більше не потрібна */
   if(first&&gap>60000)LOCK=null;   /* довго не було точок (сторінка була схована) — нитку будуємо заново */
@@ -1991,7 +2017,7 @@ function drawFrom(){
 function switches(px){px=px||"";return '<label class="sw"><input type="checkbox" id="'+px+'car"'+(st.car?" checked":"")+'><span class="k"></span><span>На авто</span></label><label class="sw"><input type="checkbox" id="'+px+'ns"'+(st.noSteps?" checked":"")+'><span class="k"></span><span>Маршрут без сходів</span></label>'}
 function bindSwitches(px){px=px||"";
   document.getElementById(px+"ns").onchange=function(e){st.noSteps=e.target.checked;save();render(true)};
-  document.getElementById(px+"car").onchange=function(e){st.car=e.target.checked;st.carIn=null;render(true)}}
+  document.getElementById(px+"car").onchange=function(e){st.car=e.target.checked;st.carIn=null;geoMode();render(true)}}
 /* «Звідки» на авто: два в’їзди на територію і «Від мене» */
 function drawFromCar(){
   var h='<div class="pk-h">Звідки заїжджаєте?</div><div class="from">',ks=Object.keys(CAR_IN);if(navigator.geolocation)ks.unshift("geo");
@@ -2184,7 +2210,10 @@ function alertPoll(){if(!ALERT_URL||!window.fetch)return;fetch(ALERT_URL,{cache:
   .then(function(){setTimeout(alertPoll,document.hidden?120000:30000)})}
 if(Q.get("alert")==="1")setAlert(true);else alertPoll();
 (function(){var n=document.createElement("div");n.className="north glass";n.setAttribute("aria-label","Північ — угорі карти");n.title="Північ — угорі карти";
-  n.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3 18 19 12 15.5 6 19z" fill="currentColor"/></svg><b>Пн</b>';document.body.appendChild(n)})();
+  n.innerHTML='<svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">'
+    +'<circle cx="20" cy="20" r="15.5" class="cr"/><path class="tk" d="M20 31.2v2.6M6.2 20h2.6M31.2 20h2.6"/>'
+    +'<text x="20" y="11.6" class="nl">Пн</text>'
+    +'<path class="nn" d="M20 13.4 23.6 21H16.4z"/><path class="ns" d="M20 31 16.4 21h7.2z"/><circle cx="20" cy="21" r="1.7" class="hub"/></svg>';document.body.appendChild(n)})();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
 }
 </script>
