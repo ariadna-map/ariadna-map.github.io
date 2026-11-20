@@ -1026,12 +1026,25 @@ rep('</style>','/* ---------- v29 ---------- */\n'
     '@media (prefers-color-scheme:dark){.north{--glass-tint:rgba(36,44,50,.24);box-shadow:0 6px 18px -6px rgba(0,0,0,.6),inset 1.2px 1.2px 1px -.4px rgba(255,255,255,.4),'
     'inset -1.2px -1.2px 1px -.4px rgba(255,255,255,.18),0 0 18px -4px rgba(150,185,210,.35)}.north .hub{fill:#dfe6ea}}\n'
     '</style>')
+# ================= v30 (20.11.2026): «Моє місцезнаходження» у два рядки; компас — лише стрілка =================
+rep('</style>','/* ---------- v30 ---------- */\n'
+    '.res .ft .medot{display:inline-block;width:9px;height:9px;margin:0 1px 0 2px;border-radius:50%;background:#2f7cf6;box-shadow:0 0 0 2px #fff,0 0 0 3px rgba(47,124,246,.25);vertical-align:0}\n'
+    '.dk .v.long{white-space:normal;hyphens:manual;-webkit-hyphens:manual;font-size:13.5px;line-height:1.12;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}\n'
+    '.north,.north.glass{width:24px;height:44px;padding:0;background:none!important;border:0;border-radius:0;box-shadow:none!important;'
+    '-webkit-backdrop-filter:none!important;backdrop-filter:none!important;top:calc(max(12px,env(safe-area-inset-top)) + 30px);right:calc(max(12px,env(safe-area-inset-right)) + 10px);opacity:.82}\n'
+    '.north svg{position:static;width:24px;height:44px;overflow:visible}\n'
+    '.north .nn{fill:#e5484d;filter:drop-shadow(0 0 3px rgba(229,72,77,.8)) drop-shadow(0 0 7px rgba(229,72,77,.35))}\n'
+    '.north .ns{fill:rgba(255,255,255,.55);stroke:rgba(30,36,40,.35);stroke-width:.7;filter:drop-shadow(0 0 3px rgba(255,255,255,.7))}\n'
+    '.north .hub{fill:#fff;stroke:rgba(0,0,0,.3);stroke-width:.6}\n'
+    '.north .nl{fill:#e5484d;font-size:8.6px;font-weight:800;text-anchor:middle;paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:2.2px}\n'
+    '@media (prefers-color-scheme:dark){.north .ns{fill:rgba(220,228,232,.38);stroke:rgba(255,255,255,.25);filter:drop-shadow(0 0 3px rgba(150,185,210,.5))}.north .nl{stroke:rgba(20,24,28,.85)}}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
-h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==14,nth;s=s[:h0]+css_+s[h1:]
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==15,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))

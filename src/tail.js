@@ -7,7 +7,7 @@ var Q=new URLSearchParams(location.search);
 var st={dept:null,b:-1,start:navigator.geolocation?"geo":null,auto:!navigator.geolocation,noSteps:false,car:false,carIn:null},lastCar=null,lastCarK=null;
 try{var sv=JSON.parse(localStorage.getItem("ariadna")||"{}");st.noSteps=!!sv.noSteps}catch(_){}
 if(STARTS[Q.get("from")]){st.start=Q.get("from");st.auto=false}
-STARTS.geo={geo:1,name:"Моя геопозиція",cap:"Звідки",short:"Від мене",street:"",tr:"",at:null,stop:null,hint:"Синя точка — це ви. Лінія оновлюється, коли ви рухаєтеся."};
+STARTS.geo={geo:1,name:"Моє місцезнаходження",cap:"Звідки",short:"Моє місцезнаходження",street:"",tr:"",at:null,stop:null,hint:"Синя точка — це ви. Лінія оновлюється, коли ви рухаєтеся."};
 function startKeys(){var k=Object.keys(STARTS).filter(function(k){return !STARTS[k].geo});if(navigator.geolocation)k.unshift("geo");return k}
 function bIndex(k){for(var i=0;i<B.length;i++)if(B[i].k===k)return i;return -1}
 function dById(id){for(var i=0;i<D.length;i++)if(D[i].id===id)return D[i];return null}
@@ -631,17 +631,17 @@ function bindSwitches(px){px=px||"";
 function drawFromCar(){
   var h='<div class="pk-h">Звідки заїжджаєте?</div><div class="from">',ks=Object.keys(CAR_IN);if(navigator.geolocation)ks.unshift("geo");
   ks.forEach(function(k){var geo=k==="geo",R=geo?null:(lastCar?lastCar[k]:null),on=k===lastCarK;
-    h+='<button type="button" data-c="'+k+'" class="'+(geo?"geo":"")+'" aria-pressed="'+on+'"><span class="bus">'+(geo?DOT:CARI)+'</span><span class="ft"><b>'+esc(geo?"Від мене":CARN[k].t)+'</b><small>'+esc(geo?"якщо ви вже на території":CARN[k].s)+'</small></span>'+(st.b>=0&&!geo?'<span class="m">'+(R?R.min+" хв":"—")+'</span>':'')+'</button>'});
+    h+='<button type="button" data-c="'+k+'" class="'+(geo?"geo":"")+'" aria-pressed="'+on+'"><span class="bus">'+(geo?DOT:CARI)+'</span><span class="ft"><b>'+esc(geo?"Моє місцезнаходження":CARN[k].t)+'</b><small>'+esc(geo?"якщо ви вже на території":CARN[k].s)+'</small></span>'+(st.b>=0&&!geo?'<span class="m">'+(R?R.min+" хв":"—")+'</span>':'')+'</button>'});
   h+='</div>'+switches()+'<p class="pk-note">Оберіть, з якого боку заїжджаєте, — біля кожного в’їзду видно, скільки хвилин до місця.</p>';
   var bd=document.getElementById("fromBody");bd.innerHTML=h;
   bd.querySelectorAll(".from button").forEach(function(x){x.onclick=function(){pop(null);var k=x.dataset.c;dockOpen=false;if(k==="geo"){if(GEO.err&&!GEO.pos){geoHelp();return}setStart("geo");return}st.carIn=k;render(true)}});
   bindSwitches();
 }
 function setFrom(){
-  if(st.car){bFrom.classList.remove("empty");document.getElementById("fromC").textContent="На авто";document.getElementById("fromV").textContent=lastCarK==="geo"?"Від мене":lastCarK?CARN[lastCarK].sh:"В’їзд";
+  if(st.car){bFrom.classList.remove("empty");document.getElementById("fromC").textContent="На авто";document.getElementById("fromV").textContent=lastCarK==="geo"?"Моє місцезнаходження":lastCarK?CARN[lastCarK].sh:"В’їзд";fvLong();
     var ci=document.getElementById("fromI");ci.className="ic sm "+(lastCarK==="geo"?"me":"bus");ci.innerHTML=lastCarK==="geo"?DOT:CARI;return}
   var S=st.start?STARTS[st.start]:null;bFrom.classList.toggle("empty",!S);
-  document.getElementById("fromC").textContent=S?S.cap:"";document.getElementById("fromV").textContent=S?S.short:"Звідки?";
+  document.getElementById("fromC").textContent=S?S.cap:"";document.getElementById("fromV").textContent=S?S.short:"Звідки?";fvLong();
   var i=document.getElementById("fromI");i.className="ic sm "+(S?(S.geo||S.here?"me":"bus"):"");i.innerHTML=S?(S.geo||S.here?DOT:VEH(S)):PIN;
 }
 var PKB='<button type="button" class="gbtn thread" id="go" data-k="pick">'+PIN+'Показати</button>';
@@ -657,6 +657,9 @@ function cancelAll(){if(st.b<0&&!st.dept)return;farKey=null;var was={dept:st.dep
 function drawPick(){var g=document.getElementById("pickme");
   if(!g){g=document.createElementNS("http://www.w3.org/2000/svg","g");g.id="pickme";var me=document.getElementById("me");me.parentNode.insertBefore(g,me)}
   var P=st.start==="pin"&&STARTS.pin;g.innerHTML=P?lbl("pickme",P.at[0].toFixed(1),P.at[1].toFixed(1),0,'<circle class="ring" r="11"/><circle class="dot" r="6"/>'):""}
+/* «Моє місцезнаходження» у вузькому полі: два рядки, перенос «місце-/знаходження» (м’який дефіс) */
+function fvLong(){var v=document.getElementById("fromV");if(!v)return;var t=v.textContent;if(t.indexOf("місцезнаходження")>=0)v.textContent=t.replace("місцезнаходження","місце\u00ADзнаходження");
+  v.classList.toggle("long",v.textContent.length>14)}
 function render(zoom){drawPick();
   document.querySelectorAll("#pTo [data-d]").forEach(function(c){c.setAttribute("aria-pressed",c.dataset.d===st.dept?"true":"false")});
   var ARo=st.dept?areaOf(st.dept):null;svg.querySelectorAll(".b").forEach(function(p){p.classList.toggle("on",!ARo&&+p.dataset.b===st.b)});
@@ -698,14 +701,15 @@ function render(zoom){drawPick();
   var s=SK?STARTS[SK]:null,r=s?routes[SK]:null,cr=null;
   /* ви вже біля дверей або в цьому корпусі — маршрут не потрібен, потрібна кнопка «Надіслати» */
   var me0=GEO.f||GEO.pos;if(wantGeo&&near&&(Math.hypot(me0[0]-door[0],me0[1]-door[1])<25||(b.p&&inRings(me0,b.p.map(pts)))))HERE=true;
-  document.getElementById("resF").innerHTML=s?esc(s.geo?s.short:stopNm(s))+'<i>→</i>'+esc(toV.textContent):"";
+  /* у вузькому банері «Моє місцезнаходження» не влізе разом з метою — тут його позначає синя точка, як на карті */
+  document.getElementById("resF").innerHTML=s?(s.geo?'<b class="medot" role="img" aria-label="Моє місцезнаходження"></b>':esc(stopNm(s)))+'<i>→</i>'+esc(toV.textContent):"";
   lastCar=null;lastCarK=null;
   if(st.car&&!b.priv){
     lastCar={};Object.keys(CAR_IN).forEach(function(k){lastCar[k]=carRoute(CAR_IN[k],door,st.noSteps)});
     if(wantGeo&&near&&!st.carIn){cr=carRoute(GEO.f||GEO.pos,door,st.noSteps);if(cr)lastCarK="geo"}
     if(!cr){lastCarK=st.carIn&&lastCar[st.carIn]?st.carIn:null;cr=lastCarK?lastCar[lastCarK]:null}
     r=null}
-  if(st.car){var tv=d?dShort(d):(b.k?"Корпус "+b.k:b.n);document.getElementById("resF").innerHTML='Авто '+esc(lastCarK==="geo"?"від вас":lastCarK?CARN[lastCarK].sh:"")+'<i>→</i>'+esc(tv)}
+  if(st.car){var tv=d?dShort(d):(b.k?"Корпус "+b.k:b.n);document.getElementById("resF").innerHTML='Авто '+(lastCarK==="geo"?'<b class="medot" role="img" aria-label="Моє місцезнаходження"></b>':esc(lastCarK?CARN[lastCarK].sh:""))+'<i>→</i>'+esc(tv)}
   var GL=FOLLOW?'<button type="button" class="gbtn thread on" id="go">'+STOPI+'Стоп</button>':'<button type="button" class="gbtn thread" id="go">'+NAV+'Вести</button>';
   var FL=d&&d.fl?flT(d.fl)+(viaLift?", ліфтом":"")+" · ":"";
   var GM='<a class="gbtn thread" id="go" data-k="gm" href="'+esc(gmFar())+'" target="_blank" rel="noopener" aria-label="Відкрити Google Карти">'+GMAP+'Google Карти</a>',isFar=false;
@@ -789,6 +793,7 @@ function shareTo(to,name){var dv=to&&dById(to),vt=dv&&dv.vis?" Передачі 
 /* ---------- старт ---------- */
 dockH();apply();fitAll(0);
 var to=Q.get("to");
+if(!to){var slP=decodeURIComponent(location.pathname.replace(/^\/+|\.html$|\/+$/g,""));if(slP)for(var sk in SLUGS)if(SLUGS[sk]===slP){to=sk;break}}
 /* посилання «Куди» (його надсилають рідним): одразу питаємо, де людина, і ведемо від неї. Без «Куди» — спитаємо, коли оберуть */
 if(to&&dById(to)){var dd=dById(to);st.dept=to;st.b=dd.k===null?-1:bIndex(dd.k);geoAsk();render(true)}
 else if(to&&/^k\d+$/.test(to)&&bIndex(to.slice(1))>=0){st.b=bIndex(to.slice(1));geoAsk();render(true)}
@@ -818,11 +823,11 @@ function setAlert(on){on=!!on;if(on===ALERT)return;ALERT=on;drawAlert()}
 function alertPoll(){if(!ALERT_URL||!window.fetch)return;fetch(ALERT_URL,{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){setAlert(j&&j.kyiv===true)},function(){})
   .then(function(){setTimeout(alertPoll,document.hidden?120000:30000)})}
 if(Q.get("alert")==="1")setAlert(true);else alertPoll();
-(function(){var n=document.createElement("div");n.className="north glass";n.setAttribute("aria-label","Північ — угорі карти");n.title="Північ — угорі карти";
-  n.innerHTML='<svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">'
-    +'<circle cx="20" cy="20" r="15.5" class="cr"/><path class="tk" d="M20 31.2v2.6M6.2 20h2.6M31.2 20h2.6"/>'
-    +'<text x="20" y="11.6" class="nl">Пн</text>'
-    +'<path class="nn" d="M20 13.4 23.6 21H16.4z"/><path class="ns" d="M20 31 16.4 21h7.2z"/><circle cx="20" cy="21" r="1.7" class="hub"/></svg>';document.body.appendChild(n)})();
+(function(){var n=document.createElement("div");n.className="north";n.setAttribute("aria-label","Північ — угорі карти");n.title="Північ — угорі карти";
+  n.innerHTML='<svg viewBox="0 0 24 44" width="24" height="44" aria-hidden="true"><text x="12" y="8.6" class="nl">Пн</text>'
+    +'<path class="nn" d="M12 11.5 16.6 27H7.4z"/><path class="ns" d="M12 42.5 7.4 27h9.2z"/><circle cx="12" cy="27" r="1.6" class="hub"/></svg>';document.body.appendChild(n)})();
+/* офлайн (20.11.2026): після першого відкриття з інтернетом карта відкривається й без нього — sw.js кешує сторінку, шрифти й значки */
+if("serviceWorker" in navigator&&location.protocol==="https:")addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
 }
 </script>
