@@ -16,7 +16,11 @@ function dShort(d){return d.q||d.x?(d.short||d.t):"Відділення "+d.id}
 function inK(k){return D.filter(function(x){return k&&x.k===k&&!x.x})}
 function dName(x){return x.q?x.t.toLowerCase():"№ "+x.id}
 function save(){try{localStorage.setItem("ariadna",JSON.stringify({noSteps:st.noSteps}))}catch(_){}}
-function syncUrl(){try{var p=new URLSearchParams(location.search);if(st.dept)p.set("to",st.dept);else if(st.b>=0&&B[st.b].k)p.set("to","k"+B[st.b].k);else p.delete("to");var s=p.toString();history.replaceState(history.state,"",location.pathname+(s?"?"+s:""))}catch(_){}}
+/* зрозумілі адреси: ariadna-map.github.io/viddilennia-16 — їх і сторінки з карткою-прев’ю робить src/links.py (20.11.2026).
+   В адресному рядку теж зрозуміла адреса: її скопіюють чи перешлють — у месенджері буде картка саме цього відділення */
+var SLUGS={/*SLUGS*/};
+function syncUrl(){try{var p=new URLSearchParams(location.search),to=st.dept||(st.b>=0&&B[st.b].k?"k"+B[st.b].k:""),path="/";p.delete("to");
+  if(to&&SLUGS[to])path="/"+SLUGS[to];else if(to)p.set("to",to);var s=p.toString();history.replaceState(history.state,"",path+(s?"?"+s:"")+location.hash)}catch(_){}}
 
 /* ---------- геопозиція: синя точка, маршрут від вас, оновлення в русі ---------- */
 var GEO={pos:null,acc:0,err:"",watch:null,first:true,last:null,t:0,boost:false,bt:0,good:false};
@@ -718,11 +722,9 @@ function render(zoom){
   if(zoom)requestAnimationFrame(function(){fitBox.apply(null,lastBox)});else apply();
 }
 /* рідним іде лише «Куди». Звідки — визначить їхній телефон: на території — від них, далеко — Google Карти до потрібної зупинки */
-/* зрозумілі адреси для «Надіслати»: ariadna-map.github.io/viddilennia-16 — їх і сторінки з карткою-прев’ю робить src/links.py */
-var SLUGS={/*SLUGS*/};
 function share(){shareTo(st.dept||(st.b>=0&&B[st.b].k?"k"+B[st.b].k:""),curTitle)}
 function shareTo(to,name){var dv=to&&dById(to),vt=dv&&dv.vis?" Передачі й відвідування "+visText(dv.vis)+(dv.vis.q?", тиха година "+hm(dv.vis.q[0])+"–"+hm(dv.vis.q[1]):"")+".":"";
-  var url=to&&SLUGS[to]?location.origin+"/"+SLUGS[to]:location.origin+location.pathname+(to?"?to="+encodeURIComponent(to):""),title="Ariadna — "+name,text=name+" — Кирилівська, 103."+vt+" Відкрийте посилання: карта сама прокладе шлях від того місця, де ви будете.";
+  var url=location.origin+"/"+(to&&SLUGS[to]?SLUGS[to]:to?"?to="+encodeURIComponent(to):""),title="Ariadna — "+name,text=name+" — Кирилівська, 103."+vt+" Відкрийте посилання: карта сама прокладе шлях від того місця, де ви будете.";
   if(navigator.share){navigator.share({title:title,text:text,url:url}).catch(function(){})}
   else if(navigator.clipboard){navigator.clipboard.writeText(text+" "+url).then(function(){say("Посилання скопійовано","вставте його в повідомлення рідним")},function(){say("Не вдалося скопіювати",url)})}
   else say("Надішліть рідним це посилання",url,null,"",15000)
@@ -734,6 +736,7 @@ var to=Q.get("to");
 /* посилання «Куди» (його надсилають рідним): одразу питаємо, де людина, і ведемо від неї. Без «Куди» — спитаємо, коли оберуть */
 if(to&&dById(to)){var dd=dById(to);st.dept=to;st.b=dd.k===null?-1:bIndex(dd.k);geoAsk();render(true)}
 else if(to&&/^k\d+$/.test(to)&&bIndex(to.slice(1))>=0){st.b=bIndex(to.slice(1));geoAsk();render(true)}
+if(st.dept||st.b>=0)syncUrl();   /* /?to=16 → /viddilennia-16 в адресному рядку */
 else{render(false);setTimeout(function(){if(!cur&&st.b<0&&!st.dept)pop("to",true)},450)}
 try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(function(p){if(p.state==="granted")geoAsk()})}catch(_){}
 setTimeout(mastArm,900);

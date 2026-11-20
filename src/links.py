@@ -7,7 +7,7 @@ D = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(D, '..')
 SITE = 'https://ariadna-map.github.io'
 PLACE = 'Психіатрична лікарня · Київ, вул. Кирилівська, 103'
 OGIMG = SITE + '/brand/og.jpg'
-CTA = 'Відкрийте — карта сама прокладе шлях від того місця, де ви будете.'
+CTA = 'Карта прокладе шлях від того місця, де ви будете.'
 
 # --- дані з головного скрипту сторінки ---
 t = open('/tmp/t.js', encoding='utf8').read()
@@ -33,42 +33,47 @@ def slug(s):
 def hm(m): return '%d:%02d' % (m // 60, m % 60)
 def fl_t(f): return str(f) + (' поверхи' if isinstance(f, str) and re.match(r'^\d', f) else ' поверх')
 
-items = []   # (to, slug, title, description)
+# «Маршрут до …»: родовий відмінок для названих місць (для нових — запасний варіант «Як дійти: …»)
+TO = {'pr':'до приймального відділення','pol':'до поліклініки','amb':'до амбулаторії № 1','adm':'до адміністрації',
+      'kab':'до кабінету амбулаторного прийому','prm':'до приймального відділення (чоловічий блок)','prw':'до приймального відділення (жіночий блок)',
+      'arh':'до архіву','ekopfo':'до ЕКОПФО','lift':'до ліфта корпусу 1','vkz':'до великої конференц-зали','muz':'до музею',
+      'ukr11':'до укриття в корпусі 11','cafe':'до кафе','mkz':'до малої конференц-зали'}
+items = []   # (to, slug, title, description, card_title)
 for d in data['D']:
     named = d['q'] or d['x']
     title = d['t'] if named else 'Відділення № ' + d['id']
     sl = slug(d['t'] if named else 'Відділення ' + d['id'])
+    card = 'Маршрут ' + (TO[d['id']] if named and d['id'] in TO else 'до відділення № ' + d['id']) if (not named or d['id'] in TO) else 'Як дійти: ' + d['t']
     bits = []
-    if d['full'] and d['full'] != d['t']: bits.append(d['full'] + '.')
+    v = d['vis']
+    if v: bits.append('Години відвідувань: щоденно ' + ' і '.join(hm(a) + '–' + hm(b) for a, b in v['o']) +
+                      (', тиха година ' + hm(v['q'][0]) + '–' + hm(v['q'][1]) if v.get('q') else '') + '.')
     where = ('Корпус ' + d['k'] if d['k'] else '') + (', ' + fl_t(d['fl']) if d['fl'] is not None else '')
     if where and not re.search(r'корпус', title, re.I): bits.append(where + '.')
-    v = d['vis']
-    if v: bits.append('Передачі й відвідування щоденно ' + ' і '.join(hm(a) + '–' + hm(b) for a, b in v['o']) +
-                      (', тиха година ' + hm(v['q'][0]) + '–' + hm(v['q'][1]) if v.get('q') else '') + '.')
+    if d['full'] and d['full'] != d['t']: bits.append(d['full'] + '.')
     bits.append(CTA)
-    items.append((d['id'], sl, title, ' '.join(bits)))
+    items.append((d['id'], sl, title, ' '.join(bits), card))
 for b in data['B']:
     title = 'Корпус ' + b['k'] + (' — ' + b['n'] if b['n'] else '')
-    items.append(('k' + b['k'], 'korpus-' + b['k'], title, (b['n'] + '. ' if b['n'] else '') + CTA))
+    items.append(('k' + b['k'], 'korpus-' + b['k'], title, (b['n'] + '. ' if b['n'] else '') + CTA, 'Маршрут до корпусу ' + b['k']))
 
 seen = {}
-for i, (to, sl, ti, de) in enumerate(items):
-    if sl in seen: sl = sl + '-' + slug(to); items[i] = (to, sl, ti, de)
+for i, (to, sl, ti, de, ca) in enumerate(items):
+    if sl in seen: sl = sl + '-' + slug(to); items[i] = (to, sl, ti, de, ca)
     assert sl not in seen, sl; seen[sl] = to
 
 PAGE = '''<!DOCTYPE html>
 <html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{title} — як дійти · {place}</title>
+<title>{card} · {place}</title>
 <meta name="description" content="{desc}">
 <meta property="og:type" content="website"><meta property="og:locale" content="uk_UA">
 <meta property="og:site_name" content="Карта-план психіатричної лікарні · Кирилівська, 103">
-<meta property="og:title" content="{title} — як дійти">
+<meta property="og:title" content="{card}">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Карта-план психіатричної лікарні, вул. Кирилівська, 103">
 <meta name="twitter:card" content="summary_large_image">
-<meta http-equiv="refresh" content="0;url={go}">
 <link rel="icon" type="image/svg+xml" href="/brand/ariadna-favicon.svg">
 <script>location.replace({go_js}+location.hash)</script>
 </head><body style="font:17px/1.5 system-ui,sans-serif;margin:24px"><p><a href="{go}">{title} — відкрити карту</a></p></body></html>
@@ -76,10 +81,10 @@ PAGE = '''<!DOCTYPE html>
 man = os.path.join(D, 'links-manifest.txt')
 old = set(open(man).read().split()) if os.path.exists(man) else set()
 new = set()
-for to, sl, ti, de in items:
+for to, sl, ti, de, ca in items:
     go = '/?to=' + to; fn = sl + '.html'; new.add(fn)
     open(os.path.join(ROOT, fn), 'w', encoding='utf8').write(PAGE.format(
-        title=html.escape(ti), place=html.escape(PLACE), desc=html.escape(de), url=SITE + '/' + sl, img=OGIMG,
+        title=html.escape(ti), card=html.escape(ca), place=html.escape(PLACE), desc=html.escape(de), url=SITE + '/' + sl, img=OGIMG,
         go=html.escape(go), go_js=json.dumps(go)))
 for fn in old - new:   # відділення перейменували чи прибрали — стара сторінка йде
     p = os.path.join(ROOT, fn)
@@ -88,7 +93,7 @@ open(man, 'w').write('\n'.join(sorted(new)) + '\n')
 
 # --- карта «куди → зрозуміла адреса» для кнопки «Надіслати» ---
 ip = os.path.join(ROOT, 'index.html'); s = open(ip, encoding='utf8').read()
-m = json.dumps({to: sl for to, sl, ti, de in items}, ensure_ascii=False, separators=(',', ':'))[1:-1]
+m = json.dumps({it[0]: it[1] for it in items}, ensure_ascii=False, separators=(',', ':'))[1:-1]
 assert s.count('/*SLUGS*/') == 1
 s = s.replace('/*SLUGS*/', m)
 # картка-прев’ю для головної сторінки (QR, загальне посилання)
