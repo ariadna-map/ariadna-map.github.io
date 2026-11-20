@@ -562,6 +562,18 @@ body.cam-free #loc{background:var(--thread);color:#1d2328;box-shadow:0 0 0 3px r
 .north{position:fixed;z-index:14;top:calc(max(12px,env(safe-area-inset-top)) + 28px);right:max(12px,env(safe-area-inset-right));display:flex;align-items:center;gap:3px;padding:4px 8px 4px 5px;border-radius:9px;font-size:11px;line-height:1;color:var(--ink);pointer-events:none;opacity:.85}
 .north svg{color:#c0392b}
 body.popping .north,body.toasting .north,body.alert-on .north{opacity:0}
+/* ---------- v28 ---------- */
+body.mykolai .me .wave{fill:#e3bd62;opacity:.4}
+body.mykolai .me .rb{fill:none;stroke:#e3bd62;stroke-width:2.3}
+body.mykolai .me .bow{fill:#e3bd62;stroke:#fff;stroke-width:1.1;stroke-linejoin:round}
+#mastA{position:relative;overflow:hidden}
+#mastA .snow{position:absolute;inset:0;pointer-events:none;border-radius:9px}
+#mastA .snow i{position:absolute;top:-4px;left:6px;width:2.6px;height:2.6px;border-radius:50%;background:#fff;opacity:.9;animation:snowf 4.2s linear infinite}
+#mastA .snow i:nth-child(2){left:15px;animation-duration:5.2s;animation-delay:-2.1s;width:2px;height:2px}
+#mastA .snow i:nth-child(3){left:24px;animation-duration:4.6s;animation-delay:-3.4s}
+#mastA .snow i:nth-child(4){left:29px;animation-duration:5.8s;animation-delay:-.9s;width:2px;height:2px}
+@keyframes snowf{0%{transform:translate(0,0)}50%{transform:translate(2px,20px)}100%{transform:translate(-1px,42px)}}
+@media (prefers-reduced-motion:reduce){#mastA .snow{display:none}}
 </style>
 </head>
 <body>
@@ -1266,6 +1278,12 @@ function syncUrl(){try{var p=new URLSearchParams(location.search),to=st.dept||(s
 /* ---------- геопозиція: синя точка, маршрут від вас, оновлення в русі ---------- */
 var GEO={pos:null,acc:0,err:"",watch:null,first:true,last:null,t:0,boost:false,bt:0,good:false};
 /* «Вести»: маршрут від того місця, де ви зараз; карта йде за вами, екран не гасне. Далеко від лікарні — Google Карти */
+/* Миколайчик (6 грудня): з вечора 5-го (18:00) до кінця 6-го — логотип зі стрічкою й бантиком, сніжинки, синя точка — «подарунок» (20.11.2026).
+   Перевірка заздалегідь: ?holiday=1; вимкнути: ?holiday=0 */
+var HOLI=(function(){var q=new URLSearchParams(location.search).get("holiday");if(q==="1")return true;if(q==="0")return false;
+  var d=new Date();return d.getMonth()===11&&((d.getDate()===5&&d.getHours()>=18)||d.getDate()===6)})();
+if(HOLI){document.body.classList.add("mykolai");var mi=document.querySelector("#mastA img");if(mi)mi.src="brand/ariadna-favicon-mykolai.svg";
+  var ma=document.getElementById("mastA");if(ma){var sn=document.createElement("span");sn.className="snow";sn.setAttribute("aria-hidden","true");sn.innerHTML="<i></i><i></i><i></i><i></i>";ma.appendChild(sn)}}
 var FOLLOW=false,CAM=true,camT=0,camN=0,WL=null,lastDoor=null,HERE=false;
 function awake(on){try{if(on&&!WL&&navigator.wakeLock)navigator.wakeLock.request("screen").then(function(l){WL=l;l.addEventListener("release",function(){WL=null})},function(){});else if(!on&&WL){WL.release();WL=null}}catch(_){}}
 /* сторінку сховали — стеження вимикаємо; повернулися — дивимося ще раз, де ви (рідні повертаються сюди з Google Карт уже біля лікарні) */
@@ -1498,7 +1516,7 @@ function meAt(){return GEO.show||GEO.f||GEO.pos}
 
 function geoText(){return GEO.err||(GEO.pos?(geoFar()?"ви за ≈ "+fmtKm(geoFar())+" від лікарні":"точність ±"+GEO.acc+" м"):(GEO.watch!==null?"визначаю…":"торкніться, щоб визначити"))}
 function drawMe(){var g=document.getElementById("me");if(!GEO.pos||geoFar()){g.innerHTML="";return}var m=meAt();
-  g.innerHTML='<circle class="acc" cx="'+m[0].toFixed(1)+'" cy="'+m[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",m[0].toFixed(1),m[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/><circle class="hit" r="16" data-me="1"/>');apply()}
+  g.innerHTML='<circle class="acc" cx="'+m[0].toFixed(1)+'" cy="'+m[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",m[0].toFixed(1),m[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/>'+(HOLI?'<path class="rb" d="M-5.4 0H5.4M0-5.4V5.4"/><path class="bow" d="M0-8.4c-2.4-3.8-6.6-2.8-4.8.3 1.1 1.2 3.2.9 4.8-.3zM0-8.4c2.4-3.8 6.6-2.8 4.8.3-1.1 1.2-3.2.9-4.8-.3z"/>':'')+'<circle class="hit" r="16" data-me="1"/>');apply()}
 /* перші 30 с — точно (GPS), щоб перша точка була правильною; далі — економно, щоб телефон не грівся. Під час «Вести» — точно весь час */
 function geoStart(){
   if(!navigator.geolocation){GEO.err="цей браузер не підтримує геопозицію";return false}

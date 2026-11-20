@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Логотип на Миколайчика (6 грудня): золота риска «A» — стрічка з бантиком, кілька сніжинок. 20.11.2026 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135.14 135.14" width="32" height="32" role="img" aria-label="Ariadna">
+<title>Ariadna</title>
+<rect width="135.14" height="135.14" rx="29.73" fill="#222B31"/>
+<g fill="#F3EFE6" opacity=".55">
+<circle cx="18" cy="22" r="2.6"/><circle cx="114" cy="16" r="2"/><circle cx="121" cy="44" r="2.6"/><circle cx="12" cy="58" r="1.8"/><circle cx="108" cy="118" r="2.2"/><circle cx="26" cy="122" r="1.6"/>
+</g>
+<g transform="translate(17.57 14.86)">
+<path fill="#F3EFE6" d="M60.22 0 L39.78 0 L0 100 L20.45 100 L50 25.7 L62.45 57 L82.9 57 Z M79.55 100 L100 100 L87.67 69 L67.22 69 Z"/>
+<!-- кінчики стрічки виходять з-під риски -->
+<g stroke="#222B31" stroke-width="2.2" stroke-linejoin="round">
+<path fill="#CDAA62" d="M60.5 63 L54.5 85 L59.5 82.5 L62.5 87 L65 64 Z"/>
+<path fill="#B8954F" d="M66.5 63 L72.5 85 L67.5 82.5 L64.5 87 L62 64 Z"/>
+</g>
+<path fill="#CDAA62" d="M37.55 57 L94 57 A6 6 0 0 1 94 69 L32.78 69 Z"/>
+<!-- бантик посередині стрічки -->
+<g stroke="#222B31" stroke-width="2.2" stroke-linejoin="round">
+<path fill="#DDBE79" d="M63.5 61 C53 44 37 45 40.5 57 C43 67 55 66.5 63.5 61 Z"/>
+<path fill="#DDBE79" d="M63.5 61 C74 44 90 45 86.5 57 C84 67 72 66.5 63.5 61 Z"/>
+<rect fill="#CDAA62" x="57.5" y="54.8" width="12" height="12.4" rx="3.8"/>
+</g>
+</g></svg>

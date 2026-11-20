@@ -25,6 +25,12 @@ function syncUrl(){try{var p=new URLSearchParams(location.search),to=st.dept||(s
 /* ---------- геопозиція: синя точка, маршрут від вас, оновлення в русі ---------- */
 var GEO={pos:null,acc:0,err:"",watch:null,first:true,last:null,t:0,boost:false,bt:0,good:false};
 /* «Вести»: маршрут від того місця, де ви зараз; карта йде за вами, екран не гасне. Далеко від лікарні — Google Карти */
+/* Миколайчик (6 грудня): з вечора 5-го (18:00) до кінця 6-го — логотип зі стрічкою й бантиком, сніжинки, синя точка — «подарунок» (20.11.2026).
+   Перевірка заздалегідь: ?holiday=1; вимкнути: ?holiday=0 */
+var HOLI=(function(){var q=new URLSearchParams(location.search).get("holiday");if(q==="1")return true;if(q==="0")return false;
+  var d=new Date();return d.getMonth()===11&&((d.getDate()===5&&d.getHours()>=18)||d.getDate()===6)})();
+if(HOLI){document.body.classList.add("mykolai");var mi=document.querySelector("#mastA img");if(mi)mi.src="brand/ariadna-favicon-mykolai.svg";
+  var ma=document.getElementById("mastA");if(ma){var sn=document.createElement("span");sn.className="snow";sn.setAttribute("aria-hidden","true");sn.innerHTML="<i></i><i></i><i></i><i></i>";ma.appendChild(sn)}}
 var FOLLOW=false,CAM=true,camT=0,camN=0,WL=null,lastDoor=null,HERE=false;
 function awake(on){try{if(on&&!WL&&navigator.wakeLock)navigator.wakeLock.request("screen").then(function(l){WL=l;l.addEventListener("release",function(){WL=null})},function(){});else if(!on&&WL){WL.release();WL=null}}catch(_){}}
 /* сторінку сховали — стеження вимикаємо; повернулися — дивимося ще раз, де ви (рідні повертаються сюди з Google Карт уже біля лікарні) */
@@ -257,7 +263,7 @@ function meAt(){return GEO.show||GEO.f||GEO.pos}
 
 function geoText(){return GEO.err||(GEO.pos?(geoFar()?"ви за ≈ "+fmtKm(geoFar())+" від лікарні":"точність ±"+GEO.acc+" м"):(GEO.watch!==null?"визначаю…":"торкніться, щоб визначити"))}
 function drawMe(){var g=document.getElementById("me");if(!GEO.pos||geoFar()){g.innerHTML="";return}var m=meAt();
-  g.innerHTML='<circle class="acc" cx="'+m[0].toFixed(1)+'" cy="'+m[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",m[0].toFixed(1),m[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/><circle class="hit" r="16" data-me="1"/>');apply()}
+  g.innerHTML='<circle class="acc" cx="'+m[0].toFixed(1)+'" cy="'+m[1].toFixed(1)+'" r="'+Math.min(GEO.acc,200)+'"/>'+lbl("me",m[0].toFixed(1),m[1].toFixed(1),0,'<circle class="wave" r="7"/><circle class="dot" r="7"/>'+(HOLI?'<path class="rb" d="M-5.4 0H5.4M0-5.4V5.4"/><path class="bow" d="M0-8.4c-2.4-3.8-6.6-2.8-4.8.3 1.1 1.2 3.2.9 4.8-.3zM0-8.4c2.4-3.8 6.6-2.8 4.8.3-1.1 1.2-3.2.9-4.8-.3z"/>':'')+'<circle class="hit" r="16" data-me="1"/>');apply()}
 /* перші 30 с — точно (GPS), щоб перша точка була правильною; далі — економно, щоб телефон не грівся. Під час «Вести» — точно весь час */
 function geoStart(){
   if(!navigator.geolocation){GEO.err="цей браузер не підтримує геопозицію";return false}

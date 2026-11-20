@@ -995,6 +995,20 @@ rep('</style>','/* ---------- v27 ---------- */\n'
     '.north svg{color:#c0392b}\n'
     'body.popping .north,body.toasting .north,body.alert-on .north{opacity:0}\n'
     '</style>')
+# ================= v28 (20.11.2026): Миколайчик — логотип зі стрічкою, сніжинки, синя точка-подарунок =================
+rep('</style>','/* ---------- v28 ---------- */\n'
+    'body.mykolai .me .wave{fill:#e3bd62;opacity:.4}\n'
+    'body.mykolai .me .rb{fill:none;stroke:#e3bd62;stroke-width:2.3}\n'
+    'body.mykolai .me .bow{fill:#e3bd62;stroke:#fff;stroke-width:1.1;stroke-linejoin:round}\n'
+    '#mastA{position:relative;overflow:hidden}\n'
+    '#mastA .snow{position:absolute;inset:0;pointer-events:none;border-radius:9px}\n'
+    '#mastA .snow i{position:absolute;top:-4px;left:6px;width:2.6px;height:2.6px;border-radius:50%;background:#fff;opacity:.9;animation:snowf 4.2s linear infinite}\n'
+    '#mastA .snow i:nth-child(2){left:15px;animation-duration:5.2s;animation-delay:-2.1s;width:2px;height:2px}\n'
+    '#mastA .snow i:nth-child(3){left:24px;animation-duration:4.6s;animation-delay:-3.4s}\n'
+    '#mastA .snow i:nth-child(4){left:29px;animation-duration:5.8s;animation-delay:-.9s;width:2px;height:2px}\n'
+    '@keyframes snowf{0%{transform:translate(0,0)}50%{transform:translate(2px,20px)}100%{transform:translate(-1px,42px)}}\n'
+    '@media (prefers-reduced-motion:reduce){#mastA .snow{display:none}}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
