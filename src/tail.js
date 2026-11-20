@@ -3,7 +3,8 @@ var Q=new URLSearchParams(location.search);
 /* ---------- правки з редактора (/redaktor, 21.11.2026) ----------
    data/edits.js: window.ARIADNA_EDITS={d:{"16":{fl:3,vis:{…},note:"…",hide:true}},add:[…],ann:{text,until}}.
    Лише змінені поля; null — прибрати поле. ?preview=1 — чернетка з редактора (localStorage) замість опублікованого */
-var EDITS=(function(){var e=window.ARIADNA_EDITS||null;if(Q.get("preview")==="1"){try{var dr=localStorage.getItem("ariadna-draft");if(dr)e=JSON.parse(dr)}catch(_){}}return e})();
+var EDITS=(function(){var e=window.ARIADNA_EDITS||null,pv=Q.get("preview"),k=pv==="1"?"ariadna-draft":pv==="pending"?"ariadna-preview-pending":null;
+  if(k){try{var dr=localStorage.getItem(k);if(dr)e=JSON.parse(dr)}catch(_){}}return e})();   /* ?preview=pending — те, що чекає схвалення */
 (function(E){if(!E)return;var F=["t","full","short","sub","k","fl","ent","d","tel","vis","note","hide","kw"];
   function put(d,o){F.forEach(function(f){if(!Object.prototype.hasOwnProperty.call(o,f))return;if(o[f]===null||o[f]==="")delete d[f];else d[f]=o[f]});
     if(d.ent&&!ENT[d.ent])delete d.ent}
@@ -843,14 +844,14 @@ if("serviceWorker" in navigator&&location.protocol==="https:")addEventListener("
 var GC_CODE="ariadna-map",gcQ=[],gcSeen={};
 function cnt(name){if(gcSeen[name])return;gcSeen[name]=1;gcQ.push(name);gcFlush()}
 function gcFlush(){if(!window.goatcounter||!goatcounter.count)return;while(gcQ.length){var n=gcQ.shift();try{goatcounter.count({path:n,title:n,event:true})}catch(_){}}}
-if(location.protocol==="https:"&&!/^(localhost|127\.)/.test(location.hostname)&&Q.get("preview")!=="1"){var gs=document.createElement("script");gs.async=true;gs.src="https://gc.zgo.at/count.js";
+if(location.protocol==="https:"&&!/^(localhost|127\.)/.test(location.hostname)&&!Q.get("preview")){var gs=document.createElement("script");gs.async=true;gs.src="https://gc.zgo.at/count.js";
   gs.setAttribute("data-goatcounter","https://"+GC_CODE+".goatcounter.com/count");gs.onload=function(){setTimeout(gcFlush,300)};document.head.appendChild(gs)}
 addEventListener("error",function(){cnt("pomylka-js")});
 document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href*="google.com/maps"]');if(a)cnt("google-karty")},true);
 /* оголошення з редактора: раз за відвідування, 25 с */
 (function(){var A=EDITS&&EDITS.ann;if(!A||!A.text)return;if(A.until&&new Date()>new Date(A.until+"T23:59:59"))return;
   setTimeout(function(){say("Оголошення",A.text,[{t:"Зрозуміло",go:hideToast}],"",25000)},1400)})();
-if(Q.get("preview")==="1")setTimeout(function(){say("Попередній перегляд","це чернетка з редактора — люди ще бачать стару версію",null,"",8000)},400);
+if(Q.get("preview"))setTimeout(function(){say("Попередній перегляд",Q.get("preview")==="pending"?"зміни, що чекають схвалення, — люди їх ще не бачать":"це чернетка з редактора — люди ще бачать стару версію",null,"",8000)},400);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
 }
 </script>

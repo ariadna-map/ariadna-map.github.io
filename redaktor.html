@@ -66,17 +66,31 @@ ol{padding-left:20px;margin:6px 0}
 ol li{margin:4px 0}
 .muted{color:var(--muted);font-size:14px}
 #search{margin:6px 0 2px}
+.sheet{position:fixed;inset:0;z-index:8;background:rgba(22,24,26,.35);display:flex;align-items:flex-end;justify-content:center;padding:14px 14px calc(14px + env(safe-area-inset-bottom))}
+.sheet[hidden]{display:none}
+.sheet .card{width:100%;max-width:560px}
+#pend h3{margin:0 0 4px;font-size:17px}
+.chg{margin:10px 0 0;padding:0;list-style:none}
+.chg li{padding:8px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.35}
+.chg li b{display:block;font-size:15px}
+.chg .was{color:var(--muted);text-decoration:line-through}
+.chg .now{color:var(--ok);font-weight:600}
+input[type=radio]{width:22px;height:22px;min-height:0;margin:0;accent-color:var(--thread)}
 </style>
 </head>
 <body>
 <header><img src="brand/ariadna-favicon.svg" alt=""><h1>Редактор карти<small>Психіатрична лікарня · Кирилівська, 103</small></h1><button type="button" id="gear" aria-label="Налаштування" style="min-height:40px;padding:0 12px">⚙︎</button></header>
 <main>
   <div id="msg"></div>
+  <section id="pend" class="card" hidden></section>
 
   <section id="setup" class="card" hidden>
     <b>Налаштування цього телефона</b>
     <label for="who">Ваше ім’я — для журналу змін</label>
     <input id="who" autocomplete="name" placeholder="напр., Олена, сестра-господиня">
+    <label>Хто працює на цьому телефоні</label>
+    <label class="chk"><input type="radio" name="role" value="editor" id="roleE">Сестра-господиня — надсилає зміни на схвалення</label>
+    <label class="chk"><input type="radio" name="role" value="admin" id="roleA">Адміністратор — схвалює й публікує</label>
     <label for="tok">Ключ доступу (дає адміністратор)</label>
     <input id="tok" type="password" autocomplete="off" placeholder="github_pat_…">
     <div class="acts"><button type="button" class="main" id="tokSave">Зберегти й перевірити</button><button type="button" id="tokDel">Вийти з цього телефона</button></div>
@@ -85,9 +99,10 @@ ol li{margin:4px 0}
         <li>github.com → фото профілю → <b>Settings</b> → <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
         <li>Назва: «Редактор карти». Термін: 1 рік. <b>Resource owner</b>: ariadna-map.</li>
         <li><b>Repository access</b> → <b>Only select repositories</b> → ariadna-map.github.io.</li>
-        <li><b>Permissions</b> → <b>Repository permissions</b> → <b>Contents</b>: <b>Read and write</b>. Більше нічого.</li>
+        <li><b>Permissions</b> → <b>Repository permissions</b> → <b>Contents</b>: <b>Read and write</b> і <b>Issues</b>: <b>Read and write</b> (щоб адміністратор отримував лист, коли є зміни на схвалення). Більше нічого.</li>
         <li><b>Generate token</b>, скопіювати й вставити сюди на телефоні сестри-господині. Якщо GitHub попросить схвалення організації ariadna-map — схваліть у її налаштуваннях.</li>
         <li>Телефон загубили — відкличте ключ там само (<b>Revoke</b>).</li>
+        <li>Щоб листи про зміни на схвалення приходили, у репозиторії ariadna-map.github.io має бути ввімкнено <b>Watch</b> → <b>All Activity</b> (або хоча б Issues).</li>
       </ol>
     </details>
   </section>
@@ -116,6 +131,13 @@ ol li{margin:4px 0}
   <a class="btn" id="prev" href="/?preview=1" target="_blank" rel="noopener">Переглянути</a>
   <button type="button" class="main" id="pub">Опублікувати</button></div>
 <div class="toast" id="toast" hidden role="status"></div>
+<div class="sheet" id="sendCard" hidden><div class="card">
+  <b>Надіслати на схвалення</b>
+  <p class="muted" style="margin:6px 0 0">Люди побачать зміни, щойно адміністратор їх схвалить. Він отримає лист.</p>
+  <label for="cmt">Коментар для адміністратора (необов’язково)</label>
+  <textarea id="cmt" placeholder="напр., Відділення 16 переїхало на 4 поверх з понеділка"></textarea>
+  <div class="acts"><button type="button" class="main" id="sendOk">Надіслати</button><button type="button" id="sendNo">Скасувати</button></div>
+</div></div>
 
 <script>
 "use strict";
@@ -152,7 +174,10 @@ function save(){W.updated=new Date().toISOString();LS.set(K_DRAFT,JSON.stringify
 function nChanges(){var n=0;Object.keys(W.d).forEach(function(id){var p=PUB.d[id]||{},w=W.d[id];Object.keys(w).forEach(function(f){if(!same(w[f],p[f]))n++});Object.keys(p).forEach(function(f){if(!(f in w))n++})});
   Object.keys(PUB.d).forEach(function(id){if(!W.d[id])n+=Object.keys(PUB.d[id]).length});
   if(!same(W.add,PUB.add))n+=Math.max(1,Math.abs(W.add.length-PUB.add.length));if(!same(W.ann,PUB.ann))n++;return n}
-function status(){var n=nChanges();$("st").innerHTML=n?"<b>Змін: "+n+"</b>ще не опубліковано":"<b>Змін немає</b>усе опубліковано";$("pub").disabled=!n}
+function status(){if(!PUB)return;var n=nChanges(),adm=role()==="admin",sent=!adm&&typeof PEND!=="undefined"&&PEND&&PEND.status==="waiting"&&same(core(W),PEND.edits);
+  $("pub").textContent=adm?"Опублікувати":"На схвалення";
+  $("st").innerHTML=!n?"<b>Змін немає</b>усе на карті":sent?"<b>Надіслано</b>чекає схвалення":"<b>Змін: "+n+"</b>"+(adm?"ще не опубліковано":"ще не надіслано");
+  $("pub").disabled=!n||sent}
 
 /* ---------- список ---------- */
 function bName(k){for(var i=0;i<BASE.B.length;i++)if(BASE.B[i].k===k)return "Корпус "+k+(BASE.B[i].n?" — "+BASE.B[i].n:"");return k?"Корпус "+k:"Без корпусу"}
@@ -218,38 +243,110 @@ function annRender(){$("annT").value=W.ann&&W.ann.text||"";$("annU").value=W.ann
 function annSave(){var t=$("annT").value.trim(),u=$("annU").value;W.ann=t?{text:t,until:u||null}:null;save()}
 $("annT").addEventListener("change",annSave);$("annU").addEventListener("change",annSave);
 
-/* ---------- налаштування й ключ ---------- */
-$("gear").onclick=function(){$("setup").hidden=!$("setup").hidden;$("who").value=LS.get(K_WHO)||"";$("tok").value=""};
+/* ---------- налаштування, роль і ключ ---------- */
+var K_ROLE="ariadna-role",K_PREVP="ariadna-preview-pending",PEND=null;
+function role(){return LS.get(K_ROLE)==="admin"?"admin":"editor"}
+function core(e){return e?{d:e.d||{},add:e.add||[],ann:e.ann||null}:null}
+$("gear").onclick=function(){$("setup").hidden=!$("setup").hidden;$("who").value=LS.get(K_WHO)||"";$("tok").value="";$(role()==="admin"?"roleA":"roleE").checked=true};
+["roleE","roleA"].forEach(function(id){$(id).onchange=function(){LS.set(K_ROLE,$(id).value);status();pendRender()}});
 function hdr(t){return {"Authorization":"Bearer "+t,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}}
 $("tokSave").onclick=function(){var t=$("tok").value.trim()||LS.get(K_TOK),w=$("who").value.trim();if(w)LS.set(K_WHO,w);if(!t){toast("Вставте ключ доступу");return}
   fetch("https://api.github.com/repos/"+REPO+"/contents/"+FILE+"?ref="+BR,{headers:hdr(t),cache:"no-store"}).then(function(r){
-    if(r.ok){LS.set(K_TOK,t);$("setup").hidden=true;toast("Ключ працює. Можна публікувати.")}
+    if(r.ok){LS.set(K_TOK,t);$("setup").hidden=true;toast("Ключ працює.");loadPend()}
     else toast(r.status===401?"Ключ не підходить — перевірте, чи скопійовано повністю":r.status===403||r.status===404?"Ключ без доступу до карти — потрібно «Contents: Read and write» для ariadna-map.github.io":"GitHub відповів помилкою "+r.status,7000)},
     function(){toast("Немає зв’язку з GitHub — спробуйте пізніше")})};
 $("tokDel").onclick=function(){LS.del(K_TOK);toast("Ключ видалено з цього телефона")};
 
-/* ---------- публікація ---------- */
+/* ---------- GitHub ---------- */
+function api(path){return "https://api.github.com/repos/"+REPO+"/"+path}
 function b64(s){var u=new TextEncoder().encode(s),b="";for(var i=0;i<u.length;i++)b+=String.fromCharCode(u[i]);return btoa(b)}
+function unb64(b){var bin=atob(String(b).replace(/\s/g,"")),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u)}
+function ghGet(file){return fetch(api("contents/"+file+"?ref="+BR),{headers:hdr(LS.get(K_TOK)),cache:"no-store"}).then(function(r){if(r.status===404)return null;if(!r.ok)throw r.status;return r.json()})
+  .then(function(j){return j?{sha:j.sha,text:unb64(j.content)}:null})}
+function ghPut(file,text,sha,message){var b={message:message,content:b64(text),branch:BR};if(sha)b.sha=sha;
+  return fetch(api("contents/"+file),{method:"PUT",headers:hdr(LS.get(K_TOK)),body:JSON.stringify(b)}).then(function(r){if(!r.ok)throw r.status;return r.json()})}
+function ghIssue(title,body){return fetch(api("issues"),{method:"POST",headers:hdr(LS.get(K_TOK)),body:JSON.stringify({title:title,body:body})}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}
+function ghComment(n,body,close){if(!n)return Promise.resolve();var h=hdr(LS.get(K_TOK));
+  return fetch(api("issues/"+n+"/comments"),{method:"POST",headers:h,body:JSON.stringify({body:body})}).then(function(){if(close)return fetch(api("issues/"+n),{method:"PATCH",headers:h,body:JSON.stringify({state:"closed"})})}).catch(function(){})}
 function fileText(e){return "/* Правки з редактора карти (/redaktor). Файл перезаписує редактор — руками не правити. */\nwindow.ARIADNA_EDITS="+JSON.stringify(e)+";\n"}
-function pub(retry){var t=LS.get(K_TOK);if(!t){$("setup").hidden=false;$("who").value=LS.get(K_WHO)||"";toast("Спершу вставте ключ доступу",5000);return}
-  var who=LS.get(K_WHO)||"сестра-господиня",out=clone(W);out.by=who;out.updated=new Date().toISOString();
-  var api="https://api.github.com/repos/"+REPO+"/contents/"+FILE;$("pub").disabled=true;$("pub").textContent="Публікую…";
-  fetch(api+"?ref="+BR,{headers:hdr(t),cache:"no-store"}).then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(j){
-    return fetch(api,{method:"PUT",headers:hdr(t),body:JSON.stringify({message:"Редактор карти: "+who+" — змін "+nChanges(),content:b64(fileText(out)),sha:j.sha,branch:BR})})}).then(function(r){
-    if(r.status===409&&!retry){pub(true);return}if(!r.ok)throw r.status;
+function errText(e){return e===401?"Ключ не підходить або протермінований — відкрийте ⚙︎ і вставте новий.":e===403||e===404?"Ключ без права змінювати карту — потрібно «Contents: Read and write».":typeof e==="number"?"GitHub відповів помилкою "+e+". Чернетка збережена на цьому телефоні.":"Немає зв’язку. Чернетка збережена на цьому телефоні — спробуйте пізніше."}
+function needTok(){if(LS.get(K_TOK))return false;$("setup").hidden=false;$("who").value=LS.get(K_WHO)||"";$(role()==="admin"?"roleA":"roleE").checked=true;toast("Спершу вставте ключ доступу",5000);return true}
+function dt(iso){try{var d=new Date(iso);return d.toLocaleDateString("uk-UA",{day:"numeric",month:"long"})+" о "+d.toLocaleTimeString("uk-UA",{hour:"2-digit",minute:"2-digit"})}catch(_){return iso||""}}
+
+/* ---------- що змінилося — зрозумілою мовою ---------- */
+var LBL={t:"назва",full:"повна назва",sub:"підпис",d:"профіль",k:"корпус",fl:"поверх",ent:"вхід",tel:"телефони",vis:"години відвідувань",note:"примітка",hide:"на карті"};
+function curIn(E,id){E=E||empty();var b=baseOf(id),a=null;(E.add||[]).forEach(function(x){if(x.id===id)a=x});if(!b)return a?clone(a):null;
+  var o=clone(b),e=(E.d||{})[id]||{};Object.keys(e).forEach(function(f){if(e[f]===null)delete o[f];else o[f]=e[f]});return o}
+function entName(id){for(var i=0;i<BASE.ENT.length;i++)if(BASE.ENT[i].id===id)return BASE.ENT[i].n||BASE.ENT[i].t||id;return id}
+function fmt(f,v){if(f==="hide")return v?"сховано":"показано";if(v==null||v===""||(Array.isArray(v)&&!v.length))return "—";
+  if(f==="vis")return (visT(v)||"—")+(v.q?", тиха година "+hm(v.q[0])+"–"+hm(v.q[1]):"");if(f==="tel")return v.join(", ");if(f==="ent")return entName(v);return String(v)}
+function diff(A,B){var all={},out=[];BASE.D.forEach(function(d){all[d.id]=1});[A,B].forEach(function(E){((E&&E.add)||[]).forEach(function(x){all[x.id]=1})});
+  Object.keys(all).forEach(function(id){var a=curIn(A,id),b=curIn(B,id);
+    if(!a&&b){out.push({t:"Нове: "+title(b),l:[["",null,summ(b)]]});return}if(a&&!b){out.push({t:"Прибрано: "+title(a),l:[]});return}
+    var l=[];Object.keys(LBL).forEach(function(f){var va=f==="hide"?!!a[f]:a[f],vb=f==="hide"?!!b[f]:b[f];if(!same(va,vb))l.push([LBL[f],fmt(f,va),fmt(f,vb)])});
+    if(l.length)out.push({t:title(b),l:l})});
+  var x=A&&A.ann,y=B&&B.ann;if(!same(x,y))out.push({t:"Оголошення",l:[["",x&&x.text?x.text+(x.until?" (до "+x.until+")":""):"—",y&&y.text?y.text+(y.until?" (до "+y.until+")":""):"—"]]});
+  return out}
+function diffHtml(L){return '<ul class="chg">'+L.map(function(c){return '<li><b>'+esc(c.t)+'</b>'+c.l.map(function(r){return (r[0]?esc(r[0])+": ":"")+(r[1]!=null?'<span class="was">'+esc(r[1])+'</span> → ':"")+'<span class="now">'+esc(r[2])+'</span>'}).join("<br>")+'</li>'}).join("")+'</ul>'}
+function diffText(L){return L.map(function(c){return "• "+c.t+(c.l.length?"\n"+c.l.map(function(r){return "   "+(r[0]?r[0]+": ":"")+(r[1]!=null?r[1]+" → ":"")+r[2]}).join("\n"):"")}).join("\n")}
+
+/* ---------- на схваленні ---------- */
+function loadPend(){var t=LS.get(K_TOK);
+  var p=t?ghGet("data/pending.json").then(function(x){return x?JSON.parse(x.text):null}):fetch("data/pending.json",{cache:"no-store"}).then(function(r){return r.ok?r.json():null});
+  return p.catch(function(){return null}).then(function(j){PEND=j;pendRender();status()})}
+function pendRender(){var P=$("pend"),R=role();P.hidden=true;if(!PEND||!BASE)return;
+  if(R==="admin"&&PEND.status==="waiting"){var L=diff(PUB,PEND.edits);
+    P.innerHTML='<h3>На схваленні: '+L.length+' '+(L.length===1?"зміна":"змін")+'</h3><div class="muted">від '+esc(PEND.by||"редактора")+', '+esc(dt(PEND.at))+'</div>'
+      +(PEND.comment?'<div class="note" style="margin-top:10px">'+esc(PEND.comment)+'</div>':"")+(L.length?diffHtml(L):'<p class="muted">Відмінностей від опублікованого немає.</p>')
+      +'<div class="acts"><button type="button" class="gold" id="apOk">Схвалити й опублікувати</button><a class="btn" id="apPrev" href="/?preview=pending" target="_blank" rel="noopener">Переглянути на карті</a><button type="button" id="apNo">Відхилити</button></div>';
+    P.hidden=false;$("apOk").onclick=approve;$("apNo").onclick=reject;$("apPrev").onclick=function(){LS.set(K_PREVP,JSON.stringify(core(PEND.edits)))};return}
+  if(R==="editor"){var mine=PEND.by===(LS.get(K_WHO)||"сестра-господиня");if(!mine)return;
+    if(PEND.status==="waiting")P.innerHTML='<h3>Надіслано на схвалення</h3><div class="muted">'+esc(dt(PEND.at))+'. Люди побачать зміни, коли адміністратор їх схвалить.</div>';
+    else if(PEND.status==="rejected")P.innerHTML='<h3>Адміністратор відхилив зміни</h3><div class="muted">'+esc(dt(PEND.doneAt))+'</div>'+(PEND.reason?'<div class="note bad" style="margin-top:10px">'+esc(PEND.reason)+'</div>':"")+'<p class="muted">Виправте й надішліть знову.</p>';
+    else if(PEND.status==="approved"&&Date.now()-new Date(PEND.doneAt).getTime()<3*864e5)P.innerHTML='<h3>Зміни схвалено ✓</h3><div class="muted">'+esc(dt(PEND.doneAt))+' — уже на карті.</div>';
+    else return;P.hidden=false}}
+
+/* сестра-господиня: надіслати на схвалення */
+function sendOpen(){if(needTok())return;$("cmt").value="";$("sendCard").hidden=false}
+$("sendNo").onclick=function(){$("sendCard").hidden=true};
+$("sendOk").onclick=function(){var who=LS.get(K_WHO)||"сестра-господиня",cm=$("cmt").value.trim(),btn=$("sendOk"),L=diff(PUB,W);btn.disabled=true;btn.textContent="Надсилаю…";
+  var old=PEND&&PEND.status==="waiting"?PEND:null;
+  ghGet("data/pending.json").then(function(x){
+    var link="https://ariadna-map.github.io/redaktor",body="Зміни від "+who+(cm?"\n\nКоментар: "+cm:"")+"\n\n"+diffText(L)+"\n\nСхвалити чи відхилити: "+link;
+    var iss=old&&old.issue?ghComment(old.issue,"Оновлено:\n\n"+body).then(function(){return {number:old.issue}}):ghIssue("Карта: зміни на схвалення від "+who,body);
+    return iss.then(function(i){var rec={status:"waiting",by:who,at:new Date().toISOString(),comment:cm||null,issue:i&&i.number||null,edits:core(W)};
+      return ghPut("data/pending.json",JSON.stringify(rec,null,1),x&&x.sha,"Редактор карти: "+who+" — на схвалення").then(function(){PEND=rec})})})
+  .then(function(){$("sendCard").hidden=true;msg("Надіслано на схвалення. Люди побачать зміни, коли адміністратор їх схвалить.","ok");toast("Надіслано ✓",4000);pendRender();status()})
+  .catch(function(e){msg(errText(e),"bad")}).then(function(){btn.disabled=false;btn.textContent="Надіслати"})};
+
+/* адміністратор: схвалити / відхилити / опублікувати своє */
+function approve(){if(needTok())return;var me=LS.get(K_WHO)||"адміністратор",E=core(PEND.edits),b=$("apOk");b.disabled=true;b.textContent="Публікую…";
+  ghGet(FILE).then(function(x){var out=clone(E);out.by=PEND.by;out.approvedBy=me;out.updated=new Date().toISOString();
+    return ghPut(FILE,fileText(out),x&&x.sha,"Схвалено: зміни від "+PEND.by+" ("+me+")")})
+  .then(function(){return ghGet("data/pending.json")}).then(function(x){var rec=clone(PEND);rec.status="approved";rec.doneAt=new Date().toISOString();rec.doneBy=me;
+    return ghPut("data/pending.json",JSON.stringify(rec,null,1),x&&x.sha,"Схвалено: зміни від "+PEND.by).then(function(){PEND=rec;return ghComment(rec.issue,"Схвалено й опубліковано ("+me+").",true)})})
+  .then(function(){var mineClean=!nChanges();PUB=clone(E);if(mineClean){W=clone(PUB);LS.del(K_DRAFT)}annRender();list();status();pendRender();msg("Схвалено й опубліковано. Карта в людей оновиться приблизно за 1–2 хвилини.","ok")})
+  .catch(function(e){b.disabled=false;b.textContent="Схвалити й опублікувати";msg(errText(e),"bad")})}
+function reject(){if(needTok())return;var why=prompt("Причина (її побачить сестра-господиня):","");if(why===null)return;var me=LS.get(K_WHO)||"адміністратор";
+  ghGet("data/pending.json").then(function(x){var rec=clone(PEND);rec.status="rejected";rec.reason=why||null;rec.doneAt=new Date().toISOString();rec.doneBy=me;
+    return ghPut("data/pending.json",JSON.stringify(rec,null,1),x&&x.sha,"Відхилено: зміни від "+PEND.by).then(function(){PEND=rec;return ghComment(rec.issue,"Відхилено"+(why?": "+why:"")+" ("+me+").",true)})})
+  .then(function(){pendRender();toast("Відхилено",4000)}).catch(function(e){msg(errText(e),"bad")})}
+function pub(retry){if(needTok())return;var who=LS.get(K_WHO)||"адміністратор",out=clone(W);out.by=who;out.updated=new Date().toISOString();$("pub").disabled=true;$("pub").textContent="Публікую…";
+  ghGet(FILE).then(function(x){return ghPut(FILE,fileText(out),x&&x.sha,"Редактор карти: "+who+" — змін "+nChanges())}).then(function(){
     PUB=clone(W);LS.del(K_DRAFT);$("pub").textContent="Опублікувати";status();msg("Опубліковано. Карта в людей оновиться приблизно за 1–2 хвилини.","ok");toast("Опубліковано ✓",5000)})
-  .catch(function(e){$("pub").textContent="Опублікувати";status();
-    msg(e===401?"Ключ не підходить або протермінований — відкрийте ⚙︎ і вставте новий.":e===403||e===404?"Ключ без права змінювати карту — потрібно «Contents: Read and write».":typeof e==="number"?"GitHub відповів помилкою "+e+". Чернетка збережена на цьому телефоні.":"Немає зв’язку. Чернетка збережена на цьому телефоні — опублікуйте пізніше.","bad")})}
-$("pub").onclick=function(){pub(false)};
+  .catch(function(e){if(e===409&&!retry){pub(true);return}$("pub").textContent="Опублікувати";status();msg(errText(e),"bad")})}
+$("pub").onclick=function(){if(role()==="admin")pub(false);else sendOpen()};
 $("search").addEventListener("input",list);
 
 /* ---------- старт ---------- */
 Promise.all([fetch("data/base.json",{cache:"no-store"}).then(function(r){return r.json()}),fetch("data/edits.js",{cache:"no-store"}).then(function(r){return r.ok?r.text():""}).catch(function(){return ""})]).then(function(x){
   BASE=x[0];PUB=parseEdits(x[1]||"");var dr=LS.get(K_DRAFT);W=empty();
   try{if(dr){W=JSON.parse(dr);W.d=W.d||{};W.add=W.add||[]}else W=clone(PUB)}catch(_){W=clone(PUB)}
-  if(dr&&nChanges())msg('На цьому телефоні є неопублікована чернетка. <button type="button" class="link" id="drop">Відкинути її</button>');
+  if(dr&&!nChanges()){LS.del(K_DRAFT)}
+  else if(dr)msg('На цьому телефоні є чернетка, якої ще немає на карті. <button type="button" class="link" id="drop">Відкинути її</button>');
   var dp=$("drop");if(dp)dp.onclick=function(){LS.del(K_DRAFT);W=clone(PUB);msg("");annRender();list();status()};
-  annRender();list();status();if(!LS.get(K_TOK)){var n=document.createElement("div");n.className="note";n.style.marginTop="8px";n.textContent="Щоб публікувати, потрібен ключ доступу: натисніть ⚙︎ угорі.";$("msg").appendChild(n)}})
+  annRender();list();status();loadPend();
+  if(!LS.get(K_TOK)){var n=document.createElement("div");n.className="note";n.style.marginTop="8px";n.textContent="Щоб надсилати чи публікувати зміни, потрібен ключ доступу: натисніть ⚙︎ угорі.";$("msg").appendChild(n)}})
 .catch(function(){msg("Не вдалося завантажити дані карти. Перевірте зв’язок і оновіть сторінку.","bad")});
 </script>
 </body>
