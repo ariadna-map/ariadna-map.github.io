@@ -934,12 +934,32 @@ rep('</style>','/* ---------- v22 ---------- */\n'
     '.hbox .hb-b{display:flex;flex-direction:column;gap:8px}\n'
     '.hbox .hb-b .gbtn{width:100%;min-height:46px;border-radius:15px;text-decoration:none}\n'
     '</style>')
+# ================= v22.1 (20.11.2026): скло як в iOS — менше розмиття, та сама прозорість, світлий обідок; кнопка «Відкрити в Safari» =================
+rep('</style>','/* ---------- v22.1 ---------- */\n'
+    # розмиття зменшено (44 → 16 px у списках, 38 → 12 px у віконцях-підказках): карту під склом видно, як фото під сповіщеннями на iPhone.
+    # Прозорість (тон фону) не змінено. Обідок — як у iOS: яскравіший зверху-зліва, слабший знизу-справа
+    '.pop.glass,.legend.glass,.toast.glass{-webkit-backdrop-filter:blur(16px) saturate(1.7) brightness(1.04);backdrop-filter:blur(16px) saturate(1.7) brightness(1.04);'
+    'box-shadow:var(--shadow),inset 1.5px 1.5px 1px -.5px rgba(255,255,255,.95),inset -1.5px -1.5px 1px -.5px rgba(255,255,255,.55),inset 0 0 0 .5px rgba(255,255,255,.4),0 0 30px -8px rgba(255,255,255,.4)}\n'
+    '.farbox.glass{-webkit-backdrop-filter:blur(12px) saturate(1.8) brightness(1.05);backdrop-filter:blur(12px) saturate(1.8) brightness(1.05);'
+    'box-shadow:0 24px 60px -18px rgba(20,26,30,.4),inset 1.5px 1.5px 1px -.5px rgba(255,255,255,.95),inset -1.5px -1.5px 1px -.5px rgba(255,255,255,.55),inset 0 0 0 .5px rgba(255,255,255,.42),0 0 36px -8px rgba(255,255,255,.45)}\n'
+    '@media (prefers-color-scheme:dark){.pop.glass,.legend.glass,.toast.glass{-webkit-backdrop-filter:blur(16px) saturate(1.5) brightness(.9);backdrop-filter:blur(16px) saturate(1.5) brightness(.9);'
+    'box-shadow:var(--shadow),inset 1.5px 1.5px 1px -.5px rgba(255,255,255,.4),inset -1.5px -1.5px 1px -.5px rgba(255,255,255,.2),inset 0 0 0 .5px rgba(255,255,255,.13),0 0 32px -10px rgba(150,185,210,.2)}'
+    '.farbox.glass{-webkit-backdrop-filter:blur(12px) saturate(1.5) brightness(.86);backdrop-filter:blur(12px) saturate(1.5) brightness(.86);'
+    'box-shadow:0 24px 60px -18px rgba(0,0,0,.55),inset 1.5px 1.5px 1px -.5px rgba(255,255,255,.42),inset -1.5px -1.5px 1px -.5px rgba(255,255,255,.2),inset 0 0 0 .5px rgba(255,255,255,.14),0 0 36px -10px rgba(150,185,210,.22)}}\n'
+    # підказка «Відкрийте карту в Safari»
+    '.hbox{transition:top .45s cubic-bezier(.32,.72,0,1)}\n'
+    '.hbox .hb-open{gap:8px}\n'
+    '.hbox .hb-f{margin-top:14px}\n.hbox .hb-last{margin-top:8px}\n'
+    '.hbox .hb-f .gbtn{width:100%;min-height:46px;border-radius:15px}\n'
+    '.hbox .hb-ic{display:inline-grid;place-items:center;width:26px;height:26px;margin:0 2px;vertical-align:-7px;border-radius:50%;background:rgba(127,127,127,.22)}\n'
+    '.hbox .hb-ic svg{width:17px;height:17px}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
-h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==11,nth;s=s[:h0]+css_+s[h1:]
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==12,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))
