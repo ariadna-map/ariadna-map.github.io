@@ -948,7 +948,7 @@ rep('</style>','/* ---------- v22.1 ---------- */\n'
     'box-shadow:0 24px 60px -18px rgba(0,0,0,.55),inset 1.5px 1.5px 1px -.5px rgba(255,255,255,.42),inset -1.5px -1.5px 1px -.5px rgba(255,255,255,.2),inset 0 0 0 .5px rgba(255,255,255,.14),0 0 36px -10px rgba(150,185,210,.22)}}\n'
     # підказка «Відкрийте карту в Safari»
     '.hbox{transition:top .45s cubic-bezier(.32,.72,0,1)}\n'
-    '.hbox .hb-open{gap:8px}\n'
+    '.hbox .hb-open{gap:8px}\n'    '.hbox .hb-row{display:flex;gap:8px}\n.hbox .hb-row .gbtn{flex:1 1 0;min-width:0;min-height:50px;border-radius:15px;font-size:16.5px}\n'
     '.hbox .hb-f{margin-top:14px}\n.hbox .hb-last{margin-top:8px}\n'
     '.hbox .hb-f .gbtn{width:100%;min-height:46px;border-radius:15px}\n'
     '.hbox .hb-ic{display:inline-grid;place-items:center;width:26px;height:26px;margin:0 2px;vertical-align:-7px;border-radius:50%;background:rgba(127,127,127,.22)}\n'

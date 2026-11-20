@@ -107,24 +107,33 @@ var IC_SAF='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="
     IC_EXT='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
     IC_DOTS='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
 /* натиснули «Відкрити в Safari/браузері»: якщо сторінка за 2 с не сховалася (застосунок не пустив) — розкриваємо підказку, куди натиснути самому */
-function openWatch(){var gone=false,on=function(){gone=true};document.addEventListener("visibilitychange",on,{once:true});addEventListener("pagehide",on,{once:true});addEventListener("blur",on,{once:true});
-  setTimeout(function(){var f=hBox.querySelector(".hb-f");if(gone||!hOpen||!f||!f.hidden||document.visibilityState!=="visible")return;f.hidden=false;
+var hFail={};
+function chrUrl(){return "googlechromes://"+location.host+location.pathname+location.search+location.hash}
+function openWatch(b){var gone=false,on=function(){gone=true};document.addEventListener("visibilitychange",on,{once:true});addEventListener("pagehide",on,{once:true});addEventListener("blur",on,{once:true});
+  setTimeout(function(){var f=hBox.querySelector(".hb-f");if(gone||!hOpen||!f||document.visibilityState!=="visible")return;
+    var t=f.querySelector(".hb-s"),was=!f.hidden;t.innerHTML=hFail[b]||hFail.saf||"";f.hidden=false;
+    /* Chrome не відкрився — копіювати посилання сенсу мало, головне — Safari */
+    f.querySelector("[data-h=copy]").hidden=b==="chr";
     var H=hBox.offsetHeight;hBox.style.top=Math.round(Math.max(70,(innerHeight-H)/2-20))+"px";
-    if(f.animate&&!(FRM&&FRM.matches))f.animate([{opacity:0,transform:"translateY(-6px)"},{opacity:1,transform:"none"}],{duration:420,easing:"cubic-bezier(.32,.72,0,1)"})},2000)}
+    if(f.animate&&!(FRM&&FRM.matches))f.animate(was?[{opacity:.3},{opacity:1}]:[{opacity:0,transform:"translateY(-6px)"},{opacity:1,transform:"none"}],{duration:420,easing:"cubic-bezier(.32,.72,0,1)"})},2000)}
 function intentUrl(){return "intent://"+location.host+location.pathname+location.search+location.hash+"#Intent;scheme=https;end"}
 function copyLink(){var u=location.href,ok=function(){say("Посилання скопійовано","вставте його в адресний рядок "+(ENV.ios?"Safari":"браузера"))};
   function fb(){var t=document.createElement("textarea");t.value=u;t.setAttribute("readonly","");t.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(t);t.select();try{t.setSelectionRange(0,u.length)}catch(_){}
     var r=false;try{r=document.execCommand("copy")}catch(_){}document.body.removeChild(t);if(r)ok();else say("Скопіюйте посилання вручну",u,null,"",15000)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,fb);else fb()}
 function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kind;hAway=false;var T,P,S,B="",F="";
-  if(kind==="app"){T=ENV.ios?"Відкрийте карту в Safari":"Відкрийте карту в браузері";
-    P="Усередині "+(ENV.app||"застосунку")+" карта, найімовірніше, не побачить, де ви. "+(ENV.ios?"У Safari":"У браузері")+" — побачить і поведе від вас.";S="";
-    /* кнопка, що сама відкриває сторінку в браузері: iPhone — адреса x-safari-https:// (iOS 15, 17 і новіші), Android — intent:// */
-    B+='<a class="gbtn thread hb-open" data-h="open" href="'+esc(ENV.ios?safUrl():intentUrl())+'">'+(ENV.ios?IC_SAF:IC_EXT)+(ENV.ios?"Відкрити в Safari":"Відкрити в браузері")+'</a>';
-    /* якщо за 2 с ми все ще тут — кнопка не спрацювала: показуємо, куди натиснути самому, з тим самим значком, що на екрані */
-    F=ENV.ios&&ENV.app==="Telegram"?"Не відкрилося? Унизу праворуч є значок компаса <span class=\"hb-ic\">"+IC_SAF+"</span> — натисніть його, і Telegram відкриє карту в Safari."
-      :ENV.ios?"Не відкрилося? Скопіюйте посилання й вставте його в адресний рядок Safari."
-      :"Не відкрилося? Угорі праворуч натисніть <span class=\"hb-ic\">"+IC_DOTS+"</span> і оберіть «Відкрити в браузері» (чи «у Chrome»)."}
+  if(kind==="app"){T="Відкрийте карту в браузері";
+    P="Усередині "+(ENV.app||"застосунку")+" карта, найімовірніше, не побачить, де ви. У браузері — побачить і поведе від вас.";S="";
+    /* iPhone: дві кнопки в ряд — Safari (x-safari-https://, iOS 15, 17 і новіші) і Chrome (googlechromes://). Браузера «за замовчуванням» сторінка
+       відкрити не може (такої адреси на iPhone немає), і чи встановлено Chrome — не знає. Android: intent:// — відкриває браузер за замовчуванням */
+    if(ENV.ios)B+='<div class="hb-row"><a class="gbtn thread hb-open" data-h="open" data-b="saf" href="'+esc(safUrl())+'">'+IC_SAF+'Safari</a>'
+      +'<a class="gbtn hb-open" data-h="open" data-b="chr" href="'+esc(chrUrl())+'">'+IC_EXT+'Chrome</a></div>';
+    else B+='<a class="gbtn thread hb-open" data-h="open" data-b="and" href="'+esc(intentUrl())+'">'+IC_EXT+'Відкрити в браузері</a>';
+    /* якщо за 2 с ми все ще тут — кнопка не спрацювала: підказка залежить від того, яку натиснули */
+    F=1;hFail={saf:ENV.app==="Telegram"?"Не відкрилося? Унизу праворуч є значок компаса <span class=\"hb-ic\">"+IC_SAF+"</span> — натисніть його, і Telegram відкриє карту в браузері."
+        :"Не відкрилося? Скопіюйте посилання й вставте його в адресний рядок Safari.",
+      chr:"Схоже, Chrome на цьому телефоні немає — натисніть «Safari».",
+      and:"Не відкрилося? Угорі праворуч натисніть <span class=\"hb-ic\">"+IC_DOTS+"</span> і оберіть «Відкрити в браузері» (чи «у Chrome»)."}}
   else if(kind==="denied"){T="Дозвольте бачити, де ви";P="Для цієї сторінки геопозицію вимкнено, тому нитку від вас не провести.";
     S=ENV.ios?(ENV.br==="Chrome"?"Параметри iPhone → Chrome → Місцезнаходження → «Коли використовується». Потім оновіть сторінку.":"Параметри iPhone → Конфіденційність та безпека → Служби визначення місцеперебування: увімкніть їх і для «Сайти Safari» оберіть «Коли використовується». Потім оновіть сторінку й дозвольте.")
       :ENV.and?"Торкніться значка ліворуч від адреси сторінки → Дозволи → Геодані → «Дозволити». Перевірте, що геодані ввімкнено й у телефоні.":"Дозвольте геопозицію для цієї сторінки в налаштуваннях браузера й оновіть її.";
@@ -133,7 +142,7 @@ function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kin
     B+='<button type="button" class="gbtn thread" data-h="retry">Спробувати ще раз</button>'}
   var BF='<button type="button" class="gbtn" data-h="from">Обрати зупинку чи в’їзд</button>';
   hBox.innerHTML='<div class="fb-in"><b class="fb-t">'+T+'</b><p>'+esc(P)+'</p>'+(S?'<p class="hb-s">'+S+'</p>':'')+'<div class="hb-b">'+B+'</div>'
-    +(F?'<div class="hb-f" hidden><p class="hb-s">'+F+'</p><button type="button" class="gbtn" data-h="copy">Скопіювати посилання</button></div>':'')+'<div class="hb-b hb-last">'+BF+'</div></div>';
+    +(F?'<div class="hb-f" hidden><p class="hb-s"></p><button type="button" class="gbtn" data-h="copy">Скопіювати посилання</button></div>':'')+'<div class="hb-b hb-last">'+BF+'</div></div>';
   if(hBox.getAnimations)hBox.getAnimations().forEach(function(x){x.cancel()});
   hBox.style.cssText="";hBox.hidden=false;hBox.style.visibility="hidden";var W=Math.min(370,innerWidth-32);hBox.style.width=W+"px";var H=hBox.offsetHeight;
   hBox.style.left=Math.round((innerWidth-W)/2)+"px";hBox.style.top=Math.round(Math.max(70,(innerHeight-H)/2-20))+"px";hBox.style.visibility="";
@@ -141,7 +150,7 @@ function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kin
   if(hBox.animate&&!(FRM&&FRM.matches))hBox.animate([{opacity:0,transform:"translateY(16px) scale(.96)"},{opacity:1,transform:"none"}],{duration:520,easing:"cubic-bezier(.32,.72,0,1)"});
   hBind()}
 function hBind(){hBox.querySelectorAll("[data-h]").forEach(function(b){b.onclick=function(){var k=b.dataset.h;
-    if(k==="copy"){copyLink();return}if(k==="open"){openWatch();return}hClose();
+    if(k==="copy"){copyLink();return}if(k==="open"){openWatch(b.dataset.b);return}hClose();
     if(k==="reload")location.reload();else if(k==="retry")setStart("geo");else if(k==="from")setTimeout(function(){pop("from")},200)}})}
 /* людина пішла в Параметри дозволяти геопозицію й повернулася (20.11.2026): одразу пробуємо ще раз — вдалося, віконце зникне само;
    ні — віконце стає коротким: «Повернулися? Оновіть сторінку» */
