@@ -1,5 +1,15 @@
 /* ---------- стан ---------- */
 var Q=new URLSearchParams(location.search);
+/* ---------- правки з редактора (/redaktor, 21.11.2026) ----------
+   data/edits.js: window.ARIADNA_EDITS={d:{"16":{fl:3,vis:{…},note:"…",hide:true}},add:[…],ann:{text,until}}.
+   Лише змінені поля; null — прибрати поле. ?preview=1 — чернетка з редактора (localStorage) замість опублікованого */
+var EDITS=(function(){var e=window.ARIADNA_EDITS||null;if(Q.get("preview")==="1"){try{var dr=localStorage.getItem("ariadna-draft");if(dr)e=JSON.parse(dr)}catch(_){}}return e})();
+(function(E){if(!E)return;var F=["t","full","short","sub","k","fl","ent","d","tel","vis","note","hide","kw"];
+  function put(d,o){F.forEach(function(f){if(!Object.prototype.hasOwnProperty.call(o,f))return;if(o[f]===null||o[f]==="")delete d[f];else d[f]=o[f]});
+    if(d.ent&&!ENT[d.ent])delete d.ent}
+  if(E.d)D.forEach(function(d){var o=E.d[d.id];if(o)put(d,o)});
+  (E.add||[]).forEach(function(a){if(!a||!a.id||D.some(function(d){return d.id===a.id}))return;var d={id:String(a.id)};if(!/^\d+$/.test(d.id))d.q=1;put(d,a);if(d.ent||d.door)D.push(d)});
+  for(var i=D.length-1;i>=0;i--)if(D[i].hide)D.splice(i,1)})(EDITS);
 /* «Звідки» не запам’ятовується (19.11.2026): щоразу — від того місця, де ви є. Поки місце невідоме, ви далеко чи точність погана,
    нитку не малюємо: ні зупинку, ні в’їзд для авто сторінка сама не обирає — без винятків (20.11.2026, Андрій). «Вести» відкриває «Звідки».
    Далеко від лікарні (> 650 м) теж: спершу «Звідки», а вже від обраної зупинки чи в’їзду — «Як дістатися» (Google Карти).
@@ -67,9 +77,9 @@ function showFar(){clearTimeout(farT);var m=geoFar();if(!m||resRow.hidden){docum
   farBox.style.left=Math.round((innerWidth-W)/2)+"px";farBox.style.top=Math.round(top)+"px";farBox.style.visibility="";
   farOpen=true;farScr.hidden=false;document.body.classList.add("far-on");
   if(farBox.animate&&!(FRM&&FRM.matches))farBox.animate([{opacity:0,transform:"translateY(16px) scale(.96)"},{opacity:1,transform:"none"}],{duration:560,easing:"cubic-bezier(.32,.72,0,1)"});
-  farBox.querySelector(".fb-go").onclick=function(){setTimeout(foldFar,250)};
+  farBox.querySelector(".fb-go").onclick=function(){cnt("google-daleko");setTimeout(foldFar,250)};
   /* телефон каже «далеко», а людина вже тут (стара чи приблизна геопозиція) — віконце геть, показує на карті */
-  farBox.querySelector(".fb-here").onclick=function(){farOpen=false;farScr.hidden=true;farReset();farBox.hidden=true;farBox.innerHTML="";document.body.classList.remove("far-on");pickStart()}}
+  farBox.querySelector(".fb-here").onclick=function(){cnt("ya-vzhe-v-likarni");farOpen=false;farScr.hidden=true;farReset();farBox.hidden=true;farBox.innerHTML="";document.body.classList.remove("far-on");pickStart()}}
 /* віконце → кнопка на банері: рамка віконця пливе й стискається до розмірів кнопки, текст тане, скло набуває кольору кнопки */
 function foldFar(){if(!farOpen)return;farOpen=false;farScr.hidden=true;
   var go=document.getElementById("go"),r0=farBox.getBoundingClientRect();
@@ -97,7 +107,7 @@ function lead(){
   if(!navigator.geolocation){if(st.start&&STARTS[st.start])say("Браузер не визначає, де ви","йдіть за ниткою від зупинки «"+stopNm(STARTS[st.start])+"»");else askFrom("Браузер не визначає, де ви");return}
   if(GEO.pos&&geoFar()&&Date.now()-GEO.t<120000){showFar();return}
   st.prevStart=st.start&&st.start!=="geo"?st.start:null;
-  FOLLOW=true;CAM=true;camN=0;awake(true);st.start="geo";st.auto=false;st.carIn=null;GEO.err="";
+  FOLLOW=true;CAM=true;camN=0;cnt("vesty");awake(true);st.start="geo";st.auto=false;st.carIn=null;GEO.err="";
   var had=geoNear();if(GEO.pos&&geoFar())GEO.pos=null;geoStart();geoMode();render(false);
   if(had){followCam(true);say("Ведемо від вас","карта рухатиметься разом з вами")}
   else say("Визначаю, де ви…","дозвольте доступ до геопозиції")}
@@ -109,7 +119,7 @@ var PICK=false;
 function pickStart(){PICK=true;pop(null);if(hOpen)hClose();document.body.classList.add("picking");
   say("Торкніться карти там, де ви стоїте","поруч із яким корпусом чи брамою ви зараз — нитка поведе звідти",[{t:"Скасувати",go:pickEnd}],"",60000)}
 function pickEnd(){PICK=false;document.body.classList.remove("picking")}
-function pickAt(x,y){var s=size(),wx=vb.x+(x-s.l)/s.w*vb.w,wy=vb.y+(y-s.t)/s.h*vb.h;pickEnd();hideToast();
+function pickAt(x,y){cnt("pokazaty-na-karti");var s=size(),wx=vb.x+(x-s.l)/s.w*vb.w,wy=vb.y+(y-s.t)/s.h*vb.h;pickEnd();hideToast();
   STARTS.pin={here:1,pin:1,name:"Місце, яке ви показали",cap:"Звідки",short:"Обране місце",street:"ви показали його на карті",tr:"",at:[wx,wy],stop:[wx,wy],
     hint:"Нитка йде від місця, яке ви показали на карті."};
   setStart("pin");if(st.b<0&&!st.dept)setTimeout(function(){pop("to")},350)}
@@ -146,7 +156,7 @@ function copyLink(){var u=location.href,ok=function(){say("Посилання с
   function fb(){var t=document.createElement("textarea");t.value=u;t.setAttribute("readonly","");t.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(t);t.select();try{t.setSelectionRange(0,u.length)}catch(_){}
     var r=false;try{r=document.execCommand("copy")}catch(_){}document.body.removeChild(t);if(r)ok();else say("Скопіюйте посилання вручну",u,null,"",15000)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,fb);else fb()}
-function geoHelp(kind){kind=kind||geoKind();hShown[kind]=true;hBox.dataset.k=kind;hAway=false;var T,P,S,B="",B2="",F="";
+function geoHelp(kind){kind=kind||geoKind();cnt("geo-pidkazka-"+kind);hShown[kind]=true;hBox.dataset.k=kind;hAway=false;var T,P,S,B="",B2="",F="";
   if(kind==="app"){T="Відкрийте карту в браузері";
     P="Усередині "+(ENV.app||"застосунку")+" карта, найімовірніше, не побачить, де ви. У браузері — побачить і поведе від вас.";S="";
     /* iPhone: дві кнопки в ряд — Safari (x-safari-https://, iOS 15, 17 і новіші) і Chrome (googlechromes://). Браузера «за замовчуванням» сторінка
@@ -301,6 +311,7 @@ function geoOk(p){
     GEO.fast=GEO.fastN>=2?true:GEO.fastN<=-3?false:!!GEO.fast;if(GEO.fast!==wasF)setTimeout(geoMode,0)}
   GEO.pos=[x,y];GEO.acc=Math.round(p.coords.accuracy);GEO.t=Date.now();GEO.first=false;clearTimeout(GEO.wd);GEO.code=0;
   if(hOpen)hClose();   /* геопозиція таки працює — підказка більше не потрібна */
+  cnt(p.coords.accuracy>500?"geo-pryblyzno":"geo-ok");
   if(first&&gap>60000)LOCK=null;   /* довго не було точок (сторінка була схована) — нитку будуємо заново */
   geoFilter(x,y,GEO.acc,GEO.t);
   if(GEO.boost&&GEO.acc<=20){GEO.boost=false;clearTimeout(GEO.bt);geoMode()}   /* точка вже точна — GPS більше не тримаємо */
@@ -431,7 +442,7 @@ function pop(name,quiet){
 }
 bTo.onclick=function(){pop(cur==="to"?null:"to")};
 bFrom.onclick=function(){pop(cur==="from"?null:"from")};
-res.onclick=function(e){if(e.target.closest("#rx")){cancelAll();return}var g=e.target.closest("#go");if(g){if(g.dataset.k==="share")share();else if(g.dataset.k==="pick")pickStart();else if(g.dataset.k!=="gm")lead();return}if(e.target.closest("a"))return;pop(cur==="det"?null:"det")};
+res.onclick=function(e){if(e.target.closest("#rx")){cancelAll();return}var g=e.target.closest("#go");if(g){if(g.dataset.k==="share"){cnt("nadislaty");share()}else if(g.dataset.k==="pick")pickStart();else if(g.dataset.k!=="gm")lead();return}if(e.target.closest("a"))return;pop(cur==="det"?null:"det")};
 res.onkeydown=function(e){if((e.key==="Enter"||e.key===" ")&&!e.target.closest("a,#go,#rx")){e.preventDefault();pop(cur==="det"?null:"det")}};
 document.getElementById("scrim").onclick=function(){pop(null)};
 document.getElementById("pToX").onclick=function(){pop(null)};
@@ -456,7 +467,7 @@ SCULPT.concat(LAND).forEach(function(p,i){if(!p.near||!nearT)return;var b=docume
   b.innerHTML='<span class="ic">'+ico(ICONS[p.near.ic])+'</span><span><b>'+esc(p.near.t)+'</b><small>'+esc(p.near.sub)+'</small></span>';
   b.onclick=function(){choose("poi"+i)};nearT.appendChild(b)});
 function flT(f){return f+(typeof f==="string"&&/^\d/.test(f)?" поверхи":" поверх")}   /* 3 поверх · 1–2 поверхи · цокольний поверх */
-function choose(id){var d=dById(id);LOCK=null;st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);geoAsk();render(true);syncUrl()}
+function choose(id){var d=dById(id);cnt("kudy-"+(SLUGS[id]||"inshe"));LOCK=null;st.dept=id;dockOpen=false;st.carIn=null;st.b=d.k===null?-1:bIndex(d.k);pop(null);geoAsk();render(true);syncUrl()}
 
 /* пошук: номер, назва, корпус, скульптура */
 function norm(s){return String(s).toLowerCase().replace(/[’'`ʼ"«»№#.,()—–-]/g," ").replace(/\s+/g," ").trim()}
@@ -817,7 +828,7 @@ function drawAlert(){var g=document.getElementById("alertL");
     document.body.appendChild(alertBar);alertBar.querySelector(".ab-go").onclick=toShelter}
   if(alertBar)alertBar.hidden=!ALERT;document.body.classList.toggle("alert-on",ALERT)}
 /* найближче укриття: від вас (якщо карта знає, де ви), інакше — від того, що зараз на екрані */
-function toShelter(){var L=shelters();if(!L.length)return;var s=size(),o=GEO.pos&&geoNear()?GEO.pos:st.start&&STARTS[st.start]&&!STARTS[st.start].geo?STARTS[st.start].at:[vb.x+vb.w/2,vb.y+vb.h/2];
+function toShelter(){cnt("do-ukryttia");var L=shelters();if(!L.length)return;var s=size(),o=GEO.pos&&geoNear()?GEO.pos:st.start&&STARTS[st.start]&&!STARTS[st.start].geo?STARTS[st.start].at:[vb.x+vb.w/2,vb.y+vb.h/2];
   L.sort(function(a,b){return Math.hypot(a.at[0]-o[0],a.at[1]-o[1])-Math.hypot(b.at[0]-o[0],b.at[1]-o[1])});choose(L[0].to)}
 function setAlert(on){on=!!on;if(on===ALERT)return;ALERT=on;drawAlert()}
 function alertPoll(){if(!ALERT_URL||!window.fetch)return;fetch(ALERT_URL,{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){setAlert(j&&j.kyiv===true)},function(){})
@@ -828,6 +839,18 @@ if(Q.get("alert")==="1")setAlert(true);else alertPoll();
     +'<path class="nn" d="M12 11.5 16.6 27H7.4z"/><path class="ns" d="M12 42.5 7.4 27h9.2z"/><circle cx="12" cy="27" r="1.6" class="hub"/></svg>';document.body.appendChild(n)})();
 /* офлайн (20.11.2026): після першого відкриття з інтернетом карта відкривається й без нього — sw.js кешує сторінку, шрифти й значки */
 if("serviceWorker" in navigator&&location.protocol==="https:")addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});
+/* ---------- лічильники (21.11.2026): GoatCounter — без cookies, без персональних даних; лише «скільки разів сталося». Подія — раз за відвідування ---------- */
+var GC_CODE="ariadna-map",gcQ=[],gcSeen={};
+function cnt(name){if(gcSeen[name])return;gcSeen[name]=1;gcQ.push(name);gcFlush()}
+function gcFlush(){if(!window.goatcounter||!goatcounter.count)return;while(gcQ.length){var n=gcQ.shift();try{goatcounter.count({path:n,title:n,event:true})}catch(_){}}}
+if(location.protocol==="https:"&&!/^(localhost|127\.)/.test(location.hostname)&&Q.get("preview")!=="1"){var gs=document.createElement("script");gs.async=true;gs.src="https://gc.zgo.at/count.js";
+  gs.setAttribute("data-goatcounter","https://"+GC_CODE+".goatcounter.com/count");gs.onload=function(){setTimeout(gcFlush,300)};document.head.appendChild(gs)}
+addEventListener("error",function(){cnt("pomylka-js")});
+document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href*="google.com/maps"]');if(a)cnt("google-karty")},true);
+/* оголошення з редактора: раз за відвідування, 25 с */
+(function(){var A=EDITS&&EDITS.ann;if(!A||!A.text)return;if(A.until&&new Date()>new Date(A.until+"T23:59:59"))return;
+  setTimeout(function(){say("Оголошення",A.text,[{t:"Зрозуміло",go:hideToast}],"",25000)},1400)})();
+if(Q.get("preview")==="1")setTimeout(function(){say("Попередній перегляд","це чернетка з редактора — люди ще бачать стару версію",null,"",8000)},400);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){dockH();apply()});
 }
 </script>

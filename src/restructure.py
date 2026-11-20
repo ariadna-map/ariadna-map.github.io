@@ -1039,6 +1039,8 @@ rep('</style>','/* ---------- v30 ---------- */\n'
     '.north .nl{fill:#e5484d;font-size:8.6px;font-weight:800;text-anchor:middle;paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:2.2px}\n'
     '@media (prefers-color-scheme:dark){.north .ns{fill:rgba(220,228,232,.38);stroke:rgba(255,255,255,.25);filter:drop-shadow(0 0 3px rgba(150,185,210,.5))}.north .nl{stroke:rgba(20,24,28,.85)}}\n'
     '</style>')
+# ================= v31 (21.11.2026): правки з редактора — data/edits.js до головного скрипту =================
+rep('</head>','<script src="data/edits.js"></script>\n</head>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()

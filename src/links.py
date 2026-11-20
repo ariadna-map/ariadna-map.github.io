@@ -19,6 +19,26 @@ t = t.replace('if(typeof document==="undefined"){', 'if(typeof document==="undef
 open('/tmp/links_dump.js', 'w', encoding='utf8').write(t)
 data = json.loads(subprocess.run(['node', '/tmp/links_dump.js'], capture_output=True, text=True, check=True).stdout)
 
+# правки з редактора (data/edits.js) — щоб картки посилань показували актуальні години, поверхи й назви
+ep = os.path.join(ROOT, 'data', 'edits.js')
+if os.path.exists(ep):
+    et = open(ep, encoding='utf8').read(); i = et.find('window.ARIADNA_EDITS='); j = et.rfind(';')
+    E = json.loads(et[i + len('window.ARIADNA_EDITS='):j]) if i >= 0 else {}
+    F = ['t', 'full', 'short', 'k', 'fl', 'vis', 'hide']
+    def put(d, o):
+        for f in F:
+            if f in o:
+                if o[f] is None or o[f] == '': d[f] = None
+                else: d[f] = o[f]
+    for d in data['D']:
+        o = (E.get('d') or {}).get(d['id'])
+        if o: put(d, o)
+    for a in (E.get('add') or []):
+        if a and a.get('id') and not any(d['id'] == str(a['id']) for d in data['D']):
+            d = {'id': str(a['id']), 't': None, 'full': None, 'short': None, 'q': not str(a['id']).isdigit(), 'x': False, 'k': None, 'fl': None, 'vis': None}
+            put(d, a); data['D'].append(d)
+    data['D'] = [d for d in data['D'] if not d.get('hide')]
+
 # --- транслітерація за постановою КМУ № 55 (2010) ---
 TR = {'а':'a','б':'b','в':'v','г':'h','ґ':'g','д':'d','е':'e','є':'ie','ж':'zh','з':'z','и':'y','і':'i','ї':'i','й':'i','к':'k','л':'l','м':'m',
       'н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'kh','ц':'ts','ч':'ch','ш':'sh','щ':'shch','ь':'','ю':'iu','я':'ia'}

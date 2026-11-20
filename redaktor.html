@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#eef0ea">
+<title>Редактор карти · Ariadna</title>
+<link rel="icon" type="image/svg+xml" href="brand/ariadna-favicon.svg">
+<!-- Редактор карти для сестри-господині (21.11.2026).
+     Показує відділення з data/base.json (так, як вони є в коді карти), зберігає лише змінене в data/edits.js
+     через GitHub API (ключ доступу лежить тільки на цьому телефоні). Карта читає data/edits.js під час відкриття. -->
+<style>
+@font-face{font-family:"Fixel Text";font-weight:400;font-display:swap;src:url(fonts/FixelText-Regular.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:500;font-display:swap;src:url(fonts/FixelText-Medium.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:600;font-display:swap;src:url(fonts/FixelText-SemiBold.woff2) format("woff2")}
+@font-face{font-family:"Fixel Text";font-weight:700;font-display:swap;src:url(fonts/FixelText-Bold.woff2) format("woff2")}
+:root{--bg:#eef0ea;--ink:#16181a;--muted:#5c6166;--line:rgba(22,24,26,.1);--card:#fff;--accent:#222b31;--accent-ink:#f3efe6;--thread:#94702f;--thread-soft:rgba(148,112,47,.14);--bad:#c0392b;--ok:#2e7d4f}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Fixel Text",system-ui,-apple-system,sans-serif;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:rgba(238,240,234,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+header img{width:34px;height:34px;border-radius:9px}
+header h1{flex:1;margin:0;font-size:18px;line-height:1.2}
+header h1 small{display:block;font-size:13px;font-weight:400;color:var(--muted)}
+main{max-width:720px;margin:0 auto;padding:12px 14px}
+section{margin:14px 0}
+h2{font-size:15px;margin:22px 4px 8px;color:var(--muted);font-weight:600;text-transform:none}
+.card{background:var(--card);border-radius:18px;box-shadow:0 1px 2px rgba(20,22,24,.05),0 10px 30px -18px rgba(20,22,24,.25);padding:14px 16px}
+.note{background:var(--thread-soft);border-radius:14px;padding:10px 14px;font-size:14.5px}
+.note.bad{background:rgba(192,57,43,.1);color:#7a1f15}
+.note.ok{background:rgba(46,125,79,.12);color:#1d5235}
+label{display:block;font-size:13.5px;color:var(--muted);margin:12px 0 4px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#f7f8f5;border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px}
+textarea{min-height:76px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--thread);outline-offset:1px;background:#fff}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1;min-width:0}
+.row .to{flex:none;color:var(--muted)}
+.chk{display:flex;align-items:center;gap:10px;margin:14px 0 4px;font-size:15px;color:var(--ink)}
+.chk input{width:22px;height:22px;min-height:0;margin:0;accent-color:var(--thread)}
+button,.btn{font:inherit;font-size:15.5px;font-weight:600;border:0;border-radius:14px;min-height:46px;padding:0 16px;cursor:pointer;background:#e4e7e0;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;gap:6px}
+button.main,.btn.main{background:var(--accent);color:var(--accent-ink)}
+button.gold{background:var(--thread);color:#fff}
+button.link{background:none;color:var(--thread);padding:0 4px;min-height:36px}
+button:disabled{opacity:.5}
+details.it{background:var(--card);border-radius:16px;margin:8px 0;box-shadow:0 1px 2px rgba(20,22,24,.05)}
+details.it>summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;align-items:center;gap:12px}
+details.it>summary::-webkit-details-marker{display:none}
+.num{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px}
+.num.n{background:#e4e7e0;color:var(--ink);font-size:16px}
+.sm{flex:1;min-width:0}
+.sm b{display:block;font-size:16px;line-height:1.25}
+.sm small{display:block;color:var(--muted);font-size:13.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--thread);visibility:hidden}
+details.it.ch .dot{visibility:visible}
+details.it.hid .sm b{text-decoration:line-through;color:var(--muted)}
+.fm{padding:0 16px 16px;border-top:1px solid var(--line)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;gap:8px;align-items:center;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(238,240,234,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.bar .st{flex:1;min-width:0;font-size:13.5px;color:var(--muted);line-height:1.25}
+.bar .st b{display:block;color:var(--ink);font-size:14.5px}
+.toast{position:fixed;left:14px;right:14px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:9;max-width:560px;margin:0 auto;background:var(--accent);color:var(--accent-ink);border-radius:16px;padding:12px 16px;font-size:15px;box-shadow:0 12px 30px -10px rgba(0,0,0,.4);transition:opacity .3s,transform .3s}
+.toast[hidden]{display:block;opacity:0;transform:translateY(10px);pointer-events:none}
+ol{padding-left:20px;margin:6px 0}
+ol li{margin:4px 0}
+.muted{color:var(--muted);font-size:14px}
+#search{margin:6px 0 2px}
+</style>
+</head>
+<body>
+<header><img src="brand/ariadna-favicon.svg" alt=""><h1>Редактор карти<small>Психіатрична лікарня · Кирилівська, 103</small></h1><button type="button" id="gear" aria-label="Налаштування" style="min-height:40px;padding:0 12px">⚙︎</button></header>
+<main>
+  <div id="msg"></div>
+
+  <section id="setup" class="card" hidden>
+    <b>Налаштування цього телефона</b>
+    <label for="who">Ваше ім’я — для журналу змін</label>
+    <input id="who" autocomplete="name" placeholder="напр., Олена, сестра-господиня">
+    <label for="tok">Ключ доступу (дає адміністратор)</label>
+    <input id="tok" type="password" autocomplete="off" placeholder="github_pat_…">
+    <div class="acts"><button type="button" class="main" id="tokSave">Зберегти й перевірити</button><button type="button" id="tokDel">Вийти з цього телефона</button></div>
+    <details style="margin-top:14px"><summary class="muted">Як отримати ключ (для адміністратора)</summary>
+      <ol class="muted">
+        <li>github.com → фото профілю → <b>Settings</b> → <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
+        <li>Назва: «Редактор карти». Термін: 1 рік. <b>Resource owner</b>: ariadna-map.</li>
+        <li><b>Repository access</b> → <b>Only select repositories</b> → ariadna-map.github.io.</li>
+        <li><b>Permissions</b> → <b>Repository permissions</b> → <b>Contents</b>: <b>Read and write</b>. Більше нічого.</li>
+        <li><b>Generate token</b>, скопіювати й вставити сюди на телефоні сестри-господині. Якщо GitHub попросить схвалення організації ariadna-map — схваліть у її налаштуваннях.</li>
+        <li>Телефон загубили — відкличте ключ там само (<b>Revoke</b>).</li>
+      </ol>
+    </details>
+  </section>
+
+  <section>
+    <h2>Оголошення для всіх відвідувачів</h2>
+    <div class="card">
+      <label for="annT">Текст (з’явиться при відкритті карти; порожньо — немає оголошення)</label>
+      <textarea id="annT" placeholder="напр., Відвідування відділення 16 тимчасово скасовано"></textarea>
+      <label for="annU">Показувати до (включно)</label>
+      <input id="annU" type="date">
+    </div>
+  </section>
+
+  <section>
+    <h2>Відділення й місця</h2>
+    <input id="search" type="search" placeholder="Пошук: номер, назва, корпус">
+    <div id="list"></div>
+    <div class="acts"><button type="button" id="addBtn">＋ Додати відділення</button></div>
+    <div id="addForm" class="card" hidden style="margin-top:10px"></div>
+  </section>
+  <p class="muted" style="margin:24px 4px">Геометрію карти (корпуси, двері, доріжки) редактор не змінює — для цього зверніться до адміністратора. Усі зміни записуються в журнал і їх можна повернути.</p>
+</main>
+
+<div class="bar"><div class="st" id="st"><b>Змін немає</b>усе опубліковано</div>
+  <a class="btn" id="prev" href="/?preview=1" target="_blank" rel="noopener">Переглянути</a>
+  <button type="button" class="main" id="pub">Опублікувати</button></div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+"use strict";
+var REPO="ariadna-map/ariadna-map.github.io",FILE="data/edits.js",BR="main",K_DRAFT="ariadna-draft",K_TOK="ariadna-token",K_WHO="ariadna-who";
+var BASE=null,PUB=null,W=null,OPEN={};
+var LS={get:function(k){try{return localStorage.getItem(k)}catch(_){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(_){}},del:function(k){try{localStorage.removeItem(k)}catch(_){}}};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function same(a,b){return JSON.stringify(a===undefined?null:a)===JSON.stringify(b===undefined?null:b)}
+function empty(){return {v:1,d:{},add:[],ann:null}}
+function hm(m){return Math.floor(m/60)+":"+("0"+m%60).slice(-2)}
+function tm(m){return m==null?"":("0"+Math.floor(m/60)).slice(-2)+":"+("0"+m%60).slice(-2)}
+function mt(s){if(!s)return null;var p=s.split(":");return +p[0]*60+(+p[1]||0)}
+var tt=0;function toast(t,ms){var e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(tt);tt=setTimeout(function(){e.hidden=true},ms||4000)}
+function msg(html,cls){$("msg").innerHTML=html?'<div class="note '+(cls||"")+'">'+html+'</div>':""}
+
+function parseEdits(txt){var i=txt.indexOf("window.ARIADNA_EDITS="),j=txt.lastIndexOf(";");if(i<0)return empty();
+  try{var e=JSON.parse(txt.slice(i+21,j));e.d=e.d||{};e.add=e.add||[];return e}catch(_){return empty()}}
+function baseOf(id){for(var i=0;i<BASE.D.length;i++)if(BASE.D[i].id===id)return BASE.D[i];return null}
+function addOf(id){for(var i=0;i<W.add.length;i++)if(W.add[i].id===id)return W.add[i];return null}
+/* поточний вигляд місця: як у коді карти + правки */
+function cur(id){var b=baseOf(id);if(!b)return addOf(id);var o=clone(b),e=W.d[id]||{};Object.keys(e).forEach(function(f){if(e[f]===null)delete o[f];else o[f]=e[f]});return o}
+function title(o){return o.q||o.x?(o.t||o.id):"Відділення № "+o.id}
+function visT(v){return v&&v.o&&v.o.length?"відвідування "+v.o.map(function(x){return hm(x[0])+"–"+hm(x[1])}).join(" і "):""}
+function summ(o){return [o.k?"корпус "+o.k:"",o.fl!=null&&o.fl!==""?o.fl+" поверх":"",visT(o.vis),o.note||""].filter(Boolean).join(" · ")||"—"}
+
+/* записати поле: якщо збігається з кодом карти — правку прибираємо */
+function setF(id,f,v){var b=baseOf(id);if(!b){var a=addOf(id);if(a){if(v===null||v===""||v===undefined)delete a[f];else a[f]=v}save();return}
+  var e=W.d[id]||(W.d[id]={});if(same(v===""?null:v,b[f]===undefined?null:b[f]))delete e[f];else e[f]=(v===""||v===undefined)?null:v;
+  if(!Object.keys(e).length)delete W.d[id];save()}
+function changed(id){return !!(W.d[id]&&Object.keys(W.d[id]).length)||!!addOf(id)}
+function save(){W.updated=new Date().toISOString();LS.set(K_DRAFT,JSON.stringify(W));status()}
+function nChanges(){var n=0;Object.keys(W.d).forEach(function(id){var p=PUB.d[id]||{},w=W.d[id];Object.keys(w).forEach(function(f){if(!same(w[f],p[f]))n++});Object.keys(p).forEach(function(f){if(!(f in w))n++})});
+  Object.keys(PUB.d).forEach(function(id){if(!W.d[id])n+=Object.keys(PUB.d[id]).length});
+  if(!same(W.add,PUB.add))n+=Math.max(1,Math.abs(W.add.length-PUB.add.length));if(!same(W.ann,PUB.ann))n++;return n}
+function status(){var n=nChanges();$("st").innerHTML=n?"<b>Змін: "+n+"</b>ще не опубліковано":"<b>Змін немає</b>усе опубліковано";$("pub").disabled=!n}
+
+/* ---------- список ---------- */
+function bName(k){for(var i=0;i<BASE.B.length;i++)if(BASE.B[i].k===k)return "Корпус "+k+(BASE.B[i].n?" — "+BASE.B[i].n:"");return k?"Корпус "+k:"Без корпусу"}
+function ids(){return BASE.D.map(function(d){return d.id}).concat(W.add.map(function(a){return a.id}))}
+function list(){var q=($("search").value||"").trim().toLowerCase(),groups={},order=[];
+  ids().forEach(function(id){var o=cur(id);if(!o)return;var hay=(title(o)+" "+(o.full||"")+" "+(o.d||"")+" корпус "+(o.k||"")+" "+o.id).toLowerCase();if(q&&hay.indexOf(q)<0)return;
+    var g=o.k||"";if(!groups[g]){groups[g]=[];order.push(g)}groups[g].push(o)});
+  order.sort(function(a,b){return (a===""?1e9:parseInt(a,10)||999)-(b===""?1e9:parseInt(b,10)||999)});
+  var h="";order.forEach(function(g){h+='<h2>'+esc(bName(g))+'</h2>';groups[g].sort(function(a,b){var x=/^\d+$/.test(a.id),y=/^\d+$/.test(b.id);return x&&y?a.id-b.id:x?-1:y?1:title(a).localeCompare(title(b),"uk")});
+    groups[g].forEach(function(o){var cls="it"+(changed(o.id)?" ch":"")+(o.hide?" hid":"");
+      h+='<details class="'+cls+'" data-id="'+esc(o.id)+'"'+(OPEN[o.id]?" open":"")+'><summary><span class="num'+(o.q||o.x?" n":"")+'">'+(o.q||o.x?"•":esc(o.id))+'</span><span class="sm"><b>'+esc(title(o))+'</b><small>'+esc(summ(o))+'</small></span><span class="dot" title="змінено"></span></summary><div class="fm"></div></details>'})});
+  $("list").innerHTML=h||'<p class="muted">Нічого не знайдено.</p>';
+  $("list").querySelectorAll("details.it").forEach(function(dt){dt.addEventListener("toggle",function(){var id=dt.dataset.id;OPEN[id]=dt.open;if(dt.open)form(dt,id)});if(dt.open)form(dt,dt.dataset.id)})}
+
+function entOpts(k,sel){var h='<option value="">— як на карті —</option>';BASE.ENT.forEach(function(e){if(k&&e.k&&e.k!==k)return;h+='<option value="'+esc(e.id)+'"'+(e.id===sel?" selected":"")+'>'+esc(e.n||e.t||e.id)+'</option>'});return h}
+function bOpts(sel){var h='<option value="">—</option>';BASE.B.forEach(function(b){h+='<option value="'+esc(b.k)+'"'+(b.k===sel?" selected":"")+'>'+esc("Корпус "+b.k+(b.n?" — "+b.n:""))+'</option>'});return h}
+function form(dt,id){var o=cur(id),named=o.q||o.x,isAdd=!baseOf(id),v=o.vis||null,f=dt.querySelector(".fm");
+  var h='';
+  if(named)h+='<label>Назва</label><input data-f="t" value="'+esc(o.t)+'">';
+  if(named)h+='<label>Повна назва</label><input data-f="full" value="'+esc(o.full)+'">';
+  else h+='<label>Профіль (кого лікують)</label><input data-f="d" value="'+esc(o.d)+'" placeholder="напр., Для хворих із супутньою соматичною патологією">';
+  h+='<div class="row"><div><label>Корпус</label><select data-f="k">'+bOpts(o.k)+'</select></div><div><label>Поверх</label><input data-f="fl" inputmode="numeric" value="'+esc(o.fl)+'"></div></div>';
+  if(o.ents)h+='<p class="muted">Кілька входів — змінює адміністратор.</p>';
+  else h+='<label>Вхід</label><select data-f="ent">'+entOpts(o.k,o.ent)+'</select>';
+  h+='<label>Телефони (через кому)</label><input data-f="tel" inputmode="tel" value="'+esc((o.tel||[]).join(", "))+'">';
+  h+='<label class="chk"><input type="checkbox" data-v="on"'+(v?" checked":"")+'>Є години відвідувань</label><div data-v="box"'+(v?"":" hidden")+'>'
+    +'<label>Відвідування (перший проміжок)</label><div class="row"><input type="time" data-v="a0" value="'+tm(v&&v.o[0]&&v.o[0][0])+'"><span class="to">—</span><input type="time" data-v="b0" value="'+tm(v&&v.o[0]&&v.o[0][1])+'"></div>'
+    +'<label>Другий проміжок (якщо є)</label><div class="row"><input type="time" data-v="a1" value="'+tm(v&&v.o[1]&&v.o[1][0])+'"><span class="to">—</span><input type="time" data-v="b1" value="'+tm(v&&v.o[1]&&v.o[1][1])+'"></div>'
+    +'<label>Тиха година (якщо є)</label><div class="row"><input type="time" data-v="qa" value="'+tm(v&&v.q&&v.q[0])+'"><span class="to">—</span><input type="time" data-v="qb" value="'+tm(v&&v.q&&v.q[1])+'"></div></div>';
+  h+='<label>Примітка (видно на карті)</label><input data-f="note" value="'+esc(o.note)+'" placeholder="напр., Відвідування тимчасово скасовано">';
+  h+='<label class="chk"><input type="checkbox" data-f="hide"'+(o.hide?" checked":"")+'>Сховати з карти</label>';
+  h+='<div class="acts">'+(isAdd?'<button type="button" data-a="del">Видалити це відділення</button>':(changed(id)?'<button type="button" data-a="reset">Повернути як було</button>':''))+'</div>';
+  f.innerHTML=h;
+  f.querySelectorAll("[data-f]").forEach(function(el){el.addEventListener("change",function(){var k=el.dataset.f,val;
+    if(el.type==="checkbox")val=el.checked||null;else val=el.value.trim();
+    if(k==="fl"&&/^\d+$/.test(val))val=+val;
+    if(k==="tel")val=val?val.split(/\s*[,;\n]\s*/).filter(Boolean):null;
+    setF(id,k,val);if(k==="k"){var s=f.querySelector('[data-f="ent"]');if(s){s.innerHTML=entOpts(val,"");setF(id,"ent",baseOf(id)&&baseOf(id).k===val?baseOf(id).ent:null)}}
+    refresh(dt,id)})});
+  function vis(){var on=f.querySelector('[data-v="on"]').checked;f.querySelector('[data-v="box"]').hidden=!on;if(!on){setF(id,"vis",null);refresh(dt,id);return}
+    var g=function(n){return mt(f.querySelector('[data-v="'+n+'"]').value)},o2=[];
+    if(g("a0")!=null&&g("b0")!=null)o2.push([g("a0"),g("b0")]);if(g("a1")!=null&&g("b1")!=null)o2.push([g("a1"),g("b1")]);
+    if(!o2.length)return;var nv={o:o2};if(g("qa")!=null&&g("qb")!=null)nv.q=[g("qa"),g("qb")];setF(id,"vis",nv);refresh(dt,id)}
+  f.querySelectorAll("[data-v]").forEach(function(el){el.addEventListener("change",vis)});
+  var r=f.querySelector('[data-a="reset"]');if(r)r.onclick=function(){delete W.d[id];save();list()};
+  var dl=f.querySelector('[data-a="del"]');if(dl)dl.onclick=function(){if(!confirm("Видалити відділення № "+id+"?"))return;W.add=W.add.filter(function(a){return a.id!==id});save();list()}}
+function refresh(dt,id){var o=cur(id);dt.querySelector(".sm b").textContent=title(o);dt.querySelector(".sm small").textContent=summ(o);dt.classList.toggle("ch",changed(id));dt.classList.toggle("hid",!!o.hide)}
+
+/* ---------- нове відділення ---------- */
+$("addBtn").onclick=function(){var F=$("addForm");if(!F.hidden){F.hidden=true;return}
+  F.innerHTML='<b>Нове відділення</b><div class="row"><div><label>Номер</label><input id="nId" inputmode="numeric" placeholder="напр., 25"></div><div><label>Поверх</label><input id="nFl" inputmode="numeric"></div></div>'
+    +'<label>Корпус</label><select id="nK">'+bOpts("")+'</select><label>Вхід</label><select id="nE">'+entOpts("","")+'</select>'
+    +'<label>Профіль</label><input id="nD"><div class="acts"><button type="button" class="main" id="nOk">Додати</button><button type="button" id="nNo">Скасувати</button></div>';
+  F.hidden=false;$("nK").onchange=function(){$("nE").innerHTML=entOpts($("nK").value,"")};$("nNo").onclick=function(){F.hidden=true};
+  $("nOk").onclick=function(){var id=$("nId").value.trim();if(!/^\d+$/.test(id)){toast("Вкажіть номер відділення цифрами");return}
+    if(ids().indexOf(id)>=0){toast("Відділення № "+id+" уже є — знайдіть його в списку");return}
+    if(!$("nK").value||!$("nE").value){toast("Оберіть корпус і вхід — без них карта не прокладе маршрут");return}
+    var a={id:id,k:$("nK").value,ent:$("nE").value};if($("nFl").value.trim())a.fl=/^\d+$/.test($("nFl").value.trim())?+$("nFl").value.trim():$("nFl").value.trim();if($("nD").value.trim())a.d=$("nD").value.trim();
+    W.add.push(a);OPEN[id]=true;save();F.hidden=true;list();toast("Додано. Не забудьте «Опублікувати».")}};
+
+/* ---------- оголошення ---------- */
+function annRender(){$("annT").value=W.ann&&W.ann.text||"";$("annU").value=W.ann&&W.ann.until||""}
+function annSave(){var t=$("annT").value.trim(),u=$("annU").value;W.ann=t?{text:t,until:u||null}:null;save()}
+$("annT").addEventListener("change",annSave);$("annU").addEventListener("change",annSave);
+
+/* ---------- налаштування й ключ ---------- */
+$("gear").onclick=function(){$("setup").hidden=!$("setup").hidden;$("who").value=LS.get(K_WHO)||"";$("tok").value=""};
+function hdr(t){return {"Authorization":"Bearer "+t,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}}
+$("tokSave").onclick=function(){var t=$("tok").value.trim()||LS.get(K_TOK),w=$("who").value.trim();if(w)LS.set(K_WHO,w);if(!t){toast("Вставте ключ доступу");return}
+  fetch("https://api.github.com/repos/"+REPO+"/contents/"+FILE+"?ref="+BR,{headers:hdr(t),cache:"no-store"}).then(function(r){
+    if(r.ok){LS.set(K_TOK,t);$("setup").hidden=true;toast("Ключ працює. Можна публікувати.")}
+    else toast(r.status===401?"Ключ не підходить — перевірте, чи скопійовано повністю":r.status===403||r.status===404?"Ключ без доступу до карти — потрібно «Contents: Read and write» для ariadna-map.github.io":"GitHub відповів помилкою "+r.status,7000)},
+    function(){toast("Немає зв’язку з GitHub — спробуйте пізніше")})};
+$("tokDel").onclick=function(){LS.del(K_TOK);toast("Ключ видалено з цього телефона")};
+
+/* ---------- публікація ---------- */
+function b64(s){var u=new TextEncoder().encode(s),b="";for(var i=0;i<u.length;i++)b+=String.fromCharCode(u[i]);return btoa(b)}
+function fileText(e){return "/* Правки з редактора карти (/redaktor). Файл перезаписує редактор — руками не правити. */\nwindow.ARIADNA_EDITS="+JSON.stringify(e)+";\n"}
+function pub(retry){var t=LS.get(K_TOK);if(!t){$("setup").hidden=false;$("who").value=LS.get(K_WHO)||"";toast("Спершу вставте ключ доступу",5000);return}
+  var who=LS.get(K_WHO)||"сестра-господиня",out=clone(W);out.by=who;out.updated=new Date().toISOString();
+  var api="https://api.github.com/repos/"+REPO+"/contents/"+FILE;$("pub").disabled=true;$("pub").textContent="Публікую…";
+  fetch(api+"?ref="+BR,{headers:hdr(t),cache:"no-store"}).then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(j){
+    return fetch(api,{method:"PUT",headers:hdr(t),body:JSON.stringify({message:"Редактор карти: "+who+" — змін "+nChanges(),content:b64(fileText(out)),sha:j.sha,branch:BR})})}).then(function(r){
+    if(r.status===409&&!retry){pub(true);return}if(!r.ok)throw r.status;
+    PUB=clone(W);LS.del(K_DRAFT);$("pub").textContent="Опублікувати";status();msg("Опубліковано. Карта в людей оновиться приблизно за 1–2 хвилини.","ok");toast("Опубліковано ✓",5000)})
+  .catch(function(e){$("pub").textContent="Опублікувати";status();
+    msg(e===401?"Ключ не підходить або протермінований — відкрийте ⚙︎ і вставте новий.":e===403||e===404?"Ключ без права змінювати карту — потрібно «Contents: Read and write».":typeof e==="number"?"GitHub відповів помилкою "+e+". Чернетка збережена на цьому телефоні.":"Немає зв’язку. Чернетка збережена на цьому телефоні — опублікуйте пізніше.","bad")})}
+$("pub").onclick=function(){pub(false)};
+$("search").addEventListener("input",list);
+
+/* ---------- старт ---------- */
+Promise.all([fetch("data/base.json",{cache:"no-store"}).then(function(r){return r.json()}),fetch("data/edits.js",{cache:"no-store"}).then(function(r){return r.ok?r.text():""}).catch(function(){return ""})]).then(function(x){
+  BASE=x[0];PUB=parseEdits(x[1]||"");var dr=LS.get(K_DRAFT);W=empty();
+  try{if(dr){W=JSON.parse(dr);W.d=W.d||{};W.add=W.add||[]}else W=clone(PUB)}catch(_){W=clone(PUB)}
+  if(dr&&nChanges())msg('На цьому телефоні є неопублікована чернетка. <button type="button" class="link" id="drop">Відкинути її</button>');
+  var dp=$("drop");if(dp)dp.onclick=function(){LS.del(K_DRAFT);W=clone(PUB);msg("");annRender();list();status()};
+  annRender();list();status();if(!LS.get(K_TOK)){var n=document.createElement("div");n.className="note";n.style.marginTop="8px";n.textContent="Щоб публікувати, потрібен ключ доступу: натисніть ⚙︎ угорі.";$("msg").appendChild(n)}})
+.catch(function(){msg("Не вдалося завантажити дані карти. Перевірте зв’язок і оновіть сторінку.","bad")});
+</script>
+</body>
+</html>
