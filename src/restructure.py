@@ -1009,8 +1009,8 @@ rep('</style>','/* ---------- v28 ---------- */\n'
     '@keyframes snowf{0%{transform:translate(0,0)}50%{transform:translate(2px,20px)}100%{transform:translate(-1px,42px)}}\n'
     '@media (prefers-reduced-motion:reduce){#mastA .snow{display:none}}\n'
     '</style>')
-# ================= v29 (20.11.2026): без «Котельні»; компас; авто =================
-rep('n:"Котельня",','')   # з міркувань безпеки корпус 14 — без назви
+# ================= v29 (20.11.2026): назву корпусу 14 прибрано (безпека); компас; авто =================
+# (з 21.11.2026 корпуси господарського двору — «Господарський блок» прямо в src_v31.html)
 rep('</style>','/* ---------- v29 ---------- */\n'
     '.north{width:46px;height:46px;padding:0;border-radius:50%;justify-content:center;flex-direction:column;gap:0;opacity:1;'
     'top:calc(max(12px,env(safe-area-inset-top)) + 30px);--glass-tint:rgba(255,255,255,.12);--glass-spec:rgba(255,255,255,.08);--glass-glow:rgba(255,255,255,.1);'
@@ -1042,12 +1042,12 @@ rep('</style>','/* ---------- v30 ---------- */\n'
 # ================= v31 (21.11.2026): правки з редактора — data/edits.js до головного скрипту =================
 rep('</head>','<script src="data/edits.js"></script>\n</head>')
 # ================= v33 (21.11.2026): описи входів і місць — через орієнтири, без сторін світу; «Тут помилка» =================
-# Люди не знають, де схід. Орієнтири взято з даних карти (відстані перевірено): статуя, укриття, гараж, «Лаокоон», адміністрація, аптека,
+# Люди не знають, де схід. Орієнтири взято з даних карти (відстані перевірено): статуя, укриття, корпус 17, «Лаокоон», адміністрація, аптека,
 # приймальне, стела «Фахівцям лікарні», банкомат, Дон Кіхот, дзвіниця, статуя Ісуса Христа; маршрут від зупинок звірено з графом доріжок.
 rep('Двері — у наскрізному проході крізь північне крило корпусу','Двері — у наскрізному проході крізь крило корпусу, за кілька кроків від статуї у дворі')
-rep('Двері — у наскрізному проході крізь південне крило корпусу','Двері — у наскрізному проході крізь крило корпусу між двором з укриттям і гаражем (корпус 17)')
-rep('двері з південного боку корпусу 1','двері в корпусі 1 з боку дороги до гаража (корпус 17)')
-rep('Двері — з південного боку корпусу, з дороги.','Двері — у корпусі з боку дороги, а не з двору; гараж (корпус 17) — далі по цій дорозі.')
+rep('Двері — у наскрізному проході крізь південне крило корпусу','Двері — у наскрізному проході крізь крило корпусу між двором з укриттям і корпусом 17')
+rep('двері з південного боку корпусу 1','двері в корпусі 1 з боку дороги до корпусу 17')
+rep('Двері — з південного боку корпусу, з дороги.','Двері — у корпусі з боку дороги, а не з двору; корпус 17 — далі по цій дорозі.')
 rep('двері із західного краю корпусу 1','двері в торці корпусу 1 біля скульптури «Лаокоон і його сини»')
 rep('Двері — із західного краю корпусу.','Двері — у торці корпусу, за кілька кроків від скульптури «Лаокоон і його сини».')
 rep('двері зі східного торця корпусу 2','двері в торці корпусу 2 з боку адміністрації')
@@ -1076,12 +1076,37 @@ rep('</style>','/* ---------- v33 ---------- */\n'
     '.legend .lg-err{width:100%;margin-top:12px;min-height:42px;border-radius:13px}\n'
     '@media (prefers-color-scheme:dark){.rbox .rt{background:rgba(20,24,28,.4);border-color:rgba(255,255,255,.14)}}\n'
     '</style>')
+# ================= v34 (21.11.2026): QR-код на екрані; наближення ще на 20 %; клубок (пробний); «Знайшли помилку?» =================
+# наближення руками — ще на 20 % ближче (найменша ширина карти 73 → 61 м); автоматичне «показати місце» лишається як було (WFIT)
+rep('WMIN=73, WFIT=110,','WMIN=61, WFIT=110,')
+# бібліотеку QR телефон кешує заздалегідь — QR працює й без інтернету
+rep('<script src="data/edits.js"></script>','<link rel="prefetch" href="vendor/qrcode.min.js">\n<script src="data/edits.js"></script>')
+rep('</style>','/* ---------- v34 ---------- */\n'
+    '.shrrow{display:flex;gap:8px;width:100%}.shrrow #shr{flex:1;min-width:0}\n'
+    '.shrrow .qrb{flex:none;padding:0 14px;gap:6px}\n'
+    '.qrsheet{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(14,18,20,.55);'
+    '-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}\n'
+    '.qrsheet[hidden]{display:none}\n'
+    '.qr-in{width:min(380px,100%);background:#fff;color:#16181a;border-radius:28px;padding:24px 22px 20px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}\n'
+    '.qr-t{display:block;font-size:21px;line-height:1.2;margin-bottom:12px}\n'
+    '.qr-c svg{display:block;width:min(74vw,300px);height:auto;margin:0 auto;image-rendering:pixelated}\n'
+    '.qr-u{margin:12px 0 6px;font-size:18px;font-weight:700;line-height:1.25;word-break:break-word;letter-spacing:.01em}\n'
+    '.qr-in p{margin:0 0 16px;font-size:14.5px;line-height:1.4;color:#4a4f54}\n'
+    '.qr-in .gbtn{width:100%;min-height:48px;border-radius:15px}\n'
+    # клубок нитки
+    '.lb.pin .ball .bs{fill:rgba(255,255,255,.9);filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}\n'
+    '.lb.pin .ball .bb{fill:#c9a35a;stroke:#6e521f;stroke-width:1}\n'
+    '.lb.pin .ball .bw1{fill:none;stroke:#7a5a22;stroke-width:1.05;stroke-linecap:round;opacity:.8}\n'
+    '.lb.pin .ball .bw2{fill:none;stroke:#e9cf92;stroke-width:1;stroke-linecap:round;opacity:.9}\n'
+    '.lb.pin .ball .bh{fill:none;stroke:#fff;stroke-width:1.4;stroke-linecap:round;opacity:.7}\n'
+    '@media (prefers-color-scheme:dark){.lb.pin .ball .bs{fill:rgba(20,24,28,.85)}}\n'
+    '</style>')
 # ---------- JS: хвіст ----------
 i=s.index("/* ---------- стан ---------- */")
 s=s[:i]+open('tail.js',encoding='utf8').read()
 for a_,b_ in AFTER:
     assert a_ in s,('AFTER',a_[:60]);s=s.replace(a_,b_)
 assert 'ПСИХІАТРІЯ' not in s,'офіційна назва лікарні ще лишилась'
-h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==16,nth;s=s[:h0]+css_+s[h1:]
+h0=s.index('<style>');h1=s.index('</style>',h0);css_,nth=theme_css(s[h0:h1]);assert nth==17,nth;s=s[:h0]+css_+s[h1:]
 open('src.html','w',encoding='utf8').write(s)
 print('ok',len(s))

@@ -117,6 +117,15 @@ input[type=radio]{width:22px;height:22px;min-height:0;margin:0;accent-color:var(
     </div>
   </section>
 
+  <section id="cfgSec" hidden>
+    <h2>Налаштування карти (адміністратор)</h2>
+    <div class="card">
+      <label for="cfgMail">Пошта для повідомлень «Знайшли помилку?»</label>
+      <input id="cfgMail" type="email" inputmode="email" autocomplete="off" placeholder="адреса, куди відвідувачі надсилають помилки">
+      <p class="muted" style="margin:8px 0 0">Адреса буде видна в коді сторінки. Порожньо — повідомлення лише рахуються в лічильнику, без листів.</p>
+    </div>
+  </section>
+
   <section>
     <h2>Відділення й місця</h2>
     <input id="search" type="search" placeholder="Пошук: номер, назва, корпус">
@@ -148,7 +157,7 @@ function $(id){return document.getElementById(id)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function same(a,b){return JSON.stringify(a===undefined?null:a)===JSON.stringify(b===undefined?null:b)}
-function empty(){return {v:1,d:{},add:[],ann:null}}
+function empty(){return {v:1,d:{},add:[],ann:null,cfg:null}}
 function hm(m){return Math.floor(m/60)+":"+("0"+m%60).slice(-2)}
 function tm(m){return m==null?"":("0"+Math.floor(m/60)).slice(-2)+":"+("0"+m%60).slice(-2)}
 function mt(s){if(!s)return null;var p=s.split(":");return +p[0]*60+(+p[1]||0)}
@@ -173,7 +182,7 @@ function changed(id){return !!(W.d[id]&&Object.keys(W.d[id]).length)||!!addOf(id
 function save(){W.updated=new Date().toISOString();LS.set(K_DRAFT,JSON.stringify(W));status()}
 function nChanges(){var n=0;Object.keys(W.d).forEach(function(id){var p=PUB.d[id]||{},w=W.d[id];Object.keys(w).forEach(function(f){if(!same(w[f],p[f]))n++});Object.keys(p).forEach(function(f){if(!(f in w))n++})});
   Object.keys(PUB.d).forEach(function(id){if(!W.d[id])n+=Object.keys(PUB.d[id]).length});
-  if(!same(W.add,PUB.add))n+=Math.max(1,Math.abs(W.add.length-PUB.add.length));if(!same(W.ann,PUB.ann))n++;return n}
+  if(!same(W.add,PUB.add))n+=Math.max(1,Math.abs(W.add.length-PUB.add.length));if(!same(W.ann,PUB.ann))n++;if(!same(W.cfg||null,PUB.cfg||null))n++;return n}
 function status(){if(!PUB)return;var n=nChanges(),adm=role()==="admin",sent=!adm&&typeof PEND!=="undefined"&&PEND&&PEND.status==="waiting"&&same(core(W),PEND.edits);
   $("pub").textContent=adm?"Опублікувати":"На схвалення";
   $("st").innerHTML=!n?"<b>Змін немає</b>усе на карті":sent?"<b>Надіслано</b>чекає схвалення":"<b>Змін: "+n+"</b>"+(adm?"ще не опубліковано":"ще не надіслано");
@@ -238,6 +247,9 @@ $("addBtn").onclick=function(){var F=$("addForm");if(!F.hidden){F.hidden=true;re
     var a={id:id,k:$("nK").value,ent:$("nE").value};if($("nFl").value.trim())a.fl=/^\d+$/.test($("nFl").value.trim())?+$("nFl").value.trim():$("nFl").value.trim();if($("nD").value.trim())a.d=$("nD").value.trim();
     W.add.push(a);OPEN[id]=true;save();F.hidden=true;list();toast("Додано. Не забудьте «Опублікувати».")}};
 
+/* ---------- налаштування карти (лише адміністратор) ---------- */
+function cfgRender(){$("cfgSec").hidden=role()!=="admin";$("cfgMail").value=W&&W.cfg&&W.cfg.mail||""}
+$("cfgMail").addEventListener("change",function(){var v=$("cfgMail").value.trim();if(v&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){toast("Схоже, адреса неповна — перевірте");return}W.cfg=v?{mail:v}:null;save()});
 /* ---------- оголошення ---------- */
 function annRender(){$("annT").value=W.ann&&W.ann.text||"";$("annU").value=W.ann&&W.ann.until||""}
 function annSave(){var t=$("annT").value.trim(),u=$("annU").value;W.ann=t?{text:t,until:u||null}:null;save()}
@@ -246,9 +258,9 @@ $("annT").addEventListener("change",annSave);$("annU").addEventListener("change"
 /* ---------- налаштування, роль і ключ ---------- */
 var K_ROLE="ariadna-role",K_PREVP="ariadna-preview-pending",PEND=null;
 function role(){return LS.get(K_ROLE)==="admin"?"admin":"editor"}
-function core(e){return e?{d:e.d||{},add:e.add||[],ann:e.ann||null}:null}
+function core(e){return e?{d:e.d||{},add:e.add||[],ann:e.ann||null,cfg:e.cfg||null}:null}
 $("gear").onclick=function(){$("setup").hidden=!$("setup").hidden;$("who").value=LS.get(K_WHO)||"";$("tok").value="";$(role()==="admin"?"roleA":"roleE").checked=true};
-["roleE","roleA"].forEach(function(id){$(id).onchange=function(){LS.set(K_ROLE,$(id).value);status();pendRender()}});
+["roleE","roleA"].forEach(function(id){$(id).onchange=function(){LS.set(K_ROLE,$(id).value);status();pendRender();cfgRender()}});
 function hdr(t){return {"Authorization":"Bearer "+t,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}}
 $("tokSave").onclick=function(){var t=$("tok").value.trim()||LS.get(K_TOK),w=$("who").value.trim();if(w)LS.set(K_WHO,w);if(!t){toast("Вставте ключ доступу");return}
   fetch("https://api.github.com/repos/"+REPO+"/contents/"+FILE+"?ref="+BR,{headers:hdr(t),cache:"no-store"}).then(function(r){
@@ -285,6 +297,7 @@ function diff(A,B){var all={},out=[];BASE.D.forEach(function(d){all[d.id]=1});[A
     if(!a&&b){out.push({t:"Нове: "+title(b),l:[["",null,summ(b)]]});return}if(a&&!b){out.push({t:"Прибрано: "+title(a),l:[]});return}
     var l=[];Object.keys(LBL).forEach(function(f){var va=f==="hide"?!!a[f]:a[f],vb=f==="hide"?!!b[f]:b[f];if(!same(va,vb))l.push([LBL[f],fmt(f,va),fmt(f,vb)])});
     if(l.length)out.push({t:title(b),l:l})});
+  var cx=A&&A.cfg&&A.cfg.mail||"",cy=B&&B.cfg&&B.cfg.mail||"";if(cx!==cy)out.push({t:"Пошта для повідомлень про помилки",l:[["",cx||"—",cy||"—"]]});
   var x=A&&A.ann,y=B&&B.ann;if(!same(x,y))out.push({t:"Оголошення",l:[["",x&&x.text?x.text+(x.until?" (до "+x.until+")":""):"—",y&&y.text?y.text+(y.until?" (до "+y.until+")":""):"—"]]});
   return out}
 function diffHtml(L){return '<ul class="chg">'+L.map(function(c){return '<li><b>'+esc(c.t)+'</b>'+c.l.map(function(r){return (r[0]?esc(r[0])+": ":"")+(r[1]!=null?'<span class="was">'+esc(r[1])+'</span> → ':"")+'<span class="now">'+esc(r[2])+'</span>'}).join("<br>")+'</li>'}).join("")+'</ul>'}
@@ -345,7 +358,7 @@ Promise.all([fetch("data/base.json",{cache:"no-store"}).then(function(r){return 
   if(dr&&!nChanges()){LS.del(K_DRAFT)}
   else if(dr)msg('На цьому телефоні є чернетка, якої ще немає на карті. <button type="button" class="link" id="drop">Відкинути її</button>');
   var dp=$("drop");if(dp)dp.onclick=function(){LS.del(K_DRAFT);W=clone(PUB);msg("");annRender();list();status()};
-  annRender();list();status();loadPend();
+  annRender();cfgRender();list();status();loadPend();
   if(!LS.get(K_TOK)){var n=document.createElement("div");n.className="note";n.style.marginTop="8px";n.textContent="Щоб надсилати чи публікувати зміни, потрібен ключ доступу: натисніть ⚙︎ угорі.";$("msg").appendChild(n)}})
 .catch(function(){msg("Не вдалося завантажити дані карти. Перевірте зв’язок і оновіть сторінку.","bad")});
 </script>
